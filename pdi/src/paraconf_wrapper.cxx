@@ -175,38 +175,49 @@ bool to_bool(PC_tree_t tree, bool dflt)
 
 bool is_list(PC_tree_t tree)
 {
+	if (PC_status(tree)) return false;
 	return tree.node->type == YAML_SEQUENCE_NODE;
 }
 
 bool is_map(PC_tree_t tree)
 {
+	if (PC_status(tree)) return false;
 	return tree.node->type == YAML_MAPPING_NODE;
 }
 
 bool is_scalar(PC_tree_t tree)
 {
+	if (PC_status(tree)) return false;
 	return tree.node->type == YAML_SCALAR_NODE;
+}
+
+bool is_seq(PC_tree_t tree)
+{
+	if (PC_status(tree)) return false;
+	return tree.node->type == YAML_SEQUENCE_NODE;
+}
+
+bool exists(PC_tree_t tree)
+{
+	return PC_status(tree) == PC_OK;
 }
 
 void each(PC_tree_t tree, std::function<void(PC_tree_t)> operation)
 {
+	if (!is_seq(tree)) {
+		throw Config_error{tree, "Expected a sequence"};
+	}
 	int nb_elem = len(tree);
 	for (int elem_id = 0; elem_id < nb_elem; ++elem_id) {
 		operation(PC_get(tree, "[%d]", elem_id));
 	}
 }
 
-void opt_each(PC_tree_t tree, std::function<void(PC_tree_t)> operation)
-{
-	if (!PC_status(PC_get(tree, "[0]"))) {
-		each(tree, operation);
-	} else {
-		operation(tree);
-	}
-}
-
 void each(PC_tree_t tree, std::function<void(PC_tree_t, PC_tree_t)> operation)
 {
+	if (!is_map(tree)) {
+		throw Config_error{tree, "Expected a mapping"};
+	}
 	int nb_elem = len(tree);
 	for (int elem_id = 0; elem_id < nb_elem; ++elem_id) {
 		operation(PC_get(tree, "{%d}", elem_id), PC_get(tree, "<%d>", elem_id));
@@ -216,11 +227,11 @@ void each(PC_tree_t tree, std::function<void(PC_tree_t, PC_tree_t)> operation)
 void each_in_omap(PC_tree_t tree, std::function<void(PC_tree_t, PC_tree_t)> operation)
 {
 	int nb_elem = len(tree);
-	if (!is_list(tree)) {
+	if (!is_seq(tree)) {
 		if (is_scalar(tree)) {
 			throw Spectree_error{tree, "Expected an ordered mapping, found a scalar"};
 		} else if (is_map(tree)) {
-			throw Spectree_error{tree, "Expected an ordered mapping, found a (unordered) mapping"};
+			throw Spectree_error{tree, "Expected an ordered mapping, found an (unordered) mapping"};
 		} else {
 			throw Spectree_error{tree, "Expected an ordered mapping, invalid element found"};
 		}
@@ -234,6 +245,44 @@ void each_in_omap(PC_tree_t tree, std::function<void(PC_tree_t, PC_tree_t)> oper
 		}
 		operation(PC_get(elem, "{0}"), PC_get(elem, "<0>"));
 	}
+}
+
+void one_or_each(PC_tree_t tree, std::function<void(PC_tree_t)> operation)
+{
+	if (is_seq(tree)) {
+		each(tree, operation);
+	} else {
+		operation(tree);
+	}
+}
+
+void opt_each(PC_tree_t tree, std::function<void(PC_tree_t)> operation)
+{
+	// use the non-deprecated name
+	opt_one_or_each(tree, std::move(operation));
+}
+
+void opt_each(PC_tree_t tree, std::function<void(PC_tree_t, PC_tree_t)> operation)
+{
+	opt_one(tree, [&](PC_tree_t tree) { each(tree, std::move(operation)); });
+}
+
+void opt_each_in_seq(PC_tree_t tree, std::function<void(PC_tree_t)> operation)
+{
+	opt_one(tree, [&](PC_tree_t tree) { each(tree, std::move(operation)); });
+}
+
+void opt_one(PC_tree_t tree, std::function<void(PC_tree_t)> operation)
+{
+	if (PC_status(tree)) {
+		return;
+	}
+	operation(tree);
+}
+
+void opt_one_or_each(PC_tree_t tree, std::function<void(PC_tree_t)> operation)
+{
+	opt_one(tree, [&](PC_tree_t tree) { one_or_each(tree, std::move(operation)); });
 }
 
 } // namespace PDI
