@@ -30,7 +30,7 @@ namespace decl_netcdf {
 
 using PDI::Context;
 
-Dnc_io::Dnc_io(Context& ctx, PC_tree_t config)
+Dnc_io::Dnc_io(PDI::Logger&, Context& ctx, PC_tree_t config)
 	: m_ctx{ctx}
 {
 	PC_tree_t variable_node = PC_get(config, ".variable");
