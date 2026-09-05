@@ -18,6 +18,8 @@ and this project adheres to
   as requested [#731](https://github.com/pdidev/pdi/issues/731)
 * Split the example of HDF5 between serial and parallel versions, 
   to match NetCDF [#822](https://github.com/pdidev/pdi/issues/822)
+* Renamed the "How to create a plugin" documentation page from
+  `How_to_create_plugin` to `How_to_create_a_plugin`
 
 #### Deprecated
 * The `INSTALL_CMAKEDIR` CMake variable, which sets where the PDI CMake package
@@ -56,6 +58,10 @@ and this project adheres to
   [#753](https://github.com/pdidev/pdi/issues/753)
 * Fix a test of PDI_expression which which could not fail.
   [#753](https://github.com/pdidev/pdi/issues/753)
+* Fixed the code, the specification trees and the expected outputs in many
+  places of the documentation, they are now built and run by the test suite
+  that the CI executes, so that they can no longer go stale. This fixes
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
@@ -111,6 +117,10 @@ and this project adheres to
 * Removed an invalid Windows-specific choice of the console log output, which
   could not compile: spdlog now picks the console output for the platform,
   fixing [#816](https://github.com/pdidev/pdi/issues/816)
+* Fixed the plugin creation tutorial, whose examples did not compile against
+  the current plugin API. It is now built by the test suite that the CI
+  executes, so that it can no longer go stale. This fixes
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

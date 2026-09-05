@@ -142,7 +142,9 @@ public:
 	 *
 	 * \return function that removes callback
 	 */
+	// [on_data]
 	virtual std::function<void()> on_data(const std::function<void(const std::string&, Ref)>& callback, const std::string& name = {}) = 0;
+	// [on_data]
 
 	/** Adds new data remove callback to context
 	 *
