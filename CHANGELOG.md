@@ -16,6 +16,8 @@ and this project adheres to
 #### Changed
 * Split the example of HDF5 between serial and parallel versions, 
   to match NetCDF [#822](https://github.com/pdidev/pdi/issues/822)
+* Renamed the "How to create a plugin" documentation page from
+  `How_to_create_plugin` to `How_to_create_a_plugin`
 
 #### Deprecated
 
@@ -34,6 +36,10 @@ and this project adheres to
 * The example project asks for the Fortran component of Paraconf when it is
   built with Fortran support, as per
   [#784](https://github.com/pdidev/pdi/issues/784).
+* Fixed the code, the specification trees and the expected outputs in many
+  places of the documentation, they are now built and run by the test suite
+  that the CI executes, so that they can no longer go stale. This fixes
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
@@ -66,6 +72,10 @@ and this project adheres to
   [#733](https://github.com/pdidev/pdi/issues/733)
 
 #### Fixed
+* Fixed the plugin creation tutorial, whose examples did not compile against
+  the current plugin API. It is now built by the test suite that the CI
+  executes, so that it can no longer go stale. This fixes
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
