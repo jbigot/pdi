@@ -22,6 +22,8 @@ and this project adheres to
 * The `DISABLE_PDI` CMake option of the example project, which builds it against
   the mock PDI, is renamed `PDI_EXAMPLE_USE_MOCK_PDI`, as per
   [#785](https://github.com/pdidev/pdi/issues/785).
+* The README and the source installation guide describe the distribution as a
+  single CMake project, and document the `PDI_SUPERBUILD` option.
 
 #### Deprecated
 * The `INSTALL_CMAKEDIR` CMake variable, which sets where the PDI CMake package
