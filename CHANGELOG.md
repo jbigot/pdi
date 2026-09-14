@@ -24,6 +24,10 @@ and this project adheres to
 * The `DISABLE_PDI` CMake option of the example project, which builds it against
   the mock PDI, is renamed `PDI_EXAMPLE_USE_MOCK_PDI`, as per
   [#785](https://github.com/pdidev/pdi/issues/785).
+* The superbuild no longer sets `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` while
+  it builds and tests the distribution: the dependencies it builds are found
+  through RPATH entries, which the installation removes, as per
+  [#796](https://github.com/pdidev/pdi/issues/796).
 * The README and the source installation guide describe the distribution as a
   single CMake project, and document the `PDI_SUPERBUILD` option.
 
