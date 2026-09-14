@@ -57,6 +57,8 @@ and this project adheres to
 * The combination tests are built as part of the distribution's CMake project.
 * The distribution builds the API tests project as a subdirectory of its own
   CMake project.
+* With the superbuild, the target that rebuilds PDI is named `PDI` instead of
+  `PDI_pkg`.
 
 #### Deprecated
 
