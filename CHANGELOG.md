@@ -121,6 +121,8 @@ and this project adheres to
 * The combination tests are built as part of the distribution's CMake project.
 * The distribution builds the API tests project as a subdirectory of its own
   CMake project.
+* `bin/build_and_run_all_tests` no longer forces the system spdlog on Debian and
+  Ubuntu, as per [#796](https://github.com/pdidev/pdi/issues/796).
 * Renamed `PDI::TimerEventHandler` to `PDI::Timer_event_handler` to follow the
   class naming convention, part of
   [#755](https://github.com/pdidev/pdi/issues/755)
