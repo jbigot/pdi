@@ -34,6 +34,8 @@ and this project adheres to
 * The example project asks for the Fortran component of Paraconf when it is
   built with Fortran support, as per
   [#784](https://github.com/pdidev/pdi/issues/784).
+* The Spack environment of `spack.yaml` provides nlohmann-json, which the JSON
+  plugin requires, as per [#779](https://github.com/pdidev/pdi/issues/779).
 
 #### Security
 
