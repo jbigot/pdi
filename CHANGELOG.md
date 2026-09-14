@@ -50,6 +50,8 @@ and this project adheres to
   against the installation instead, as per
   [#787](https://github.com/pdidev/pdi/issues/787).
 * The combination tests are built as part of the distribution's CMake project.
+* The distribution builds the API tests project as a subdirectory of its own
+  CMake project.
 
 #### Deprecated
 
