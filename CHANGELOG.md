@@ -41,6 +41,9 @@ and this project adheres to
 * `find_package(PDI QUIET COMPONENTS Fortran)` no longer prints the deprecation
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
+* The distribution no longer forces `CMAKE_MODULE_PATH` into the cache, where it
+  grew by the same directories at every configuration, as per
+  [#793](https://github.com/pdidev/pdi/issues/793).
 
 #### Security
 
