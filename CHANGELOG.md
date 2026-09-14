@@ -49,6 +49,7 @@ and this project adheres to
   `bin/build_and_run_all_tests` builds and runs the example and the API tests
   against the installation instead, as per
   [#787](https://github.com/pdidev/pdi/issues/787).
+* The combination tests are built as part of the distribution's CMake project.
 
 #### Deprecated
 
