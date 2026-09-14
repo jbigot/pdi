@@ -16,6 +16,8 @@ and this project adheres to
   dependencies that are already available, instead of the whole distribution.
 * An `INSTALL_PYTHON3_SITEARCHDIR` CMake variable sets where the PDI Python
   module is installed, as per [#792](https://github.com/pdidev/pdi/issues/792).
+* PDI now supports being embedded into another CMake project with
+  `add_subdirectory`, as per [#776](https://github.com/pdidev/pdi/issues/776).
 
 #### Changed
 * Replaced the multiple independent CMake projects by a single large project,
