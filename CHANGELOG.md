@@ -18,6 +18,9 @@ and this project adheres to
   to match NetCDF [#822](https://github.com/pdidev/pdi/issues/822)
 
 #### Deprecated
+* The `WITHOUT_PDI` and `WITHOUT_PARACONF` macros defined by the mock PDI are
+  deprecated in favour of `PDI_IS_MOCK` and `PDI_WITHOUT_PARACONF`, as per
+  [#780](https://github.com/pdidev/pdi/issues/780).
 
 #### Removed
 
