@@ -36,6 +36,6 @@ install(TARGETS pdi_timer_plugin
 )
 
 # Tests
-if("${BUILD_TESTING}")
+if("${PDI_BUILD_TESTING}")
 	add_subdirectory(tests/)
 endif()
