@@ -14,6 +14,9 @@ and this project adheres to
 #### Added
 * A `PDI_SUPERBUILD` CMake option can be set to `OFF` to build PDI only, against
   dependencies that are already available, instead of the whole distribution.
+* A `PDI_BUILD_PDI_CORE` CMake option can be set to `OFF` to skip building the
+  PDI core library, and build the plugins against an installed PDI instead, as
+  per [#799](https://github.com/pdidev/pdi/issues/799).
 * PDI now supports being embedded into another CMake project with
   `add_subdirectory`, as per [#776](https://github.com/pdidev/pdi/issues/776).
 * An `INSTALL_PYTHON3_SITEARCHDIR` CMake variable sets where the PDI Python
@@ -50,6 +53,8 @@ and this project adheres to
   `PDI_SUPERBUILD` set to `OFF` to use dependencies that are already available.
 * The plugins can no longer be built as independent projects against an
   installed PDI.
+  Instead, one should set `PDI_BUILD_PDI_CORE` to `OFF` and select the plugins
+  to build with `PDI_BUILD_*_PLUGIN`.
 * The `BUILD_SHARED_LIBS` CMake option is no longer read: the PDI libraries are
   always shared, where setting it to `OFF` used to stop the configuration, as
   per [#789](https://github.com/pdidev/pdi/issues/789).
