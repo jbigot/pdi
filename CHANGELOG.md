@@ -99,6 +99,9 @@ and this project adheres to
 #### Added
 
 #### Changed
+* The `PDI_DIST_PROFILE=Devel` profile now builds in direct mode by default and
+  expects all dependencies to already be present, as per
+  [#800](https://github.com/pdidev/pdi/issues/800).
 * With the superbuild, the target that rebuilds PDI is named `PDI` instead of
   `PDI_pkg`.
 * The API tests project chooses how it gets PDI with `API_TESTS_PDI`, `FIND` or
