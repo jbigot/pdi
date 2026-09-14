@@ -16,6 +16,9 @@ and this project adheres to
   dependencies that are already available, instead of the whole distribution.
 
 #### Changed
+* Replaced the multiple independent CMake projects by a single large project,
+  where the superbuild mode only builds the vendored dependencies separately
+  now, as per [#777](https://github.com/pdidev/pdi/issues/777).
 
 #### Deprecated
 
