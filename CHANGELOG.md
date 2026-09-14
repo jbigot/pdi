@@ -16,6 +16,9 @@ and this project adheres to
   dependencies that are already available, instead of the whole distribution.
 
 #### Changed
+* Replaced the multiple independent CMake projects by a single large project,
+  where the superbuild mode only builds the vendored dependencies separately
+  now, as per [#777](https://github.com/pdidev/pdi/issues/777).
 * The `DISABLE_PDI` CMake option of the example project, which builds it against
   the mock PDI, is renamed `PDI_EXAMPLE_USE_MOCK_PDI`, as per
   [#785](https://github.com/pdidev/pdi/issues/785).
