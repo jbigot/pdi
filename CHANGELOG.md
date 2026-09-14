@@ -38,6 +38,10 @@ and this project adheres to
 #### Added
 
 #### Changed
+* `tests/cmake_tests` only checks the installed CMake package now, and
+  `bin/build_and_run_all_tests` builds and runs the example and the API tests
+  against the installation instead, as per
+  [#787](https://github.com/pdidev/pdi/issues/787).
 
 #### Deprecated
 
