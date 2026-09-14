@@ -29,6 +29,8 @@ and this project adheres to
 * `find_package(PDI QUIET COMPONENTS Fortran)` no longer prints the deprecation
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
+* The Spack environment of `spack.yaml` provides nlohmann-json, which the JSON
+  plugin requires, as per [#779](https://github.com/pdidev/pdi/issues/779).
 
 #### Security
 
