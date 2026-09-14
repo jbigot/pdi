@@ -63,6 +63,8 @@ and this project adheres to
   CMake project.
 * With the superbuild, the target that rebuilds PDI is named `PDI` instead of
   `PDI_pkg`.
+* `bin/build_and_run_all_tests` no longer forces the system spdlog on Debian and
+  Ubuntu, as per [#796](https://github.com/pdidev/pdi/issues/796).
 
 #### Deprecated
 
