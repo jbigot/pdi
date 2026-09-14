@@ -86,6 +86,9 @@ and this project adheres to
 * Tests run a command in a fresh temporary directory through the `runtest_dir`
   target, `$<TARGET_FILE:runtest_dir>`, instead of a copy of `runtest-dir` in
   each test directory, as per [#794](https://github.com/pdidev/pdi/issues/794).
+* The `PDI_DIST_PROFILE=Devel` profile now builds in direct mode by default and
+  expects all dependencies to already be present, as per
+  [#800](https://github.com/pdidev/pdi/issues/800).
 
 #### Deprecated
 
