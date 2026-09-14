@@ -14,6 +14,9 @@ and this project adheres to
 #### Added
 * A `PDI_SUPERBUILD` CMake option can be set to `OFF` to build PDI only, against
   dependencies that are already available, instead of the whole distribution.
+* A `PDI_BUILD_PDI_CORE` CMake option can be set to `OFF` to skip building the
+  PDI core library, and build the plugins against an installed PDI instead, as
+  per [#799](https://github.com/pdidev/pdi/issues/799).
 * An `INSTALL_PYTHON3_SITEARCHDIR` CMake variable sets where the PDI Python
   module is installed, as per [#792](https://github.com/pdidev/pdi/issues/792).
 * PDI now supports being embedded into another CMake project with
@@ -43,6 +46,8 @@ and this project adheres to
   `PDI_SUPERBUILD` set to `OFF` to use dependencies that are already available.
 * The plugins can no longer be built as independent projects against an
   installed PDI.
+  Instead, one should set `PDI_BUILD_PDI_CORE` to `OFF` and select the plugins
+  to build with `PDI_BUILD_*_PLUGIN`.
 
 #### Fixed
 * The source installation guide lists Doxygen, says that the distribution provides
