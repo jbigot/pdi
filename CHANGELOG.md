@@ -71,6 +71,9 @@ and this project adheres to
 * A parallel NetCDF found through its own CMake configuration is no longer taken
   for a sequential one when no prefix path points at its headers, as per
   [#771](https://github.com/pdidev/pdi/issues/771).
+* The source installation guide lists Doxygen, which the documentation requires,
+  and says that the distribution provides pybind11, part of
+  [#774](https://github.com/pdidev/pdi/issues/774).
 
 #### Security
 * PDI builds again against paraconf 1.2.0 with `-Werror=format-security`, and
