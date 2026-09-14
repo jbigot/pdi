@@ -12,6 +12,8 @@ and this project adheres to
 ### For users
 
 #### Added
+* A `PDI_SUPERBUILD` CMake option can be set to `OFF` to build PDI only, against
+  dependencies that are already available, instead of the whole distribution.
 
 #### Changed
 * Split the example of HDF5 between serial and parallel versions, 
@@ -24,6 +26,9 @@ and this project adheres to
   [#788](https://github.com/pdidev/pdi/issues/788).
 
 #### Removed
+* The PDI core can no longer be configured on its own from the `pdi/` directory:
+  configure the distribution from its root directory instead, with
+  `PDI_SUPERBUILD` set to `OFF` to use dependencies that are already available.
 * The `BUILD_SHARED_LIBS` CMake option is no longer read: the PDI libraries are
   always shared, where setting it to `OFF` used to stop the configuration, as
   per [#789](https://github.com/pdidev/pdi/issues/789).
