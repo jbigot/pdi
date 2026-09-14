@@ -21,6 +21,10 @@ and this project adheres to
   now, as per [#777](https://github.com/pdidev/pdi/issues/777).
 * The README and the source installation guide describe the distribution as a
   single CMake project, and document the `PDI_SUPERBUILD` option.
+* The superbuild no longer sets `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` while
+  it builds and tests the distribution: the dependencies it builds are found
+  through RPATH entries, which the installation removes, as per
+  [#796](https://github.com/pdidev/pdi/issues/796).
 
 #### Deprecated
 
