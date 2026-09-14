@@ -85,6 +85,8 @@ and this project adheres to
   `add_data_callback`, `add_data_remove_callback`, `add_event_callback` and
   `add_empty_desc_access_callback`, as per
   [#720](https://github.com/pdidev/pdi/issues/720)
+* The in-tree `pdirun` that the tests use no longer sets `LD_LIBRARY_PATH`, and
+  no longer prints every command it runs.
 * Renamed `PDI::TimerEventHandler` to `PDI::Timer_event_handler` to follow the
   class naming convention, part of
   [#755](https://github.com/pdidev/pdi/issues/755)
