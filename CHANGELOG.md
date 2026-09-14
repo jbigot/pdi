@@ -23,6 +23,11 @@ and this project adheres to
 * Replaced the multiple independent CMake projects by a single large project,
   where the superbuild mode only builds the vendored dependencies separately
   now, as per [#777](https://github.com/pdidev/pdi/issues/777).
+* Every PDI CMake build option (except for installation paths) is now named with
+  a `PDI_` prefix, `BUILD_FORTRAN` becomes `PDI_BUILD_FORTRAN`, `DIST_PROFILE`
+  becomes `PDI_DIST_PROFILE` and `USE_HDF5` becomes `PDI_USE_HDF5`, and the
+  unprefixed names keep working when PDI is built on its own for compatibility,
+  as per [#797](https://github.com/pdidev/pdi/issues/797).
 * The `DISABLE_PDI` CMake option of the example project, which builds it against
   the mock PDI, is renamed `PDI_EXAMPLE_USE_MOCK_PDI`, as per
   [#785](https://github.com/pdidev/pdi/issues/785).
@@ -67,10 +72,13 @@ and this project adheres to
 * The distribution no longer forces `CMAKE_MODULE_PATH` into the cache, where it
   grew by the same directories at every configuration, as per
   [#793](https://github.com/pdidev/pdi/issues/793).
+* The source installation guide gives the right default of the option that
+  builds the tests: `OFF`, or `ON` with the `Devel` profile, part of
+  [#774](https://github.com/pdidev/pdi/issues/774).
 * The configuration no longer suggests setting `USE_MPI` and `USE_Threads`,
   which have no effect, fixing [#791](https://github.com/pdidev/pdi/issues/791).
 * The build type the distribution profile selects is now actually applied:
-  `DIST_PROFILE=User` builds `Release` and `Devel` builds `Debug`, as per
+  `PDI_DIST_PROFILE=User` builds `Release` and `Devel` builds `Debug`, as per
   [#773](https://github.com/pdidev/pdi/issues/773).
 * A parallel NetCDF found through its own CMake configuration is no longer taken
   for a sequential one when no prefix path points at its headers, as per
