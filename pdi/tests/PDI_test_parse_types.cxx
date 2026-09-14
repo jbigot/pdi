@@ -325,7 +325,7 @@ vector<param_pair> scalar_types{
 	{"{type: byte, kind: 0}", Scalar_datatype::make(Scalar_kind::UNKNOWN, 1)},
 
 
-#ifdef BUILD_FORTRAN
+#ifdef PDI_BUILD_FORTRAN
 	{"character", Scalar_datatype::make(Scalar_kind::UNSIGNED, PDI_CHARACTER_DEFAULT_KIND)},
 	{"type: character", Scalar_datatype::make(Scalar_kind::UNSIGNED, PDI_CHARACTER_DEFAULT_KIND)},
 	{"{type: character, kind: 0}", Scalar_datatype::make(Scalar_kind::UNSIGNED, PDI_CHARACTER_DEFAULT_KIND)},
@@ -342,7 +342,7 @@ vector<param_pair> scalar_types{
 	{"type: real", Scalar_datatype::make(Scalar_kind::FLOAT, PDI_REAL_DEFAULT_KIND)},
 	{"{type: real, kind: 0}", Scalar_datatype::make(Scalar_kind::FLOAT, PDI_REAL_DEFAULT_KIND)},
 	{"{type: real, kind: 256}", Scalar_datatype::make(Scalar_kind::FLOAT, 256)},
-#endif // BUILD_FORTRAN
+#endif // PDI_BUILD_FORTRAN
 };
 
 vector<param_pair> array_types{

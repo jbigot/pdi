@@ -21,6 +21,11 @@ and this project adheres to
 * Replaced the multiple independent CMake projects by a single large project,
   where the superbuild mode only builds the vendored dependencies separately
   now, as per [#777](https://github.com/pdidev/pdi/issues/777).
+* Every PDI CMake build option (except for installation paths) is now named with
+  a `PDI_` prefix, `BUILD_FORTRAN` becomes `PDI_BUILD_FORTRAN`, `DIST_PROFILE`
+  becomes `PDI_DIST_PROFILE` and `USE_HDF5` becomes `PDI_USE_HDF5`, and the
+  unprefixed names keep working when PDI is built on its own for compatibility,
+  as per [#797](https://github.com/pdidev/pdi/issues/797).
 * The README and the source installation guide describe the distribution as a
   single CMake project, and document the `PDI_SUPERBUILD` option.
 * The superbuild no longer sets `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` while
@@ -50,6 +55,9 @@ and this project adheres to
 * The distribution no longer forces `CMAKE_MODULE_PATH` into the cache, where it
   grew by the same directories at every configuration, as per
   [#793](https://github.com/pdidev/pdi/issues/793).
+* The source installation guide gives the right default of the option that
+  builds the tests: `OFF`, or `ON` with the `Devel` profile, part of
+  [#774](https://github.com/pdidev/pdi/issues/774).
 
 #### Security
 
