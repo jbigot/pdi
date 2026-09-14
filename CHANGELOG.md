@@ -19,6 +19,8 @@ and this project adheres to
 * Replaced the multiple independent CMake projects by a single large project,
   where the superbuild mode only builds the vendored dependencies separately
   now, as per [#777](https://github.com/pdidev/pdi/issues/777).
+* The README and the source installation guide describe the distribution as a
+  single CMake project, and document the `PDI_SUPERBUILD` option.
 
 #### Deprecated
 
