@@ -1,5 +1,6 @@
 #=============================================================================
 # Copyright (C) 2025-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+# Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
 #
 # All rights reserved.
 #
@@ -27,13 +28,32 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #=============================================================================
 
+# Part of the multiple_find cmake_test, a sub-directory that looks for all C Fortran & python components of PDI
+
 cmake_minimum_required(VERSION 3.22...4.2)
 
 set(COMPONENTS)
+
 if("${BUILD_FORTRAN}")
 	list(APPEND COMPONENTS f90)
 endif()
+
 if("${BUILD_PYTHON}")
 	list(APPEND COMPONENTS python pysupport)
 endif()
+
 find_package(PDI REQUIRED C plugins ${COMPONENTS})
+
+assert("${PDI_FOUND}")
+assert(TARGET PDI::PDI_C)
+assert(TARGET PDI::PDI_plugins)
+
+if("${BUILD_FORTRAN}")
+	assert(TARGET PDI::PDI_f90)
+endif()
+
+if("${BUILD_PYTHON}")
+	assert(TARGET PDI::PDI_python)
+	assert(TARGET PDI::PDI_f90)
+	list(APPEND COMPONENTS python pysupport)
+endif()
