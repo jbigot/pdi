@@ -27,6 +27,9 @@ and this project adheres to
   [#758](https://github.com/pdidev/pdi/issues/758).
 * Improved the error message if one test in Decl'NetCDF fails
   [#739](https://github.com/pdidev/pdi/issues/739)
+* The source installation guide lists Doxygen, which the documentation requires,
+  and says that the distribution provides pybind11, part of
+  [#774](https://github.com/pdidev/pdi/issues/774).
 
 #### Security
 
