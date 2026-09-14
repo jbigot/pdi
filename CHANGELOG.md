@@ -29,6 +29,9 @@ and this project adheres to
   files are installed, is renamed `INSTALL_PDICMAKEDIR`; the old name still
   works but prints a deprecation warning, as per
   [#788](https://github.com/pdidev/pdi/issues/788).
+* The `WITHOUT_PDI` and `WITHOUT_PARACONF` macros defined by the mock PDI are
+  deprecated in favour of `PDI_IS_MOCK` and `PDI_WITHOUT_PARACONF`, as per
+  [#780](https://github.com/pdidev/pdi/issues/780).
 
 #### Removed
 * The `BUILD_SHARED_LIBS` CMake option is no longer read: the PDI libraries are
