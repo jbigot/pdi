@@ -56,6 +56,9 @@ and this project adheres to
 * The example project asks for the Fortran component of Paraconf when it is
   built with Fortran support, as per
   [#784](https://github.com/pdidev/pdi/issues/784).
+* The distribution no longer forces `CMAKE_MODULE_PATH` into the cache, where it
+  grew by the same directories at every configuration, as per
+  [#793](https://github.com/pdidev/pdi/issues/793).
 * The configuration no longer suggests setting `USE_MPI` and `USE_Threads`,
   which have no effect, fixing [#791](https://github.com/pdidev/pdi/issues/791).
 * The build type the distribution profile selects is now actually applied:
