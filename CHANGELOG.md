@@ -12,12 +12,17 @@ and this project adheres to
 ### For users
 
 #### Added
+* A `PDI_SUPERBUILD` CMake option can be set to `OFF` to build PDI only, against
+  dependencies that are already available, instead of the whole distribution.
 
 #### Changed
 
 #### Deprecated
 
 #### Removed
+* The PDI core can no longer be configured on its own from the `pdi/` directory:
+  configure the distribution from its root directory instead, with
+  `PDI_SUPERBUILD` set to `OFF` to use dependencies that are already available.
 
 #### Fixed
 * The source installation guide lists Doxygen, says that the distribution provides
