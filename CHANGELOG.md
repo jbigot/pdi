@@ -65,6 +65,8 @@ and this project adheres to
   whatever it is, and an expression that ends with a lone `\` is now reported
   as an error instead of crashing, fixing
   [#846](https://github.com/pdidev/pdi/issues/846)
+* The Spack environment of `spack.yaml` provides nlohmann-json, which the JSON
+  plugin requires, as per [#779](https://github.com/pdidev/pdi/issues/779).
 
 #### Security
 
