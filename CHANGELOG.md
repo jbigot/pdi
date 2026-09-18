@@ -112,6 +112,8 @@ and this project adheres to
 * The source installation guide lists Doxygen, which the documentation requires,
   and says that the distribution provides pybind11, part of
   [#774](https://github.com/pdidev/pdi/issues/774).
+* The Spack environment of `spack.yaml` provides nlohmann-json, which the JSON
+  plugin requires, as per [#779](https://github.com/pdidev/pdi/issues/779).
 
 #### Security
 
