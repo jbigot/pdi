@@ -78,6 +78,8 @@ and this project adheres to
   whatever it is, and an expression that ends with a lone `\` is now reported
   as an error instead of crashing, fixing
   [#846](https://github.com/pdidev/pdi/issues/846)
+* The source installation guide says that the `Devel` profile selects the
+  `Debug` build type, part of [#774](https://github.com/pdidev/pdi/issues/774).
 * A parallel NetCDF found through its own CMake configuration is no longer taken
   for a sequential one when no prefix path points at its headers, as per
   [#771](https://github.com/pdidev/pdi/issues/771).
