@@ -62,6 +62,9 @@ and this project adheres to
 #### Added
 
 #### Changed
+* The API tests project chooses how it gets PDI with `API_TESTS_PDI`, `FIND` or
+  `MOCK`, instead of the `DISABLE_PDI` option, as per
+  [#786](https://github.com/pdidev/pdi/issues/786).
 * `tests/cmake_tests` only checks the installed CMake package now, and
   `bin/build_and_run_all_tests` builds and runs the example and the API tests
   against the installation instead, as per
