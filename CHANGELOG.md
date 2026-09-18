@@ -14,6 +14,8 @@ and this project adheres to
 #### Added
 * A `PDI_SUPERBUILD` CMake option can be set to `OFF` to build PDI only, against
   dependencies that are already available, instead of the whole distribution.
+* An `INSTALL_PYTHON3_SITEARCHDIR` CMake variable sets where the PDI Python
+  module is installed, as per [#792](https://github.com/pdidev/pdi/issues/792).
 
 #### Changed
 * Improved error message in type check in Decl'NetCDF when reading scalar variable from file
@@ -70,6 +72,9 @@ and this project adheres to
 * The example project asks for the Fortran component of Paraconf when it is
   built with Fortran support, as per
   [#784](https://github.com/pdidev/pdi/issues/784).
+* The distribution no longer forces `CMAKE_MODULE_PATH` into the cache, where it
+  grew by the same directories at every configuration, as per
+  [#793](https://github.com/pdidev/pdi/issues/793).
 * The build type the distribution profile selects is now actually applied:
   `DIST_PROFILE=User` builds `Release` and `Devel` builds `Debug`, as per
   [#773](https://github.com/pdidev/pdi/issues/773).
