@@ -23,8 +23,8 @@ and this project adheres to
 * The PDI core can no longer be configured on its own from the `pdi/` directory:
   configure the distribution from its root directory instead, with
   `PDI_SUPERBUILD` set to `OFF` to use dependencies that are already available.
-* The plugins other than Timer can no longer be built as independent projects
-  against an installed PDI.
+* The plugins can no longer be built as independent projects against an
+  installed PDI.
 
 #### Fixed
 * The source installation guide lists Doxygen, says that the distribution provides
