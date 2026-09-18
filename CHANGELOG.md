@@ -117,6 +117,8 @@ and this project adheres to
 * Tests run a command in a fresh temporary directory through the `runtest_dir`
   target, `$<TARGET_FILE:runtest_dir>`, instead of a copy of `runtest-dir` in
   each test directory, as per [#794](https://github.com/pdidev/pdi/issues/794).
+* `bin/build_and_run_all_tests` no longer forces the system spdlog on Debian and
+  Ubuntu, as per [#796](https://github.com/pdidev/pdi/issues/796).
 * Merged `Callbacks` into `Global_context` and renamed the callback functions,
   as per [#720](https://github.com/pdidev/pdi/issues/720)
 * Renamed `PDI::TimerEventHandler` to `PDI::Timer_event_handler` to follow the
