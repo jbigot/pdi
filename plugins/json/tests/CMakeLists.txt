@@ -54,7 +54,7 @@ function(build_test_compare TEST_NAME)
              COMMAND ${CMAKE_COMMAND} -DTEST_NAME=${TEST_NAME}
                                       -DEXPECTED_OUTPUT_PATH=${EXPECTED_OUTPUT_PATH}
                                       -DACTUAL_OUTPUT_PATH=${ACTUAL_OUTPUT_PATH}
-                                      -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/compare_content.cmake)
+                                      -P "${PROJECT_SOURCE_DIR}/cmake/compare_content.cmake")
 endfunction()
 
 
