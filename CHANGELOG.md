@@ -157,6 +157,8 @@ and this project adheres to
   This is part of [#721](https://github.com/pdidev/pdi/issues/721)
 * `<pdi/plugin.h>` no longer declares anything at global scope. Fixes
   [#756](https://github.com/pdidev/pdi/issues/756)
+* `bin/build_and_run_all_tests` no longer forces the system spdlog on Debian and
+  Ubuntu, as per [#796](https://github.com/pdidev/pdi/issues/796).
 
 #### Deprecated
 * `PDI::TimerEventHandler` and the `PLUGIN_API_VERSION`,
