@@ -39,6 +39,9 @@ and this project adheres to
   [#796](https://github.com/pdidev/pdi/issues/796).
 
 #### Deprecated
+* The `WITHOUT_PDI` and `WITHOUT_PARACONF` macros defined by the mock PDI are
+  deprecated in favour of `PDI_IS_MOCK` and `PDI_WITHOUT_PARACONF`, as per
+  [#780](https://github.com/pdidev/pdi/issues/780).
 
 #### Removed
 * The PDI core can no longer be configured on its own from the `pdi/` directory:
