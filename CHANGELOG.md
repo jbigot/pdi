@@ -14,6 +14,8 @@ and this project adheres to
 #### Added
 * A `PDI_SUPERBUILD` CMake option can be set to `OFF` to build PDI only, against
   dependencies that are already available, instead of the whole distribution.
+* An `INSTALL_PYTHON3_SITEARCHDIR` CMake variable sets where the PDI Python
+  module is installed, as per [#792](https://github.com/pdidev/pdi/issues/792).
 
 #### Changed
 * Replaced the multiple independent CMake projects by a single large project,
@@ -63,6 +65,9 @@ and this project adheres to
   [#784](https://github.com/pdidev/pdi/issues/784).
 * The source installation guide says that the `Devel` profile selects the
   `Debug` build type, part of [#774](https://github.com/pdidev/pdi/issues/774).
+* The distribution no longer forces `CMAKE_MODULE_PATH` into the cache, where it
+  grew by the same directories at every configuration, as per
+  [#793](https://github.com/pdidev/pdi/issues/793).
 
 #### Security
 
