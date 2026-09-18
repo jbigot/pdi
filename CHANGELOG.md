@@ -89,6 +89,8 @@ and this project adheres to
 * The `PDI_DIST_PROFILE=Devel` profile now builds in direct mode by default and
   expects all dependencies to already be present, as per
   [#800](https://github.com/pdidev/pdi/issues/800).
+* `bin/build_and_run_all_tests` no longer forces the system spdlog on Debian and
+  Ubuntu, as per [#796](https://github.com/pdidev/pdi/issues/796).
 
 #### Deprecated
 
