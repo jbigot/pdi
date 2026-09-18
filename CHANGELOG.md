@@ -49,6 +49,9 @@ and this project adheres to
 * The build type the distribution profile selects is now actually applied:
   `DIST_PROFILE=User` builds `Release` and `Devel` builds `Debug`, as per
   [#773](https://github.com/pdidev/pdi/issues/773).
+* The example project asks for the Fortran component of Paraconf when it is
+  built with Fortran support, as per
+  [#784](https://github.com/pdidev/pdi/issues/784).
 
 #### Security
 
