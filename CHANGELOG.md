@@ -126,6 +126,9 @@ and this project adheres to
 * The combination tests are built as part of the distribution's CMake project.
 * The distribution builds the API tests project as a subdirectory of its own
   CMake project.
+* Tests run a command in a fresh temporary directory through the `runtest_dir`
+  target, `$<TARGET_FILE:runtest_dir>`, instead of a copy of `runtest-dir` in
+  each test directory, as per [#794](https://github.com/pdidev/pdi/issues/794).
 * Renamed `PDI::TimerEventHandler` to `PDI::Timer_event_handler` to follow the
   class naming convention, part of
   [#755](https://github.com/pdidev/pdi/issues/755)
