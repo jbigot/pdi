@@ -162,6 +162,8 @@ and this project adheres to
   [#756](https://github.com/pdidev/pdi/issues/756)
 * `bin/build_and_run_all_tests` no longer forces the system spdlog on Debian and
   Ubuntu, as per [#796](https://github.com/pdidev/pdi/issues/796).
+* The in-tree `pdirun` that the tests use no longer sets `LD_LIBRARY_PATH`, and
+  no longer prints every command it runs.
 
 #### Deprecated
 * `PDI::TimerEventHandler` and the `PLUGIN_API_VERSION`,
