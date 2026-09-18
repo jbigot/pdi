@@ -62,6 +62,9 @@ and this project adheres to
 * Flags passed to `bin/build_and_run_all_tests` through `CMAKE_FLAGS` take
   precedence over those the script chooses, as per
   [#782](https://github.com/pdidev/pdi/issues/782).
+* `bin/build_and_run_all_tests` configures, builds and tests every project the
+  same way, and passes `CMAKE_FLAGS` to all of them, as per
+  [#783](https://github.com/pdidev/pdi/issues/783).
 
 #### Security
 
