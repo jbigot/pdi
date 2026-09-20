@@ -56,11 +56,10 @@ protected:
 public:
 	/** Creates I/O operation (read or write) on NetCDF file
 	 *
-	 * \param logger Logger to use while creating this I/O
 	 * \param ctx Context of this I/O
 	 * \param config Configuration node of this I/O
 	 */
-	Dnc_io(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t config);
+	Dnc_io(PDI::Context& ctx, PC_tree_t config);
 
 	/** Getter for variable path
 	 *
