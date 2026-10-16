@@ -34,8 +34,14 @@ and this project adheres to
 ### For plugin developers
 
 #### Added
+* `PDI::Expression` can be built from a `std::string_view`, and from a string that is used as is, without parsing the $-expressions it holds, with
+  `PDI::Expression(PDI::RAW_STRING, str)`, as per [#829](https://github.com/pdidev/pdi/issues/829)
+* Adding two string `PDI::Expression` concatenates them, as per [#830](https://github.com/pdidev/pdi/issues/830)
+* `PDI::Expression` supports the `+=`, `-=`, `*=`, `/=` and `%=` operators, `a += b` behaving like `a = a + b`
 
 #### Changed
+* The conversion of a `PDI::Expression` to `bool` is now explicit, so that an expression can be added to, or multiplied by, a number or a C string
+  without ambiguity
 * Merged `Callbacks` into `Global_context` and renamed the callback functions,
   as per [#720](https://github.com/pdidev/pdi/issues/720)
 * Renamed `PDI::TimerEventHandler` to `PDI::Timer_event_handler` to follow the
