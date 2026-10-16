@@ -1,6 +1,7 @@
 /*******************************************************************************
  * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020-2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
+ * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +30,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -37,6 +39,13 @@
 #include <pdi/pdi_fwd.h>
 
 namespace PDI {
+
+struct Raw_string {
+	explicit constexpr Raw_string() = default;
+};
+
+/// The tag to select the Expression constructors that build a string without parsing it
+inline constexpr Raw_string RAW_STRING{};
 
 class PDI_EXPORT Expression
 {
@@ -72,6 +81,15 @@ public:
 	 *
 	 * \param[in] expr the string to parse
 	 */
+	Expression(std::string_view expr);
+
+	/** Builds (i.e. parse) an expression from a string
+	 *
+	 * The grammar of an expression is as follow:
+	 * \include docs/expression_grammar.in.txt
+	 *
+	 * \param[in] expr the string to parse
+	 */
 	Expression(const char* expr);
 
 	/** Builds (i.e. parse) an expression from a string
@@ -82,6 +100,13 @@ public:
 	 * \param[in] expr the string to parse
 	 */
 	Expression(const std::string& expr);
+
+	/** Builds an expression from a string without evaluating any $-expression in it, as if they were all escaped
+	 *
+	 * \param[in] raw a tag to select this constructor
+	 * \param[in] expr the string to use as is
+	 */
+	Expression(Raw_string raw, std::string_view expr);
 
 	/** Builds an expression that represents an integer
 	 *
@@ -121,10 +146,22 @@ public:
 
 	/** Summation operator of an expression
 	 *
+	 * When both operands are strings, i.e. neither a lone reference nor an operation, this concatenates them.
+	 * A reference to a string can be added by embedding it in a string: `"${a}${b}"`.
+	 *
 	 * \param[in] expr the expression to add
 	 * \return Expression as a result of sum
 	 */
 	Expression operator+ (const Expression& expr) const;
+
+	/** Summation assignment operator of an expression
+	 *
+	 * `a += b` behaves like `a = a + b`
+	 *
+	 * \param[in] expr the expression to add
+	 * \return *this
+	 */
+	Expression& operator+= (const Expression& expr);
 
 	/** Multiplication operator of an expression
 	 *
@@ -133,12 +170,30 @@ public:
 	 */
 	Expression operator* (const Expression& expr) const;
 
+	/** Multiplication assignment operator of an expression
+	 *
+	 * `a *= b` behaves like `a = a * b`
+	 *
+	 * \param[in] expr the expression to multiply
+	 * \return *this
+	 */
+	Expression& operator*= (const Expression& expr);
+
 	/** Subtraction operator of an expression
 	 *
 	 * \param[in] expr the expression to subtract
 	 * \return Expression as a result of subtraction
 	 */
 	Expression operator- (const Expression& expr) const;
+
+	/** Subtraction assignment operator of an expression
+	 *
+	 * `a -= b` behaves like `a = a - b`
+	 *
+	 * \param[in] expr the expression to subtract
+	 * \return *this
+	 */
+	Expression& operator-= (const Expression& expr);
 
 	/** Division operator of an expression
 	 *
@@ -147,6 +202,15 @@ public:
 	 */
 	Expression operator/ (const Expression& expr) const;
 
+	/** Division assignment operator of an expression
+	 *
+	 * `a /= b` behaves like `a = a / b`
+	 *
+	 * \param[in] expr the expression to divide
+	 * \return *this
+	 */
+	Expression& operator/= (const Expression& expr);
+
 	/** Modulo operator of an expression
 	 *
 	 * \param[in] expr the expression to use modulo
@@ -154,11 +218,20 @@ public:
 	 */
 	Expression operator% (const Expression& expr) const;
 
+	/** Modulo assignment operator of an expression
+	 *
+	 * `a %= b` behaves like `a = a % b`
+	 *
+	 * \param[in] expr the expression to use modulo
+	 * \return *this
+	 */
+	Expression& operator%= (const Expression& expr);
+
 	/** Checks whether this is an empty expression
 	 *
 	 * \return true if the expression is non-empty
 	 */
-	operator bool () const;
+	explicit operator bool () const;
 
 	/** Evaluates an expression as an integer
 	 *
