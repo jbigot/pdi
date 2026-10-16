@@ -1,6 +1,7 @@
 #=============================================================================
 # Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
 # Copyright (C) 2018 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
+# Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -64,6 +65,7 @@ add_executable(PDI_unit_tests
 		PDI_datatype_attributes.cxx
 		PDI_error.cxx
 		PDI_expression.cxx
+		PDI_expression_operators.cxx
 # 		PDI_initialize_plugins.cxx
 		PDI_member.cxx
 		PDI_pointer_datatype.cxx

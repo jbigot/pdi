@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2015-2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +46,14 @@ struct PDI_NO_EXPORT Expression::Impl::String_literal: public Expression::Impl {
 
 	/// array of subvalues
 	std::vector<Subvalue> m_values;
+
+	String_literal();
+
+	explicit String_literal(std::string start);
+
+	/** Builds the string literal that evaluates to the concatenation of the evaluations of two string literals
+	 */
+	static std::unique_ptr<String_literal> concat(const String_literal& first, const String_literal& second);
 
 	std::unique_ptr<Impl> clone() const override;
 

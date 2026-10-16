@@ -115,6 +115,10 @@ enum class Scalar_kind : uint8_t {
  */
 class Expression;
 
+/** A tag to select the Expression constructors that build a string without parsing it
+ */
+struct Raw_string;
+
 /** The base class of all errors thrown by PDI
  */
 class Error;
