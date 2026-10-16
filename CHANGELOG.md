@@ -50,8 +50,20 @@ and this project adheres to
   directory it builds in, and a `--ctest-outdir <dir>` option to choose where
   it writes the JUnit test reports, part of
   [#895](https://github.com/pdidev/pdi/issues/895).
+* `PDI::Expression` can be built from a `std::string_view`, and from a string
+  that is used as is, without parsing the $-expressions it holds, with
+  `PDI::Expression(PDI::RAW_STRING, str)`, as per
+  [#829](https://github.com/pdidev/pdi/issues/829)
+* Adding two string `PDI::Expression` concatenates them, as per
+  [#830](https://github.com/pdidev/pdi/issues/830)
+* `PDI::Expression` supports the `+=`, `-=`, `*=`, `/=` and `%=` operators,
+  `a += b` behaving like `a = a + b`, as per
+  [#857](https://github.com/pdidev/pdi/issues/857)
 
 #### Changed
+* The conversion of a `PDI::Expression` to `bool` is now explicit, so that an
+  expression can be added to, or multiplied by, a number or a C string without
+  ambiguity, as per [#857](https://github.com/pdidev/pdi/issues/857)
 
 #### Deprecated
 * The `TEST_DIR` and `CTEST_DIR` environment variables of

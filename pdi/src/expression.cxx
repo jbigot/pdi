@@ -1,6 +1,7 @@
 /*******************************************************************************
  * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
+ * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +30,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 #include "pdi/array_datatype.h"
 #include "pdi/context.h"
@@ -44,11 +46,15 @@
 #include "expression/impl/int_literal.h"
 #include "expression/impl/operation.h"
 #include "expression/impl/reference_expression.h"
+#include "expression/impl/string_literal.h"
 
 #include "pdi/expression.h"
 
 namespace PDI {
 
+using std::make_unique;
+using std::string;
+using std::string_view;
 using std::unique_ptr;
 
 Expression::Expression(std::unique_ptr<Impl> impl)
@@ -66,12 +72,20 @@ Expression::Expression(const Expression& value)
 
 Expression::Expression(Expression&& value) = default;
 
+Expression::Expression(string_view val_str)
+	: Expression{string(val_str.begin(), val_str.end()).c_str()} //TODO: switch the whole parsing API to string_view
+{}
+
 Expression::Expression(const char* val_str)
 	: m_impl{Impl::parse(val_str)}
 {}
 
 Expression::Expression(const std::string& val_str)
 	: Expression{val_str.c_str()}
+{}
+
+Expression::Expression(Raw_string, string_view val_str)
+	: m_impl(make_unique<Impl::String_literal>(string(val_str)))
 {}
 
 Expression::Expression(long value)
@@ -101,31 +115,73 @@ Expression& Expression::operator= (Expression&& value) = default;
 
 Expression Expression::operator+ (const Expression& expr) const
 {
-	return unique_ptr<Expression::Impl>{new Expression::Impl::Operation(*this, Expression::Impl::Operation::Operator::PLUS, expr)};
+	Expression result(*this);
+	result += expr;
+	return result;
+}
+
+Expression& Expression::operator+= (const Expression& expr)
+{
+	auto const * const first = dynamic_cast<const Impl::String_literal*>(m_impl.get());
+	auto const * const second = dynamic_cast<const Impl::String_literal*>(expr.m_impl.get());
+	if (first && second) {
+		m_impl = Impl::String_literal::concat(*first, *second);
+	} else {
+		m_impl = make_unique<Impl::Operation>(*this, Impl::Operation::Operator::PLUS, expr);
+	}
+	return *this;
 }
 
 Expression Expression::operator* (const Expression& expr) const
 {
-	return unique_ptr<Expression::Impl>{new Expression::Impl::Operation(*this, Expression::Impl::Operation::Operator::MULT, expr)};
-	;
+	Expression result(*this);
+	result *= expr;
+	return result;
+}
+
+Expression& Expression::operator*= (const Expression& expr)
+{
+	m_impl = make_unique<Impl::Operation>(*this, Impl::Operation::Operator::MULT, expr);
+	return *this;
 }
 
 Expression Expression::operator- (const Expression& expr) const
 {
-	return unique_ptr<Expression::Impl>{new Expression::Impl::Operation(*this, Expression::Impl::Operation::Operator::MINUS, expr)};
-	;
+	Expression result(*this);
+	result -= expr;
+	return result;
+}
+
+Expression& Expression::operator-= (const Expression& expr)
+{
+	m_impl = make_unique<Impl::Operation>(*this, Impl::Operation::Operator::MINUS, expr);
+	return *this;
 }
 
 Expression Expression::operator/ (const Expression& expr) const
 {
-	return unique_ptr<Expression::Impl>{new Expression::Impl::Operation(*this, Expression::Impl::Operation::Operator::DIV, expr)};
-	;
+	Expression result(*this);
+	result /= expr;
+	return result;
+}
+
+Expression& Expression::operator/= (const Expression& expr)
+{
+	m_impl = make_unique<Impl::Operation>(*this, Impl::Operation::Operator::DIV, expr);
+	return *this;
 }
 
 Expression Expression::operator% (const Expression& expr) const
 {
-	return unique_ptr<Expression::Impl>{new Expression::Impl::Operation(*this, Expression::Impl::Operation::Operator::MOD, expr)};
-	;
+	Expression result(*this);
+	result %= expr;
+	return result;
+}
+
+Expression& Expression::operator%= (const Expression& expr)
+{
+	m_impl = make_unique<Impl::Operation>(*this, Impl::Operation::Operator::MOD, expr);
+	return *this;
 }
 
 long Expression::to_long(Context& ctx) const
