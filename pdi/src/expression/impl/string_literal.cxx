@@ -48,9 +48,25 @@ namespace PDI {
 
 using std::dynamic_pointer_cast;
 using std::make_shared;
+using std::make_unique;
 using std::string;
 using std::unique_ptr;
 using std::unordered_set;
+
+Expression::Impl::String_literal::String_literal() = default;
+
+Expression::Impl::String_literal::String_literal(string start)
+	: m_start(start)
+{}
+
+unique_ptr<Expression::Impl::String_literal> Expression::Impl::String_literal::concat(const String_literal& first, const String_literal& second)
+{
+	auto result = make_unique<String_literal>(first);
+	string& tail = result->m_values.empty() ? result->m_start : result->m_values.back().second;
+	tail += second.m_start;
+	result->m_values.insert(result->m_values.end(), second.m_values.begin(), second.m_values.end());
+	return result;
+}
 
 unique_ptr<Expression::Impl> Expression::Impl::String_literal::clone() const
 {

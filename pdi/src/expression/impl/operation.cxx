@@ -48,134 +48,55 @@ using std::make_shared;
 using std::remove_cv_t;
 using std::unique_ptr;
 
+namespace {
+
+template <class Valtype>
+Ref wrap(Valtype val)
+{
+	return Ref(
+		new decltype(val)(val),
+		[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
+		Scalar_datatype::type_for_v<decltype(val)>,
+		true,
+		false
+	);
+}
+
+} // namespace
+
 template <class O1, class O2>
 Ref Expression::Impl::Operation::eval(O1 const computed_value, Operator const op, O2 const operand_value)
 {
 	switch (op) {
-	case PLUS: {
-		auto val = computed_value + operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case MINUS: {
-		auto val = computed_value - operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case MULT: {
-		auto val = computed_value * operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
+	case PLUS:
+		return wrap(computed_value + operand_value);
+	case MINUS:
+		return wrap(computed_value - operand_value);
+	case MULT:
+		return wrap(computed_value * operand_value);
 	case DIV: {
-		auto val = computed_value / operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
+		return wrap(computed_value / operand_value);
 	} break;
-	case MOD: {
+	case MOD:
 		if constexpr (is_integral_v<O1> && is_integral_v<O2>) {
-			auto val = computed_value % operand_value;
-			return Ref(
-				new decltype(val)(val),
-				[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-				Scalar_datatype::type_for_v<decltype(val)>,
-				true,
-				false
-			);
+			return wrap(computed_value % operand_value);
 		} else {
 			throw Type_error("Invalid operands to modulo operation");
 		}
-	} break;
-	case EQUAL: {
-		auto val = computed_value == operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case AND: {
-		auto val = computed_value && operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case OR: {
-		auto val = computed_value || operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case GT: {
-		auto val = computed_value > operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case LT: {
-		auto val = computed_value < operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case GET: {
-		auto val = computed_value >= operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
-	case LET: {
-		auto val = computed_value <= operand_value;
-		return Ref(
-			new decltype(val)(val),
-			[](void* p) { delete reinterpret_cast<decltype(val)*>(p); },
-			Scalar_datatype::type_for_v<decltype(val)>,
-			true,
-			false
-		);
-	} break;
+	case EQUAL:
+		return wrap(computed_value == operand_value);
+	case AND:
+		return wrap(computed_value && operand_value);
+	case OR:
+		return wrap(computed_value || operand_value);
+	case GT:
+		return wrap(computed_value > operand_value);
+	case LT:
+		return wrap(computed_value < operand_value);
+	case GET:
+		return wrap(computed_value >= operand_value);
+	case LET:
+		return wrap(computed_value <= operand_value);
 	}
 	throw Type_error("Unexpected type");
 }

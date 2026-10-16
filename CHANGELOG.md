@@ -74,6 +74,10 @@ and this project adheres to
 #### Added
 * Tests check that an array type accepts `order: C` and `order: c` and rejects
   any other order, as per [#758](https://github.com/pdidev/pdi/issues/758)
+* `PDI::Expression` can be built from a `std::string_view`, and from a string that is used as is, without parsing the $-expressions it holds, with
+  `PDI::Expression(PDI::RAW_STRING, str)`, as per [#829](https://github.com/pdidev/pdi/issues/829)
+* Adding two string `PDI::Expression` concatenates them, as per [#830](https://github.com/pdidev/pdi/issues/830)
+* `PDI::Expression` supports the `+=`, `-=`, `*=`, `/=` and `%=` operators, `a += b` behaving like `a = a + b`
 
 #### Changed
 * The API tests project chooses how it gets PDI with `API_TESTS_PDI`, `FIND` or
@@ -85,6 +89,8 @@ and this project adheres to
   `add_data_callback`, `add_data_remove_callback`, `add_event_callback` and
   `add_empty_desc_access_callback`, as per
   [#720](https://github.com/pdidev/pdi/issues/720)
+* The conversion of a `PDI::Expression` to `bool` is now explicit, so that an expression can be added to, or multiplied by, a number or a C string
+  without ambiguity
 * Renamed `PDI::TimerEventHandler` to `PDI::Timer_event_handler` to follow the
   class naming convention, part of
   [#755](https://github.com/pdidev/pdi/issues/755)
