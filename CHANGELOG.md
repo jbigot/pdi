@@ -133,6 +133,9 @@ and this project adheres to
 * A plugin that does not export its pretty name, now loads under its own name
   instead of crashing PDI, fixing
   [#836](https://github.com/pdidev/pdi/issues/836)
+* Flags passed to `bin/build_and_run_all_tests` through `CMAKE_FLAGS` take
+  precedence over those the script chooses, as per
+  [#782](https://github.com/pdidev/pdi/issues/782).
 
 #### Security
 
