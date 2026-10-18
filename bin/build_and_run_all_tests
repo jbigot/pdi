@@ -141,6 +141,9 @@ conf_build_and_run ./install/bin/pdirun example_installed "${SRCDIR}/example" \
 
 # The runs that use no installation
 
+printf "\n\n\n\e[1;36m *** Unit test the deprecated CMake variable names\e[m\n\n"
+cmake -S "${SRCDIR}/tests/cmake_tests/deprecated_alias" -B tests_cmake_deprecated_alias
+
 printf "\n\n\n\e[1;36m *** Run the examples with SubdirMock PDI\e[m\n\n"
 conf_build_and_run "" example_subdirmock "${SRCDIR}/example" -DPDI_EXAMPLE_USE_MOCK_PDI=ON
 
