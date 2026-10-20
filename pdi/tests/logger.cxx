@@ -65,6 +65,7 @@ using PDI::Scalar_datatype;
 using PDI::Scalar_kind;
 using PDI::Spectree_error;
 using PDI::State_error;
+using PDI::Value_error;
 using spdlog::spdlog_ex;
 using spdlog::sinks::basic_file_sink_st;
 using spdlog::sinks::ostream_sink_st;
@@ -252,6 +253,11 @@ TEST_F(LoggerTest, LevelInMapping)
 	EXPECT_EQ(written(), "shown\n");
 }
 
+TEST_F(LoggerTest, InvalidLevelThrows)
+{
+	EXPECT_THAT([&] { Pdi_logger pdi(config("{level: verbose}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`verbose'")));
+}
+
 TEST_F(LoggerTest, UnknownKeyThrows)
 {
 	EXPECT_THAT([&] { Pdi_logger pdi(config("{levle: info}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`levle'")));
@@ -302,11 +308,18 @@ INSTANTIATE_TEST_SUITE_P(
 	LoggerLevelTest,
 	Values(
 		pair{"trace", "trace\ndebug\ninfo\nwarn\nerror\ncritical\n"},
+		pair{"TRACE", "trace\ndebug\ninfo\nwarn\nerror\ncritical\n"},
 		pair{"debug", "debug\ninfo\nwarn\nerror\ncritical\n"},
 		pair{"info", "info\nwarn\nerror\ncritical\n"},
+		pair{"Info", "info\nwarn\nerror\ncritical\n"},
 		pair{"warn", "warn\nerror\ncritical\n"},
+		pair{"warning", "warn\nerror\ncritical\n"},
+		pair{"WARNING", "warn\nerror\ncritical\n"},
+		pair{"err", "error\ncritical\n"},
 		pair{"error", "error\ncritical\n"},
-		pair{"off", ""}
+		pair{"critical", "critical\n"},
+		pair{"off", ""},
+		pair{"OFF", ""}
 	)
 );
 
@@ -318,6 +331,12 @@ TEST_F(LoggerTest, DefaultLevel)
 	pdi.info("hidden");
 	pdi.warn("shown");
 	EXPECT_EQ(written(), "shown\n");
+}
+
+TEST_F(LoggerTest, InvalidDefaultLevelThrows)
+{
+	Pdi_logger pdi(no_config());
+	EXPECT_THAT([&] { pdi.default_level("verbose"); }, ThrowsMessage<Value_error>(HasSubstr("`verbose'")));
 }
 
 /*
@@ -573,6 +592,12 @@ TEST_F(LoggerTest, DefaultLevelSparesLoggersWithTheirOwnLevel)
 	EXPECT_EQ(written(), "shown\n");
 }
 
+TEST_F(LoggerTest, PluginInvalidLevelThrows)
+{
+	Pdi_logger pdi(no_config());
+	EXPECT_THAT([&] { Plugin_logger plugin(pdi, "plugin", config("{level: verbose}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`verbose'")));
+}
+
 TEST_F(LoggerTest, PluginUnknownKeyThrows)
 {
 	Pdi_logger pdi(no_config());
@@ -589,6 +614,21 @@ TEST_F(LoggerTest, PluginSequenceThrows)
 {
 	Pdi_logger pdi(no_config());
 	EXPECT_THAT([&] { Plugin_logger plugin(pdi, "plugin", config("[info]")); }, ThrowsMessage<Spectree_error>(HasSubstr("sequence")));
+}
+
+TEST_F(LoggerTest, InvalidPluginLoggerLeavesNoDanglingPointer)
+{
+	// where the plugin logger that fails lies, then a plugin logger of another infrastructure, that the first one must not reach
+	alignas(Plugin_logger) unsigned char storage[sizeof(Plugin_logger)];
+	Pdi_logger pdi(config("{pattern: '%v', outputs: {o: {kind: stream}}}"));
+	Pdi_logger other_pdi(config("{pattern: '%v', outputs: {p: {kind: stream}}}"));
+	use_streams(other_pdi, {"p"});
+	EXPECT_THROW((void)new (storage) Plugin_logger(pdi, "plugin", config("{level: verbose}")), Spectree_error);
+	Plugin_logger* other = new (storage) Plugin_logger(other_pdi, "other", no_config());
+	pdi.default_level("warn");
+	other->info("shown");
+	other->~Plugin_logger();
+	EXPECT_EQ(written("p"), "shown\n");
 }
 
 TEST_F(LoggerTest, DestroyedPluginLoggerLeavesTheInfrastructure)
