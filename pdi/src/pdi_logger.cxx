@@ -120,12 +120,12 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 	bool log_to_stdout = true; // unless outputs are configured, write to stdout
 	PC_tree_t warn_about_deprecated_output{PC_NODE_NOT_FOUND, nullptr, nullptr};
 	if (is_scalar(logging_tree)) {
-		m_default_logging_level = level_from_str(logging_tree).value_or(m_default_logging_level);
+		m_default_logging_level = level_from_str(logging_tree);
 	} else if (!PC_status(logging_tree)) {
 		each(logging_tree, [&](PC_tree_t key_tree, PC_tree_t value_tree) {
 			string key = to_string(key_tree);
 			if (key == "level") {
-				m_default_logging_level = level_from_str(value_tree).value_or(m_default_logging_level);
+				m_default_logging_level = level_from_str(value_tree);
 			} else if (key == "pattern") {
 				m_default_pattern = to_string(value_tree);
 				m_default_pattern_source = Pattern_source::UNEVALUATED_EXPLICIT;
@@ -167,7 +167,7 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 				// read the whole configuration of the output first, with its name as context for the errors
 				try {
 					PC_tree_t level_tree = PC_get(output_tree, ".level");
-					if (!PC_status(level_tree)) level = level_from_str(level_tree).value_or(level);
+					if (!PC_status(level_tree)) level = level_from_str(level_tree);
 					PC_tree_t pattern_tree = PC_get(output_tree, ".pattern");
 					if (!PC_status(pattern_tree)) pattern = to_string(pattern_tree);
 					set<string> allowed_key{"kind", "level", "pattern"};
@@ -226,8 +226,6 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 			output.sink->set_pattern(default_pattern);
 		}
 	}
-	// warn about the levels of the configuration that name no known level, now that the outputs have their pattern
-	warn_invalid_levels();
 	if (!PC_status(warn_about_deprecated_output)) {
 		warn("`logging.output' is deprecated in favor of the new `logging.outputs' (plural)");
 	}
@@ -302,8 +300,7 @@ void Pdi_logger::default_pattern(string pattern, Context& ctx)
 
 void Pdi_logger::default_level(string level_str)
 {
-	if (auto level = level_from_str(std::move(level_str))) default_level(*level);
-	warn_invalid_levels();
+	default_level(level_from_str(level_str));
 }
 
 void Pdi_logger::set_output_stream(string_view name, ostream& output)

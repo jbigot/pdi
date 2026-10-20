@@ -175,7 +175,9 @@ public:
 
 	/** Set the default logging level of the infrastructure
 	 *
-	 * \param[in] level the name of the new level: `trace`, `debug`, `info`, `warn`, `error` or `off`, any other name is ignored with a warning
+	 * \param[in] level the name of the new level, case insensitive: `trace`, `debug`, `info`, `warning`/`warn`, `error`/`err`, `critical` or `off`
+	 *
+	 * \throw Value_error if `level` names no known level
 	 *
 	 * \deprecated this will be removed in an upcoming release. The global logging infrastructure should not be modified through loggers.
 	 */

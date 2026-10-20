@@ -49,7 +49,6 @@ Plugin_logger::Plugin_logger(Pdi_logger& pdi_logger, string_view name, PC_tree_t
 	update_level(pdi_logger.m_default_logging_level);
 	// register last, so that a logger whose configuration is invalid leaves no dangling pointer in the PDI logger
 	pdi_logger.m_plugin_loggers.emplace(this);
-	warn_invalid_levels();
 }
 
 Plugin_logger::~Plugin_logger()
