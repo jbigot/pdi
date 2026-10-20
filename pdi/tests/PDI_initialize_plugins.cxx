@@ -25,7 +25,7 @@
 
 #include <gtest/gtest.h>
 
-#include "global_context.cxx"
+#include "data_store.cxx"
 #include "logger.cxx"
 
 #include "mocks/context_mock.h"
