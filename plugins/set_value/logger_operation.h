@@ -44,13 +44,11 @@ class Logger_operation: public Operation
 	/// pattern to set to the logger on execute
 	std::string m_pattern;
 
-	/// evaluate pattern on execute
-	PDI::Expression m_evaluate = 0L;
-
 public:
 	/** Creates logger operation
      * \param[in] logger a logger
      * \param[in] logger_node yaml config tree of logger operation
+     * \throw PDI::Spectree_error if the operation holds the `evaluate` key, that is no longer supported
      */
 	Logger_operation(PDI::Logger& logger, PC_tree_t logger_node);
 

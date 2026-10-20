@@ -24,19 +24,17 @@
  ******************************************************************************/
 
 #include <string>
-#include <unordered_map>
-
-#include <spdlog/spdlog.h>
 
 #include <pdi/context.h>
 #include <pdi/error.h>
 #include <pdi/expression.h>
 #include <pdi/logger.h>
-#include <pdi/ref_any.h>
 
 #include "logger_operation.h"
 
 namespace set_value {
+
+using std::string;
 
 Logger_operation::Logger_operation(PDI::Logger& logger, PC_tree_t logger_node)
 {
@@ -55,37 +53,23 @@ Logger_operation::Logger_operation(PDI::Logger& logger, PC_tree_t logger_node)
 
 	PC_tree_t evaluate_node = PC_get(logger_node, ".evaluate");
 	if (!PC_status(evaluate_node)) {
-		logger.debug("\tevaluate");
-		m_evaluate = evaluate_node;
+		throw PDI::Spectree_error(evaluate_node, "the `evaluate' key is not supported, use `pattern' instead");
 	}
 }
 
 void Logger_operation::execute(PDI::Logger& logger, PDI::Context& ctx)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	if (m_level) {
-		static const std::unordered_map<std::string, spdlog::level::level_enum> level_map
-			= {{"trace", spdlog::level::level_enum::trace},
-		       {"debug", spdlog::level::level_enum::debug},
-		       {"info", spdlog::level::level_enum::info},
-		       {"warn", spdlog::level::level_enum::warn},
-		       {"error", spdlog::level::level_enum::err},
-		       {"off", spdlog::level::level_enum::off}};
-		std::string level_str = m_level.to_string(ctx);
-		auto level_it = level_map.find(level_str);
-		if (level_it != level_map.end()) {
-			logger.warn("Changing level to {}", level_str);
-			logger.global_level(level_it->second);
-		} else {
-			logger.warn("Invalid logging level: {}. Available: 'trace', 'debug', 'info', 'warn', 'error', 'off'.", level_str);
-		}
+		string level_str = m_level.to_string(ctx);
+		logger.info("Changing default logging level to `{}'", level_str);
+		logger.default_level(std::move(level_str));
 	}
 	if (!m_pattern.empty()) {
-		logger.global_pattern(m_pattern);
-		logger.evaluate_global_pattern(ctx);
+		logger.default_pattern(m_pattern, ctx);
 	}
-	if (m_evaluate.to_long(ctx)) {
-		logger.evaluate_global_pattern(ctx);
-	}
+#pragma GCC diagnostic pop
 }
 
 } // namespace set_value

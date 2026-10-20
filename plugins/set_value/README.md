@@ -218,7 +218,6 @@ Defines settings for global PDI logger.
 |:--|:----|
 |`"level"` (*optional*)   |level to set to the logger|
 |`"pattern"` (*optional*) |pattern to set to the logger|
-|`"evaluate"` (*optional*) |if true evaluate the logger pattern|
 
 ## Full configuration example {#full_config}
 

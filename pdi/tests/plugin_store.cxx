@@ -22,68 +22,54 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-#include <memory>
 #include <string>
-#include <unordered_set>
-#include <utility>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
 #include <paraconf.h>
-#include <spdlog/logger.h>
 
-#include <pdi.h>
-#include <pdi/array_datatype.h>
-#include <pdi/context.h>
-#include <pdi/data_descriptor.h>
-#include <pdi/logger.h>
-#include <pdi/plugin.h>
-#include <pdi/scalar_datatype.h>
-#include <pdi/testing.h>
+#include "pdi/error.h"
+#include "pdi/logger.h"
+#include "pdi/paraconf_wrapper.h"
+#include "pdi/plugin.h"
+#include "pdi/testing.h"
 
-using PDI::Array_datatype;
+#include "data_store.h"
+#include "logging_test.h"
+
 using PDI::Context;
+using PDI::Data_store;
 using PDI::Logger;
-using PDI::PdiTest;
 using PDI::Plugin;
-using PDI::Scalar_datatype;
-using PDI::Scalar_kind;
+using PDI::State_error;
+using PDI::to_string;
 using std::pair;
 using std::string;
 using std::unique_ptr;
 using std::unordered_set;
+using testing::ElementsAre;
+using testing::MatchesRegex;
 
 namespace {
 
-/// The name of the data holding the loaded plugin name
-constexpr char PLUGIN_NAME_DATA[] = "LOADED_PLUGIN_NAME";
+/// The logger PDI gave the last `logger_probe' plugin it loaded
+Logger* probe_logger = nullptr;
 
-/// A plugin that reports the name of its logger in the Context
-struct prelinked_plugin: Plugin {
-	/// The name of the plugin as reported by our logger, this should match our pretty name
-	string m_name;
-
-	static const char* pretty_name() { return "prelinked_plugin"; }
-
-	prelinked_plugin(Logger& logger, Context& ctx, PC_tree_t)
+/** A plugin that records the logger PDI gives it, to check it uses the infrastructure of the PDI logger
+ *
+ * It adds the `block` of its configuration, if any, to the default pattern while it is loaded, as the MPI plugin does.
+ * It is linked in the test executable, where PDI finds it before looking for a plugin library.
+ */
+struct logger_probe_plugin: Plugin {
+	logger_probe_plugin(Logger& logger, Context& ctx, PC_tree_t config)
 		: Plugin{logger, ctx}
-		, m_name(logger.real_logger()->name())
 	{
-		// share a reference to the name with no memory destruction function
-		ctx[PLUGIN_NAME_DATA].share(
-			PDI::Ref(
-				m_name.data(),
-				[](void*) {},
-				Array_datatype::make(Scalar_datatype::make(Scalar_kind::UNSIGNED, sizeof(char)), m_name.size() + 1),
-				true,
-				false
-			),
-			true,
-			false
-		);
+		probe_logger = &logger;
+		PC_tree_t block_tree = PC_get(config, ".block");
+		if (!PC_status(block_tree)) logger.add_default_pattern_block(to_string(block_tree));
 	}
 
-	~prelinked_plugin() { context()[PLUGIN_NAME_DATA].reclaim(); }
+	static string pretty_name() { return "Logger-probe"; }
 };
 
 /// The name of the logger of the last `no_pretty_name` plugin created
@@ -94,14 +80,13 @@ struct no_pretty_name_plugin: Plugin {
 	no_pretty_name_plugin(Logger& logger, Context& ctx)
 		: Plugin{logger, ctx}
 	{
-		no_pretty_name_logger_name = logger.real_logger()->name();
+		no_pretty_name_logger_name = "no_pretty_name";
 	}
 };
 
 } // namespace
 
-/// The `prelinked` plugin, to be found by PDI in the test executable, with no plugin library to load.
-PDI_PLUGIN(prelinked)
+PDI_PLUGIN(logger_probe)
 
 /*
  * The symbols of the `no_pretty_name` plugin, written by hand, as a plugin built without PDI_PLUGIN may be, with no pretty name symbol.
@@ -130,26 +115,78 @@ extern "C" pair<unordered_set<string>, unordered_set<string>> PDI_EXPORT PDI_plu
 #pragma clang diagnostic pop
 #endif
 
-/// The tests of plugin loading
-struct PluginLoaderTest: PdiTest {};
-
-/*
- * A plugin linked into the application loads, with no plugin library to search for
+/** The unit tests of the plugin store
+ *
+ * The plugin store is internal to the PDI library, so the tests reach it through the data store that owns it.
  */
-TEST_F(PluginLoaderTest, PrelinkedPluginLoads)
-{
-	InitPdi(PC_parse_string("plugins: {prelinked: ~}"));
-	void* name = nullptr;
-	ASSERT_EQ(PDI_OK, PDI_access(PLUGIN_NAME_DATA, &name, PDI_IN));
-	EXPECT_STREQ(prelinked_plugin::pretty_name(), static_cast<const char*>(name));
-	EXPECT_EQ(PDI_OK, PDI_release(PLUGIN_NAME_DATA));
-}
+struct PluginStoreTest1: public PDI::PdiTest {};
 
 /*
  * A plugin that provides no pretty name loads, under its own name
  */
-TEST_F(PluginLoaderTest, PluginWithoutPrettyNameIsNamedAfterItself)
+TEST_F(PluginStoreTest1, PluginWithoutPrettyNameIsNamedAfterItself)
 {
 	InitPdi(PC_parse_string("plugins: {no_pretty_name: ~}"));
 	EXPECT_EQ(no_pretty_name_logger_name, "no_pretty_name");
 }
+
+/** The unit tests of the plugin store
+ *
+ * The plugin store is internal to the PDI library, so the tests reach it through the data store that owns it.
+ */
+struct PluginStoreTest: public LoggingTest {};
+
+/*
+ * The logger of each plugin uses the infrastructure of the PDI logger: its outputs, its pattern and its default level
+ */
+
+TEST_F(PluginStoreTest, PluginLoggerUsesPdiLoggerInfrastructure)
+{
+	probe_logger = nullptr;
+	Data_store store(config("{logging: {level: error, pattern: '%n|%l|%v', outputs: {o: {kind: stream}}}, plugins: {logger_probe: ~}}"));
+	ASSERT_NE(probe_logger, nullptr);
+	use_streams(store.logger());
+	probe_logger->warn("hidden");
+	probe_logger->error("shown");
+	EXPECT_EQ(written(), "Logger-probe|error|shown\n");
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+TEST_F(PluginStoreTest, PluginLoggerReachesPdiLogger)
+{
+	probe_logger = nullptr;
+	Data_store store(config("{logging: {level: error, pattern: '%n|%v', outputs: {o: {kind: stream}}}, plugins: {logger_probe: ~}}"));
+	ASSERT_NE(probe_logger, nullptr);
+	use_streams(store.logger());
+	probe_logger->default_level("info");
+	probe_logger->default_pattern("[%n] %v", store);
+	store.logger().info("pdi");
+	probe_logger->info("probe");
+	EXPECT_EQ(written(), "[PDI] pdi\n[Logger-probe] probe\n");
+}
+
+TEST_F(PluginStoreTest, PluginLoggerSharesDefaultPatternBlocks)
+{
+	probe_logger = nullptr;
+	Data_store store(config("{logging: {outputs: {o: {kind: stream}}}, plugins: {logger_probe: {block: B}}}"));
+	ASSERT_NE(probe_logger, nullptr);
+	use_streams(store.logger());
+	store.logger().info("msg");
+	probe_logger->info("msg");
+	EXPECT_THAT(
+		written_lines(),
+		ElementsAre(MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI")), MatchesRegex(default_pattern_regex(R"(\[B\])", "Logger-probe")))
+	);
+}
+
+TEST_F(PluginStoreTest, PluginLoggerBlocksAfterInitializationThrow)
+{
+	probe_logger = nullptr;
+	Data_store store(config("{logging: error, plugins: {logger_probe: ~}}"));
+	ASSERT_NE(probe_logger, nullptr);
+	EXPECT_THROW(probe_logger->add_default_pattern_block("B"), State_error);
+}
+
+#pragma GCC diagnostic pop
