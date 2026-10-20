@@ -1,5 +1,6 @@
 #=============================================================================
 # Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+# Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
 #
 # All rights reserved.
 #
@@ -131,7 +132,6 @@ configure_file(src/version.h.in pdi/version.h @ONLY)
 set(PDI_C_SRC
 		src/array_datatype.cxx
 		src/context.cxx
-		src/context_proxy.cxx
 		src/data_descriptor.cxx
 		src/data_descriptor_impl.cxx
 		src/datatype.cxx
