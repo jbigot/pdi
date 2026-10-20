@@ -257,6 +257,14 @@ TEST_F(LoggerTest, SequenceThrows)
 	EXPECT_THAT([&] { Pdi_logger pdi(config("[info]")); }, ThrowsMessage<Spectree_error>(HasSubstr("sequence")));
 }
 
+TEST_F(LoggerTest, CoreSequenceThrows)
+{
+	EXPECT_THAT(
+		[&] { Pdi_logger pdi(config("{core: [info]}")); },
+		ThrowsMessage<Spectree_error>(AllOf(HasSubstr("logger of the core"), HasSubstr("sequence")))
+	);
+}
+
 TEST_F(LoggerTest, LogAtLevel)
 {
 	Pdi_logger pdi(config("{level: warn, pattern: '%v', outputs: {o: {kind: stream}}}"));
@@ -648,6 +656,17 @@ TEST_F(LoggerTest, StreamSetAgain)
 	EXPECT_EQ(written("again"), "PDI/plugin second\n");
 }
 
+TEST_F(LoggerTest, StreamSparesLoggersThatDisableIt)
+{
+	Pdi_logger pdi(config("{pattern: '%n %v', outputs: {o: {kind: stream}, p: {kind: stream}}}"));
+	Plugin_logger plugin(pdi, "plugin", config("{disabled_outputs: [o]}"));
+	use_streams(pdi, {"o", "p"});
+	pdi.info("a");
+	plugin.info("b");
+	EXPECT_EQ(written("o"), "PDI a\n");
+	EXPECT_EQ(written("p"), "PDI a\nPDI/plugin b\n");
+}
+
 TEST_F(LoggerTest, StreamLevelAndPattern)
 {
 	Pdi_logger pdi(config("{pattern: 'D %v', outputs: {o: {kind: stream, level: warn, pattern: 'O %v'}}}"));
@@ -799,6 +818,76 @@ TEST_F(LoggerTest, PluginLoggerSharesOutputsInOrder)
 }
 
 /*
+ * The logger of the core
+ */
+
+TEST_F(LoggerTest, CoreLevel)
+{
+	Pdi_logger pdi(config("{core: {level: warn}, pattern: '%v', outputs: {o: {kind: stream}}}"));
+	use_streams(pdi);
+	Plugin_logger plugin(pdi, "plugin", no_config());
+	pdi.info("hidden");
+	plugin.info("plugin");
+	pdi.warn("pdi");
+	EXPECT_EQ(written(), "plugin\npdi\n");
+}
+
+TEST_F(LoggerTest, CoreLevelBelowDefaultLevel)
+{
+	Pdi_logger pdi(config("{level: warn, core: debug, pattern: '%v', outputs: {o: {kind: stream}}}"));
+	use_streams(pdi);
+	Plugin_logger plugin(pdi, "plugin", no_config());
+	pdi.debug("pdi");
+	plugin.info("hidden");
+	EXPECT_EQ(written(), "pdi\n");
+}
+
+TEST_F(LoggerTest, CoreLevelAsScalar)
+{
+	Pdi_logger pdi(config("{core: warn, pattern: '%v', outputs: {o: {kind: stream}}}"));
+	use_streams(pdi);
+	pdi.info("hidden");
+	pdi.warn("shown");
+	EXPECT_EQ(written(), "shown\n");
+}
+
+TEST_F(LoggerTest, CoreDisabledOutputs)
+{
+	Pdi_logger pdi(config("{pattern: '%n %v', outputs: {o: {kind: stream}, p: {kind: stream}}, core: {disabled_outputs: [o]}}"));
+	use_streams(pdi, {"o", "p"});
+	Plugin_logger plugin(pdi, "plugin", no_config());
+	pdi.info("a");
+	plugin.info("b");
+	EXPECT_EQ(written("o"), "PDI/plugin b\n");
+	EXPECT_EQ(written("p"), "PDI a\nPDI/plugin b\n");
+}
+
+TEST_F(LoggerTest, PluginDisabledOutputs)
+{
+	Pdi_logger pdi(config("{pattern: '%n %v', outputs: {o: {kind: stream}, p: {kind: stream}}}"));
+	use_streams(pdi, {"o", "p"});
+	Plugin_logger plugin(pdi, "plugin", config("{disabled_outputs: [p]}"));
+	pdi.info("a");
+	plugin.info("b");
+	EXPECT_EQ(written("o"), "PDI a\nPDI/plugin b\n");
+	EXPECT_EQ(written("p"), "PDI a\n");
+}
+
+TEST_F(LoggerTest, UnknownDisabledOutputThrows)
+{
+	EXPECT_THAT([&] { Pdi_logger pdi(config("{core: {disabled_outputs: [nope]}}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`nope'")));
+}
+
+TEST_F(LoggerTest, PluginUnknownDisabledOutputThrows)
+{
+	Pdi_logger pdi(no_config());
+	EXPECT_THAT(
+		[&] { Plugin_logger plugin(pdi, "plugin", config("{disabled_outputs: [nope]}")); },
+		ThrowsMessage<Spectree_error>(HasSubstr("`nope'"))
+	);
+}
+
+/*
  * The deprecated output
  */
 
@@ -822,6 +911,20 @@ TEST_F(LoggerTest, DeprecatedOutputWithoutFile)
 {
 	Inspectable<Pdi_logger> pdi(config("{level: error, output: {}}"));
 	EXPECT_THAT(pdi.output_kinds(), ElementsAre("stdout"));
+}
+
+TEST_F(LoggerTest, DeprecatedOutputNames)
+{
+	{
+		Inspectable<Pdi_logger> pdi(
+			config("{pattern: '%n %v', output: {file: '" + log_file("pdi.log") + "', console: on}, core: {disabled_outputs: [stdout]}}")
+		);
+		Inspectable<Plugin_logger> plugin(pdi, "plugin", config("{disabled_outputs: [file]}"));
+		EXPECT_THAT(pdi.output_kinds(), ElementsAre("file"));
+		EXPECT_THAT(plugin.output_kinds(), ElementsAre("stdout"));
+		pdi.info("a");
+	}
+	EXPECT_EQ(log_content("pdi.log"), "PDI a\n");
 }
 
 TEST_F(LoggerTest, DeprecatedOutputWithOutputsThrows)

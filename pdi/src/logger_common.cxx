@@ -31,6 +31,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include <paraconf.h>
 
@@ -38,11 +39,13 @@
 #include <spdlog/sinks/null_sink.h>
 
 #include "pdi/error.h"
+#include "pdi/fmt.h"
 #include "pdi/logger.h"
 #include "pdi/paraconf_wrapper.h"
 
 #include "logger_common.h"
 
+using fmt::join;
 using spdlog::sink_ptr;
 using spdlog::sinks::null_sink_st;
 using std::dynamic_pointer_cast;
@@ -51,6 +54,7 @@ using std::find;
 using std::string;
 using std::string_view;
 using std::unordered_map;
+using std::vector;
 
 namespace PDI {
 
@@ -73,12 +77,29 @@ void Logger_common::setup(PC_tree_t logger_tree, const unordered_map<string, Out
 					m_logger.set_level(*level);
 					m_explicitly_set_logging_level = true;
 				}
+			} else if (key == "disabled_outputs") {
+				each(value_tree, [&](PC_tree_t one_disabled_output_tree) {
+					string disabled_name = to_string(one_disabled_output_tree);
+					if (!outputs.contains(disabled_name)) {
+						vector<string_view> valid_names;
+						for (auto&& [out_name, output]: outputs) {
+							valid_names.emplace_back(out_name);
+						}
+						throw Spectree_error(
+							one_disabled_output_tree,
+							"unknown output `{}', valid outputs are: `{}'",
+							disabled_name,
+							join(valid_names, "', `")
+						);
+					}
+					m_disabled_outputs.emplace(std::move(disabled_name));
+				});
 			}
 		});
 	}
 	for (auto&& [out_name, output]: outputs) {
 		// an output of kind `stream' whose stream is not set writes nowhere: output_updated adds it once its stream is set
-		if (!dynamic_pointer_cast<null_sink_st>(output.sink)) {
+		if (!m_disabled_outputs.contains(out_name) && !dynamic_pointer_cast<null_sink_st>(output.sink)) {
 			m_logger.sinks().emplace_back(output.sink);
 		}
 	}
@@ -97,8 +118,9 @@ void Logger_common::update_level(Level default_logging_level)
 	if (!m_explicitly_set_logging_level) m_logger.set_level(default_logging_level);
 }
 
-void Logger_common::output_updated(string_view, const sink_ptr& old_output, const sink_ptr& output)
+void Logger_common::output_updated(string_view name, const sink_ptr& old_output, const sink_ptr& output)
 {
+	if (m_disabled_outputs.contains(name)) return;
 	// each output has a sink of its own, that a logger holds once at most
 	auto&& sink_it = find(m_logger.sinks().begin(), m_logger.sinks().end(), old_output);
 	if (sink_it != m_logger.sinks().end()) {
