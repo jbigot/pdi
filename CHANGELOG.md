@@ -27,6 +27,9 @@ and this project adheres to
 * An unknown key in a `logging` section is now an error instead of being
   ignored.
   Part of [#552](https://github.com/pdidev/pdi/issues/552)
+* A logging pattern ending with a lone `%` is now an error instead of being
+  ignored.
+  Part of [#813](https://github.com/pdidev/pdi/issues/813)
 
 #### Deprecated
 * The `output` key of the top-level `logging` section is deprecated in favour of
