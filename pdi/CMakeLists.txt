@@ -148,9 +148,12 @@ set(PDI_C_SRC
 		src/expression/impl/sequence.cxx
 		src/expression/impl/string_literal.cxx
 		src/logger.cxx
+		src/logger_common.cxx
 		src/paraconf_wrapper.cxx
 		src/pdi.cxx
+		src/pdi_logger.cxx
 		src/plugin.cxx
+		src/plugin_logger.cxx
 		src/plugin_store.cxx
 		src/pointer_datatype.cxx
 		src/record_datatype.cxx
