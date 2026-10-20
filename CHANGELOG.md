@@ -47,6 +47,10 @@ and this project adheres to
 * The messages of the plugins now go where the top-level `logging` section sends
   those of PDI, to the same file and in the order they are written, fixing
   [#817](https://github.com/pdidev/pdi/issues/817)
+* Any YAML spelling of false, such as `OFF`, `false` or `no`, now turns the
+  console off in the `output` of a `logging` section, as `off` does, and a
+  `console` that is not a boolean is an error, fixing
+  [#818](https://github.com/pdidev/pdi/issues/818)
 
 #### Security
 
