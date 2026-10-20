@@ -40,7 +40,7 @@ namespace PDI {
 /** A logger of the PDI logging infrastructure, that can be neither copied nor moved
  *
  * The infrastructure has a default logging level, a default pattern, and a set of named outputs (sinks in spdlog parlance).
- * Each logger has a name and a logging level, and writes to all these outputs.
+ * Each logger has a name and a logging level, and writes to a subset of these outputs.
  * Each output has a logging level, and a pattern.
  *
  * Unless set explicitly, there is a single output named `stdout`, that writes to the standard output.

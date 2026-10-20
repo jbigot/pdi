@@ -15,6 +15,9 @@ and this project adheres to
 * The top-level `logging` section can define named `outputs`, each of a `kind`,
   `file` at a `path`, `stdout` or `stderr`, with a `level` and a `pattern` of
   its own.
+  Its `core` key sets the level of the messages of PDI itself, and the outputs
+  they skip with `disabled_outputs`, which the `logging` section of a plugin
+  accepts too.
   Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Changed
