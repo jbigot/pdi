@@ -18,6 +18,10 @@ and this project adheres to
   Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Changed
+* An invalid logging level, in a `logging` section or in a Set-value `logger`
+  operation, is now an error instead of a warning; level names ignore case, and
+  `warning`, `err` and `critical` are accepted too.
+  Part of [#813](https://github.com/pdidev/pdi/issues/813)
 
 #### Deprecated
 
