@@ -134,7 +134,7 @@ protected:
 	 *                        nothing
 	 * \param[in] outputs the outputs of the infrastructure, by name
 	 *
-	 * \throw Spectree_error if the configuration is neither a level nor a mapping, or names no known output
+	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known output, or holds an unexpected key
 	 */
 	void setup(PC_tree_t logger_tree, const std::unordered_map<std::string, Output, Transparent_string_hash, std::equal_to<>>& outputs);
 
