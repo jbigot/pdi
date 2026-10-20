@@ -478,7 +478,7 @@ TEST_F(LoggerTest, BlocksThroughPluginLogger)
 	plugin.info("msg");
 	EXPECT_THAT(
 		written_lines(),
-		ElementsAre(MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI")), MatchesRegex(default_pattern_regex(R"(\[B\])", "plugin")))
+		ElementsAre(MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI")), MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI/plugin")))
 	);
 }
 
@@ -492,7 +492,7 @@ TEST_F(LoggerTest, PluginLoggerName)
 	use_streams(pdi);
 	Plugin_logger plugin(pdi, "plugin", no_config());
 	plugin.info("msg");
-	EXPECT_EQ(written(), "plugin\n");
+	EXPECT_EQ(written(), "PDI/plugin\n");
 }
 
 TEST_F(LoggerTest, PluginLoggerFollowsDefaultLevel)
@@ -604,7 +604,7 @@ TEST_F(LoggerTest, DefaultPatternThroughPluginLogger)
 	plugin.default_pattern("[%n] %v", m_ctx);
 	pdi.info("pdi");
 	plugin.info("plugin");
-	EXPECT_EQ(written(), "[PDI] pdi\n[plugin] plugin\n");
+	EXPECT_EQ(written(), "[PDI] pdi\n[PDI/plugin] plugin\n");
 }
 
 #pragma GCC diagnostic pop
@@ -633,7 +633,7 @@ TEST_F(LoggerTest, StreamReachesExistingPluginLoggers)
 	first.info("msg");
 	second.info("msg");
 	third.info("msg");
-	EXPECT_EQ(written(), "PDI msg\nfirst msg\nsecond msg\nthird msg\n");
+	EXPECT_EQ(written(), "PDI msg\nPDI/first msg\nPDI/second msg\nPDI/third msg\n");
 }
 
 TEST_F(LoggerTest, StreamSetAgain)
@@ -644,8 +644,8 @@ TEST_F(LoggerTest, StreamSetAgain)
 	plugin.info("first");
 	pdi.set_output_stream("o", m_streams["again"]);
 	plugin.info("second");
-	EXPECT_EQ(written(), "plugin first\n");
-	EXPECT_EQ(written("again"), "plugin second\n");
+	EXPECT_EQ(written(), "PDI/plugin first\n");
+	EXPECT_EQ(written("again"), "PDI/plugin second\n");
 }
 
 TEST_F(LoggerTest, StreamLevelAndPattern)
@@ -795,7 +795,7 @@ TEST_F(LoggerTest, PluginLoggerSharesOutputsInOrder)
 	pdi.info("first");
 	plugin.info("second");
 	pdi.info("third");
-	EXPECT_EQ(written(), "PDI first\nplugin second\nPDI third\n");
+	EXPECT_EQ(written(), "PDI first\nPDI/plugin second\nPDI third\n");
 }
 
 /*
