@@ -359,6 +359,19 @@ TEST_F(LoggerTest, PatternAfterOutputs)
 	EXPECT_EQ(written(), "msg\n");
 }
 
+TEST_F(LoggerTest, PatternEndingWithPercentThrows)
+{
+	EXPECT_THROW({ Pdi_logger pdi(config("{pattern: '%v %'}")); }, Value_error);
+}
+
+TEST_F(LoggerTest, PatternEscapedPercent)
+{
+	Pdi_logger pdi(config("{pattern: '%%{ %%%v', outputs: {o: {kind: stream}}}"));
+	use_streams(pdi);
+	pdi.info("msg");
+	EXPECT_EQ(written(), "%{ %msg\n");
+}
+
 TEST_F(LoggerTest, PatternColorFlags)
 {
 	Pdi_logger pdi(config("{pattern: '%^%l%$: %v', outputs: {o: {kind: stream}}}"));
@@ -407,6 +420,26 @@ TEST_F(LoggerTest, PatternStringReference)
 	EXPECT_EQ(written(), "[abc] msg\n");
 }
 
+TEST_F(LoggerTest, PatternReferenceToPercentBrace)
+{
+	m_s = "%{s}";
+	Pdi_logger pdi(config("{pattern: '[%{s}] %v', outputs: {o: {kind: stream}}}"));
+	use_streams(pdi);
+	pdi.evaluate_patterns(m_ctx);
+	pdi.info("msg");
+	EXPECT_EQ(written(), "[%{s}] msg\n");
+}
+
+TEST_F(LoggerTest, PatternReferenceToPercent)
+{
+	m_s = "50%n";
+	Pdi_logger pdi(config("{pattern: '[%{s}] %v', outputs: {o: {kind: stream}}}"));
+	use_streams(pdi);
+	pdi.evaluate_patterns(m_ctx);
+	pdi.info("msg");
+	EXPECT_EQ(written(), "[50%n] msg\n");
+}
+
 TEST_F(LoggerTest, EvaluatePatternsTwiceThrows)
 {
 	Pdi_logger pdi(config("{pattern: '[%{x}] %v'}"));
@@ -447,6 +480,13 @@ TEST_F(LoggerTest, DefaultPatternSparesOutputWithItsOwnPattern)
 	EXPECT_EQ(written("p"), "D msg\n");
 }
 
+TEST_F(LoggerTest, DefaultPatternEndingWithPercentThrows)
+{
+	Pdi_logger pdi(no_config());
+	pdi.evaluate_patterns(m_ctx);
+	EXPECT_THROW(pdi.default_pattern("%v %", m_ctx), Value_error);
+}
+
 TEST_F(LoggerTest, DefaultPatternBeforeEvaluation)
 {
 	m_x = 3;
@@ -457,6 +497,16 @@ TEST_F(LoggerTest, DefaultPatternBeforeEvaluation)
 	pdi.evaluate_patterns(m_ctx);
 	pdi.info("after");
 	EXPECT_EQ(written(), "[] before\n[3] after\n");
+}
+
+TEST_F(LoggerTest, DefaultPatternBeforeEvaluationEndingWithPercentThrows)
+{
+	Pdi_logger pdi(config("{pattern: 'A %v', outputs: {o: {kind: stream}}}"));
+	use_streams(pdi);
+	EXPECT_THROW(pdi.default_pattern("%v %", m_ctx), Value_error);
+	pdi.evaluate_patterns(m_ctx);
+	pdi.info("msg");
+	EXPECT_EQ(written(), "A msg\n");
 }
 
 /*
@@ -822,6 +872,11 @@ TEST_F(LoggerTest, OutputPatternReference)
 	pdi.evaluate_patterns(m_ctx);
 	pdi.info("after");
 	EXPECT_EQ(written(), "[] before\n[3] after\n");
+}
+
+TEST_F(LoggerTest, OutputPatternEndingWithPercentThrows)
+{
+	EXPECT_THROW({ Pdi_logger pdi(config("{outputs: {o: {kind: stream, pattern: '%v %'}}}")); }, Value_error);
 }
 
 TEST_F(LoggerTest, OutputDuplicateNameThrows)

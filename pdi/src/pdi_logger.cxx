@@ -30,6 +30,7 @@
 #include <optional>
 #include <ostream>
 #include <set>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -60,9 +61,11 @@ using spdlog::sinks::stdout_color_sink_st;
 using std::current_exception;
 using std::dynamic_pointer_cast;
 using std::make_shared;
+using std::min;
 using std::nullopt;
 using std::optional;
 using std::ostream;
+using std::ostringstream;
 using std::reference_wrapper;
 using std::set;
 using std::string;
@@ -96,14 +99,44 @@ string Pdi_logger::build_pattern(optional<string> specific_pattern, Pattern_sour
 	// the built-in pattern, with its blocks, holds no reference
 	if (src != Pattern_source::UNEVALUATED_EXPLICIT) return pattern;
 
-	for (size_t start_pos = pattern.find("%{"); start_pos != string::npos; start_pos = pattern.find("%{")) {
-		// `%{<REF>}' is the reference `${<REF>}', parse it to find where it ends
-		pattern[start_pos] = '$';
-		auto [expr, expr_len] = Expression::parse_reference(pattern.c_str() + start_pos);
-		// write its value in place of it, or nothing until there is a context to evaluate it in
-		pattern = pattern.substr(0, start_pos) + (ctx ? expr.to_string(*ctx) : string()) + pattern.substr(start_pos + expr_len);
+	ostringstream pattern_builder;
+	// copy the text up to the first flag
+	size_t start_pos = min(pattern.find('%'), pattern.size());
+	pattern_builder << string_view(pattern.begin(), pattern.begin() + start_pos);
+	while (start_pos < pattern.size()) {
+		// a `%' must be followed by its flag
+		if (start_pos == pattern.size() - 1) {
+			throw Value_error("logger pattern can not end with a `%': `{}'", pattern);
+		}
+		switch (pattern[start_pos + 1]) {
+		case '{': {
+			// `%{<REF>}' is the reference `${<REF>}', parse it to find where it ends
+			pattern[start_pos] = '$';
+			auto [expr, expr_len] = Expression::parse_reference(pattern.c_str() + start_pos);
+			// restore the pattern as written, for the error messages
+			pattern[start_pos] = '%';
+			// write its value in place of it, or nothing until there is a context to evaluate it in
+			if (ctx) {
+				// double each `%' of the value, so that spdlog prints it as is instead of reading a flag
+				for (char value_char: expr.to_string(*ctx)) {
+					if (value_char == '%') pattern_builder << '%';
+					pattern_builder << value_char;
+				}
+			}
+			start_pos += expr_len;
+		} break;
+		default: {
+			// copy any other flag, `%%' included
+			pattern_builder << string_view(pattern.begin() + start_pos, pattern.begin() + start_pos + 2);
+			start_pos += 2;
+		} break;
+		}
+		// copy the text up to the next flag
+		size_t end_pos = min(pattern.find('%', start_pos), pattern.size());
+		pattern_builder << string_view(pattern.begin() + start_pos, pattern.begin() + end_pos);
+		start_pos = end_pos;
 	}
-	return pattern;
+	return pattern_builder.str();
 }
 
 template <class Sink_type, class... Args>
