@@ -27,6 +27,9 @@ and this project adheres to
   [#785](https://github.com/pdidev/pdi/issues/785).
 * PDI is no longer tested on macOS 14, whose runners GitHub retired, as per
   [#914](https://github.com/pdidev/pdi/issues/914).
+* The `%n` flag of a logging pattern now shows `PDI/<plugin>` for the messages
+  of a plugin, instead of the name of the plugin alone.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Deprecated
 * The `INSTALL_CMAKEDIR` CMake variable, which sets where the PDI CMake package
