@@ -144,9 +144,9 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 				log_to_stdout = false; // the file replaces stdout, unless `console' says otherwise
 				add_output<basic_file_sink_st>("file", Level::trace, nullopt, to_string(file_subtree));
 			}
-			// and stdout if `console' is anything but `off', or if it is not set and `file' is not either
+			// and stdout if `console' is true, or if it is not set and `file' is not either
 			PC_tree_t console_subtree = PC_get(output_tree, ".console");
-			if (!PC_status(console_subtree)) log_to_stdout = (to_string(console_subtree) != "off");
+			if (!PC_status(console_subtree)) log_to_stdout = to_bool(console_subtree);
 		}
 		if (!PC_status(outputs_tree)) {
 			log_to_stdout = false;
