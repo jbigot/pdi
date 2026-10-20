@@ -41,7 +41,7 @@ class Pdi_logger;
 
 /** The logger of a plugin, that uses the logging infrastructure the PDI logger holds
  *
- * It has a name and a logging level of its own, and writes to the outputs of the infrastructure.
+ * It has a name and a logging level of its own, and writes to the outputs of the infrastructure, except those its configuration disables.
  *
  * Setting the default logging level or the default pattern through such a logger is deprecated.
  *
@@ -59,8 +59,8 @@ public:
 	 *
 	 * \param[in] pdi_logger the PDI logger
 	 * \param[in] name the name of the plugin, the logger is named `PDI/<name>`, as the `%n` flag of the pattern shows
-	 * \param[in] logging_tree the `logging` subtree that configures the logger: a level, or a mapping with an optional `level` key; a tree in error
-	 *                         configures nothing
+	 * \param[in] logging_tree the `logging` subtree that configures the logger: a level, or a mapping with optional `level` and `disabled_outputs`
+	 *                         keys; a tree in error configures nothing
 	 *
 	 * \throw Spectree_error if the configuration is invalid
 	 */

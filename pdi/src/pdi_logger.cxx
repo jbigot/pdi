@@ -128,8 +128,8 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 			} else if (key == "pattern") {
 				m_default_pattern = to_string(value_tree);
 				m_default_pattern_source = Pattern_source::UNEVALUATED_EXPLICIT;
-			} else if (key == "output" || key == "outputs") {
-				// configures the outputs that need the default level and patterns: read after them, below
+			} else if (key == "core" || key == "output" || key == "outputs") {
+				// configures the outputs that need the default level and patterns, and the core logger, that needs the outputs: read after them, below
 			}
 		});
 		PC_tree_t output_tree = PC_get(logging_tree, ".output");
@@ -205,8 +205,12 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 	if (log_to_stdout) {
 		add_output<stdout_color_sink_st>("stdout", Level::trace, nullopt);
 	}
-	// now that we have the default and outputs loaded, load the logger, that writes to all of them
-	setup(PC_tree_t{PC_NODE_NOT_FOUND, nullptr, nullptr}, m_outputs);
+	// now that we have the default and outputs loaded, load the logger
+	try {
+		setup(PC_get(logging_tree, ".core"), m_outputs);
+	} catch (...) {
+		rethrow_with_context(current_exception(), "while reading the logger of the core, ");
+	}
 	// and propagate the defaults
 	default_level(m_default_logging_level);
 	string default_pattern = build_pattern(nullopt, m_default_pattern_source);
