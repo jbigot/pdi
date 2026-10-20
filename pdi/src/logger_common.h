@@ -31,6 +31,7 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include <paraconf.h>
@@ -77,6 +78,9 @@ protected:
 	/// Whether this logger has a level explicitly set
 	bool m_explicitly_set_logging_level = false;
 
+	/// The names of the outputs of the infrastructure this logger does not write to
+	std::unordered_set<std::string, Transparent_string_hash, std::equal_to<>> m_disabled_outputs;
+
 	/// The names that configured a level of this logger but name no known level, to warn about once the logger can write
 	std::vector<std::string> m_invalid_levels;
 
@@ -122,13 +126,15 @@ protected:
 
 	/** Read the configuration of a logger: its level, and the outputs it writes to
 	 *
-	 * It adds to the spdlog logger every output of the infrastructure, except the outputs of kind `stream` whose stream is not set yet.
+	 * It adds to the spdlog logger every output of the infrastructure, except those the configuration disables and the outputs of kind `stream` whose
+	 * stream is not set yet.
 	 * It is meant to be called once, by the constructor of a derived class.
 	 *
-	 * \param[in] logger_tree the configuration: a level, or a mapping with an optional `level` key; a tree in error configures nothing
+	 * \param[in] logger_tree the configuration: a level, or a mapping with optional `level` and `disabled_outputs` keys; a tree in error configures
+	 *                        nothing
 	 * \param[in] outputs the outputs of the infrastructure, by name
 	 *
-	 * \throw Spectree_error if the configuration is neither a level nor a mapping
+	 * \throw Spectree_error if the configuration is neither a level nor a mapping, or names no known output
 	 */
 	void setup(PC_tree_t logger_tree, const std::unordered_map<std::string, Output, Transparent_string_hash, std::equal_to<>>& outputs);
 
@@ -138,7 +144,7 @@ protected:
 	 */
 	void update_level(Level default_logging_level);
 
-	/** Replace the sink of an output of kind `stream` by a new one
+	/** Replace the sink of an output of kind `stream` by a new one, unless this logger does not write to that output
 	 *
 	 * The new sink is added if this logger does not hold the old one, as for an output whose stream was not set.
 	 *

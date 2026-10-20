@@ -117,7 +117,7 @@ class PDI_EXPORT Pdi_logger: public Logger_common
 	 * \tparam Sink_type the type of the spdlog sink of the output
 	 * \tparam Args the types of the arguments of the constructor of the sink
 	 *
-	 * \param[in] name the name of the output, that no other output may have: the new output is ignored otherwise
+	 * \param[in] name the name of the output, by which the loggers can disable it, that no other output may have: the new output is ignored otherwise
 	 * \param[in] lvl the level of the output
 	 * \param[in] pattern the pattern of the output, empty to use the default pattern
 	 * \param[in] args the arguments of the constructor of the sink
@@ -128,10 +128,10 @@ class PDI_EXPORT Pdi_logger: public Logger_common
 public:
 	/** Create a PDI logger, and the infrastructure it holds
 	 *
-	 * \param[in] logging_tree the `logging` subtree of the specification tree root: a level, or a mapping with optional `level`, `pattern` and
-	 *                         `outputs` keys, or the `output` key in place of `outputs`; a tree in error configures nothing
+	 * \param[in] logging_tree the `logging` subtree of the specification tree root: a level, or a mapping with optional `level`, `pattern`, `outputs`
+	 *                         and `core` keys, or the `output` key in place of `outputs`; a tree in error configures nothing
 	 *
-	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known kind of output,
+	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known kind of output or output to disable,
 	 *                       holds an unexpected key, two outputs by the same name, an output with no `kind` or a file one with no `path`, or both
 	 *                       the `output` and `outputs` keys
 	 * \throw Value_error if a pattern of the configuration holds a reference that does not parse
