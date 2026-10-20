@@ -50,6 +50,19 @@ class PDI_NO_EXPORT Plugin_store
 	/// A function listing the dependencies of a plugin
 	using plugin_deps_f = std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> (*)();
 
+	/** The symbols a plugin exports
+	 */
+	struct Symbols {
+		/// The factory function of the plugin
+		plugin_factory_f ctr;
+
+		/// The function listing the dependencies of the plugin
+		plugin_deps_f deps;
+
+		/// The name of the plugin, as shown in the logs: the one the plugin provides, or the name it is loaded by if it provides none
+		std::string pretty_name;
+	};
+
 	/** Information about the load state of a plugin
 	 */
 	class Stored_plugin
@@ -87,13 +100,24 @@ class PDI_NO_EXPORT Plugin_store
 		std::unique_ptr<Plugin> m_loaded_plugin;
 
 		/// Whether this plugin is loaded or not
-		Init_state m_state;
+		Init_state m_state = PRELOADED;
 
-	public:
-		/** Pre-loads a plugin
-		 * \param store the store in which this plugin is loaded
+		/** Pre-load a plugin whose symbols are already looked up
+		 * \param store the store in which the plugin is loaded
 		 * \param name the name of the plugin
 		 * \param conf the configuration subtree of the plugin
+		 * \param symbols the symbols the plugin exports
+		 * \throw Spectree_error if the `logging` subtree of the configuration is invalid
+		 */
+		Stored_plugin(Plugin_store& store, std::string name, PC_tree_t conf, Symbols symbols);
+
+	public:
+		/** Pre-load a plugin
+		 * \param store the store in which the plugin is loaded
+		 * \param name the name of the plugin
+		 * \param conf the configuration subtree of the plugin
+		 * \throw Plugin_error if the library of the plugin cannot be loaded or lacks one of its symbols
+		 * \throw Spectree_error if the `logging` subtree of the configuration is invalid
 		 */
 		Stored_plugin(Plugin_store& store, std::string name, PC_tree_t conf);
 
@@ -118,11 +142,13 @@ class PDI_NO_EXPORT Plugin_store
 	 */
 	void initialize_path(std::vector<PC_tree_t> const & confs);
 
-	/** dlopen's a plugin taking m_plugin_path into account
+	/** Look up the symbols a plugin exports, loading its library if its constructor or dependencies are not linked in: from m_plugin_path, from
+	 * the default plugin path, or from the system path
 	 * \param name the name of the plugin
-	 * \return a handle for the loaded object, same as dlopen
+	 * \return the symbols of the plugin
+	 * \throw Plugin_error if the library cannot be loaded or lacks the constructor or the dependencies of the plugin
 	 */
-	void* plugin_dlopen(const std::string& name);
+	Symbols plugin_dlopen(const std::string& name);
 
 public:
 	/** Builds a plugin store
