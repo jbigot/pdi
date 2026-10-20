@@ -15,6 +15,10 @@ and this project adheres to
 * The top-level `logging` section of the specification tree can now define named
   `outputs`, each with a "target", `level` and `pattern` of its own.
   Part of [#552](https://github.com/pdidev/pdi/issues/552)
+* The `logging.core` key of the specification tree sets the level of the messages
+  of PDI itself, and the outputs they skip with `logging.disabled_outputs`, which
+  the `logging` section of a plugin accepts too.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Changed
 * The `%n` flag of a logging pattern now shows `PDI/<plugin>` for the messages
