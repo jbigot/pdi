@@ -1,6 +1,7 @@
 /*******************************************************************************
  * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
+ * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +36,6 @@
 
 #include "pdi/pdi_fwd.h"
 #include "pdi/context.h"
-#include "pdi/context_proxy.h"
 #include "pdi/data_descriptor.h"
 #include "pdi/logger.h"
 #include "pdi/plugin.h"
@@ -187,7 +187,7 @@ public:
 
 	void event(const char* name) override;
 
-	Logger& logger() override;
+	Logger& logger();
 
 	Datatype_template_sptr datatype(PC_tree_t node) override;
 

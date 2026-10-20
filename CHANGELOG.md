@@ -55,6 +55,12 @@ and this project adheres to
   longer includes `pdi/logger.h`, nor does `pdi/logger.h` include
   `spdlog/spdlog.h`: include them where they are used.
   This is part of [#721](https://github.com/pdidev/pdi/issues/721)
+* `Context` no longer has a `logger()` accessor.
+  A plugin's constructor must now accept an additional `PDI::Logger&` parameter
+  (before `PDI::Context&`), available afterwards through the inherited
+  `Plugin::logger()` accessor.
+  `Datatype_template::load_basic_datatypes` takes the logger to warn through.
+  Part of [#721](https://github.com/pdidev/pdi/issues/721)
 
 #### Deprecated
 * `PDI::TimerEventHandler` and the `PLUGIN_API_VERSION`,
@@ -68,6 +74,8 @@ and this project adheres to
   intended as examples but provided only misleading information and prevented
   refactoring (Decl'HDF5 benchmarks remain for now). This partially answers
   [#733](https://github.com/pdidev/pdi/issues/733)
+* Removed the `Context_proxy` class.
+  Part of [#721](https://github.com/pdidev/pdi/issues/721)
 
 #### Fixed
 
