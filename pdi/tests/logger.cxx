@@ -920,7 +920,7 @@ TEST_F(LoggerTest, DeprecatedOutputToFile)
 		EXPECT_THAT(pdi.output_kinds(), ElementsAre("file"));
 		pdi.info("msg");
 	}
-	EXPECT_EQ(log_content("pdi.log"), "msg\n");
+	EXPECT_EQ(log_content("pdi.log"), "`logging.output' is deprecated in favor of the new `logging.outputs' (plural)\nmsg\n");
 }
 
 TEST_F(LoggerTest, DeprecatedOutputToFileAndConsole)
@@ -946,7 +946,7 @@ TEST_F(LoggerTest, DeprecatedOutputNames)
 		EXPECT_THAT(plugin.output_kinds(), ElementsAre("stdout"));
 		pdi.info("a");
 	}
-	EXPECT_EQ(log_content("pdi.log"), "PDI a\n");
+	EXPECT_EQ(log_content("pdi.log"), "PDI `logging.output' is deprecated in favor of the new `logging.outputs' (plural)\nPDI a\n");
 }
 
 TEST_F(LoggerTest, DeprecatedOutputWithOutputsThrows)
