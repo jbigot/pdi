@@ -73,6 +73,9 @@ and this project adheres to
   console off in the `output` of a `logging` section, as `off` does, and a
   `console` that is not a boolean is an error, fixing
   [#818](https://github.com/pdidev/pdi/issues/818)
+* The logging sections of the specification tree reference now describe the
+  levels, the patterns and the outputs as PDI reads them, with examples that
+  run, fixing [#808](https://github.com/pdidev/pdi/issues/808)
 
 #### Security
 
