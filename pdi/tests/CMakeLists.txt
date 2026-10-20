@@ -56,6 +56,7 @@ if("${BUILD_PYTHON}")
 endif()
 
 add_executable(PDI_unit_tests
+		logger.cxx
 		paraconf_wrapper.cxx
 		parsed_modulo.cxx
 		PDI_array_datatype.cxx

@@ -227,7 +227,7 @@ Plugin_store::Symbols Plugin_store::load_plugin_symbols(string_view name)
 	return {ctr, deps_func ? deps_func() : Plugin_deps{}, pretty_name_func ? pretty_name_func() : string(name)};
 }
 
-Plugin_store::Plugin_store(Logger& logger)
+Plugin_store::Plugin_store(Pdi_logger& logger)
 	: m_logger(logger)
 {}
 

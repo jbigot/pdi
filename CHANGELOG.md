@@ -12,14 +12,33 @@ and this project adheres to
 ### For users
 
 #### Added
+* The top-level `logging` section of the specification tree can now define named
+  `outputs`, each with a "target", `level` and `pattern` of its own.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Changed
 
 #### Deprecated
 
 #### Removed
+* The `logging` section of a plugin no longer accepts `pattern` and `output`:
+  the messages of every plugin go to the outputs of the top-level `logging`
+  section, with their patterns.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
+* The Set-value `logger` operation no longer accepts the `evaluate` key: setting
+  a `pattern` evaluates its references right away, as per
+  [#814](https://github.com/pdidev/pdi/issues/814)
 
 #### Fixed
+* A level set by the Set-value `logger` operation now applies to the messages of
+  the plugins whose `logging` sets no level, not only to those of PDI, fixing
+  [#815](https://github.com/pdidev/pdi/issues/815)
+* A `pattern` set in the top-level `logging` section now applies to the messages
+  of PDI, even when the MPI plugin is loaded, fixing
+  [#807](https://github.com/pdidev/pdi/issues/807)
+* The messages of the plugins now go where the top-level `logging` section sends
+  those of PDI, to the same file and in the order they are written, fixing
+  [#817](https://github.com/pdidev/pdi/issues/817)
 
 #### Security
 
@@ -29,8 +48,15 @@ and this project adheres to
 #### Added
 
 #### Changed
+* `PDI::Logger` is now an abstract class that can be neither copied nor moved.
+  This completes [#721](https://github.com/pdidev/pdi/issues/721)
 
 #### Deprecated
+* Setting the default logging level or the default pattern through the logger of
+  a plugin, with `PDI::Logger::default_level` and `PDI::Logger::default_pattern`,
+  is deprecated: a plugin should not change the logging of PDI as a whole.
+  `default_pattern` now takes the context in which to evaluate the references of
+  the pattern. Part of [#721](https://github.com/pdidev/pdi/issues/721)
 
 #### Removed
 
