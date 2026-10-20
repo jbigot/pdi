@@ -232,7 +232,7 @@ Plugin_store::Symbols Plugin_store::plugin_dlopen(const string& name)
 	return {ctr, deps, pretty_name_func ? pretty_name_func() : name};
 }
 
-Plugin_store::Plugin_store(Logger& logger)
+Plugin_store::Plugin_store(Pdi_logger& logger)
 	: m_logger(logger)
 {}
 

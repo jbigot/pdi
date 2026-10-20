@@ -395,7 +395,7 @@ void Data_store::notify_missing_data(const string& name)
 }
 
 Data_store::Data_store(PC_tree_t conf)
-	: m_logger{"PDI", PC_get(conf, ".logging")}
+	: m_logger{PC_get(conf, ".logging")}
 	, m_plugins{m_logger}
 {
 	// Handle includes and gather all files
@@ -410,8 +410,8 @@ Data_store::Data_store(PC_tree_t conf)
 
 	m_plugins.load_plugins(*this, confs);
 
-	// evaluate pattern after loading plugins
-	m_logger.evaluate_pattern(*this);
+	// now that all plugins are loaded, we can evaluate the references in the logger pattern
+	m_logger.evaluate_patterns(*this);
 
 	std::map<std::string, std::optional<Yaml_region>> data_definition_location;
 
@@ -483,7 +483,7 @@ void Data_store::event(const char* name)
 	notify_event(name);
 }
 
-Logger& Data_store::logger()
+Pdi_logger& Data_store::logger()
 {
 	return m_logger;
 }

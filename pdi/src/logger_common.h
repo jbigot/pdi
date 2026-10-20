@@ -1,0 +1,154 @@
+/*******************************************************************************
+ * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * * Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ * * Neither the name of CEA nor the names of its contributors may be used to
+ *   endorse or promote products derived from this software without specific
+ *   prior written permission.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ ******************************************************************************/
+
+#ifndef PDI_LOGGER_COMMON_H_
+#define PDI_LOGGER_COMMON_H_
+
+#include <functional>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <unordered_map>
+#include <vector>
+
+#include <paraconf.h>
+
+#include <spdlog/common.h>
+
+#include "pdi/pdi_fwd.h"
+#include "pdi/logger.h"
+#include "pdi/paraconf_wrapper.h"
+
+namespace PDI {
+
+/** The part of the implementation of a logger that the PDI logger and the plugin loggers share
+ *
+ * It reads the configuration of a logger, and follows the changes of the infrastructure: of its default logging level, and of its outputs of kind
+ * `stream`.
+ *
+ * It is exported for the unit tests only, until they can link to the objects of the library, see https://github.com/pdidev/pdi/issues/834
+ */
+class PDI_EXPORT Logger_common: public Logger
+{
+protected:
+	/// An output of the infrastructure
+	struct Output {
+		/** Where the output writes, with its level and pattern set
+		 *
+		 * An output of kind `stream` writes nowhere until its stream is set, it holds a spdlog::sinks::null_sink_st until then.
+		 */
+		spdlog::sink_ptr sink;
+
+		/** The pattern of the output, empty to use the default pattern
+		 *
+		 * It holds references to evaluate until the infrastructure is sealed, and is evaluated from then on.
+		 */
+		std::optional<std::string> pattern;
+	};
+
+	/// A hash of strings that hashes string views alike, so that a container keyed by strings can be searched with a string view
+	struct Transparent_string_hash: std::hash<std::string_view> {
+		/// Tell the containers that this hash accepts any type that converts to a string view
+		using is_transparent = void;
+	};
+
+	/// Whether this logger has a level explicitly set
+	bool m_explicitly_set_logging_level = false;
+
+	/// The names that configured a level of this logger but name no known level, to warn about once the logger can write
+	std::vector<std::string> m_invalid_levels;
+
+	/** Look a level up by its name
+	 *
+	 * \param[in] name_param the name of the level, or a PC_tree_t holding it: `trace`, `debug`, `info`, `warn`, `error` or `off`
+	 *
+	 * \return the level, or nullopt if `name_param` names no known level, that is then added to m_invalid_levels
+	 */
+	std::optional<Level> level_from_str(auto name_param)
+	{
+		constexpr bool parsing_spectree = std::is_same_v<std::remove_cvref_t<decltype(name_param)>, PC_tree_t>;
+		std::string name = [&] {
+			if constexpr (parsing_spectree) {
+				return to_string(name_param);
+			} else {
+				return name_param;
+			}
+		}();
+
+		static const std::unordered_map<std::string, Level> levels
+			= {{"trace", Level::trace},
+		       {"debug", Level::debug},
+		       {"info", Level::info},
+		       {"warn", Level::warn},
+		       {"error", Level::err},
+		       {"off", Level::off}};
+		auto it = levels.find(name);
+		if (it != levels.end()) return it->second;
+		m_invalid_levels.emplace_back(std::move(name));
+		return std::nullopt;
+	}
+
+	/** Warn about the names of m_invalid_levels, and forget them
+	 */
+	void warn_invalid_levels();
+
+	/** Create a logger that writes to no output
+	 *
+	 * \param[in] name the name of the logger, shown by the `%n` flag of the pattern
+	 */
+	Logger_common(std::string name);
+
+	/** Read the configuration of a logger: its level, and the outputs it writes to
+	 *
+	 * It adds to the spdlog logger every output of the infrastructure, except the outputs of kind `stream` whose stream is not set yet.
+	 * It is meant to be called once, by the constructor of a derived class.
+	 *
+	 * \param[in] logger_tree the configuration: a level, or a mapping with an optional `level` key; a tree in error configures nothing
+	 * \param[in] outputs the outputs of the infrastructure, by name
+	 *
+	 * \throw Spectree_error if the configuration is neither a level nor a mapping
+	 */
+	void setup(PC_tree_t logger_tree, const std::unordered_map<std::string, Output, Transparent_string_hash, std::equal_to<>>& outputs);
+
+	/** Set the level of the spdlog logger to the default logging level, unless this logger has a level set explicitly
+	 *
+	 * \param[in] default_logging_level the default logging level of the infrastructure
+	 */
+	void update_level(Level default_logging_level);
+
+	/** Replace the sink of an output of kind `stream` by a new one
+	 *
+	 * The new sink is added if this logger does not hold the old one, as for an output whose stream was not set.
+	 *
+	 * \param[in] name the name of the output
+	 * \param[in] old_output the output to replace
+	 * \param[in] output the output to replace it with
+	 */
+	void output_updated(std::string_view name, const spdlog::sink_ptr& old_output, const spdlog::sink_ptr& output);
+};
+
+} // namespace PDI
+
+#endif // PDI_LOGGER_COMMON_H_
