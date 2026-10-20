@@ -131,7 +131,7 @@ public:
 	 * \param[in] logging_tree the `logging` subtree of the specification tree root: a level, or a mapping with optional `level`, `pattern` and
 	 *                         `outputs` keys, or the `output` key in place of `outputs`; a tree in error configures nothing
 	 *
-	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known kind of output,
+	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known level or kind of output,
 	 *                       holds an unexpected key, two outputs by the same name, an output with no `kind` or a file one with no `path`, or both
 	 *                       the `output` and `outputs` keys
 	 * \throw Value_error if a pattern of the configuration holds a reference that does not parse
@@ -176,7 +176,9 @@ public:
 	 *
 	 * \note Unlike Logger::default_level(), this is not deprecated.
 	 *
-	 * \param[in] level the name of the new level: `trace`, `debug`, `info`, `warn`, `error` or `off`, any other name is ignored with a warning
+	 * \param[in] level the name of the new level, case insensitive: `trace`, `debug`, `info`, `warning`/`warn`, `error`/`err`, `critical` or `off`
+	 *
+	 * \throw Value_error if `level` names no known level
 	 */
 	void default_level(std::string level) override;
 
