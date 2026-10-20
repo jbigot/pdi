@@ -59,6 +59,10 @@ and this project adheres to
 * The messages of the plugins now go where the top-level `logging` section sends
   those of PDI, to the same file and in the order they are written, fixing
   [#817](https://github.com/pdidev/pdi/issues/817)
+* Any YAML spelling of false, such as `OFF`, `false` or `no`, now turns the
+  console off in the `output` of a `logging` section, as `off` does, and a
+  `console` that is not a boolean is an error, fixing
+  [#818](https://github.com/pdidev/pdi/issues/818)
 
 #### Security
 
@@ -102,6 +106,10 @@ and this project adheres to
   `real_logger` are gone.
   `Datatype_template::load_basic_datatypes` takes the logger to warn through.
   This completes [#721](https://github.com/pdidev/pdi/issues/721)
+* `PDI::to_bool` now accepts every YAML 1.1 spelling of a boolean, `on`, `off`,
+  `y` and `n` included, and new unit tests cover each spelling.
+  This works around
+  [pdidev/paraconf#6](https://github.com/pdidev/paraconf/issues/6)
 
 #### Deprecated
 * Setting the default logging level or the default pattern through the logger of
