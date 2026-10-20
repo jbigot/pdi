@@ -31,6 +31,9 @@ and this project adheres to
   operation, is now an error instead of a warning; level names ignore case, and
   `warning`, `err` and `critical` are accepted too.
   Part of [#813](https://github.com/pdidev/pdi/issues/813)
+* A logging pattern ending with a lone `%` is now an error instead of being
+  ignored.
+  Part of [#813](https://github.com/pdidev/pdi/issues/813)
 
 #### Deprecated
 * The `output` key of the top-level `logging` section is deprecated in favour of
