@@ -954,6 +954,11 @@ TEST_F(LoggerTest, DeprecatedOutputWithOutputsThrows)
 	EXPECT_THROW({ Pdi_logger pdi(config("{output: {console: on}, outputs: {o: {kind: stdout}}}")); }, Spectree_error);
 }
 
+TEST_F(LoggerTest, DeprecatedConsoleNotABooleanThrows)
+{
+	EXPECT_THAT([&] { Pdi_logger pdi(config("{output: {console: maybe}}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`maybe'")));
+}
+
 /// The tests of the spellings of false that turn the console off
 struct LoggerConsoleOffTest
 	: public LoggerTest
@@ -965,7 +970,7 @@ TEST_P(LoggerConsoleOffTest, ConsoleOff)
 	EXPECT_THAT(pdi.output_kinds(), IsEmpty());
 }
 
-INSTANTIATE_TEST_SUITE_P(, LoggerConsoleOffTest, Values("off"));
+INSTANTIATE_TEST_SUITE_P(, LoggerConsoleOffTest, Values("off", "Off", "OFF", "false", "False", "FALSE", "no", "No", "NO", "n", "N"));
 
 /*
  * Output files
