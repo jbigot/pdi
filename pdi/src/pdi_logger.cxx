@@ -118,6 +118,7 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 	: Logger_common("PDI")
 {
 	bool log_to_stdout = true; // unless outputs are configured, write to stdout
+	PC_tree_t warn_about_deprecated_output{PC_NODE_NOT_FOUND, nullptr, nullptr};
 	if (is_scalar(logging_tree)) {
 		m_default_logging_level = level_from_str(logging_tree).value_or(m_default_logging_level);
 	} else if (!PC_status(logging_tree)) {
@@ -131,20 +132,18 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 			} else if (key == "core" || key == "output" || key == "outputs") {
 				// configures the outputs that need the default level and patterns, and the core logger, that needs the outputs: read after them, below
 			} else {
-				throw Spectree_error(
-					key_tree,
-					"unexpected key `{}', valid logging keys are: `level', `pattern', `outputs', `output', and `core'",
-					key
-				);
+				throw Spectree_error(key_tree, "unexpected key `{}', valid logging keys are: `level', `pattern', `outputs', and `core' (the deprecated `output' is also accepted)", key);
 			}
 		});
 		PC_tree_t output_tree = PC_get(logging_tree, ".output");
 		PC_tree_t outputs_tree = PC_get(logging_tree, ".outputs");
 		if (!PC_status(output_tree)) {
 			if (!PC_status(outputs_tree)) {
-				throw Spectree_error(output_tree, "cannot specify the `output' key when the `outputs' key is present");
+				throw Spectree_error(output_tree, "cannot specify the deprecated `output' key when the `outputs' key is present");
 			}
-			// the `output' key: a file if `file' is set
+			// warn that `output' is deprecated once the logger is built, to write the warning where the configuration says
+			warn_about_deprecated_output = output_tree;
+			// the deprecated output: a file if `file' is set
 			PC_tree_t file_subtree = PC_get(output_tree, ".file");
 			if (!PC_status(file_subtree)) {
 				log_to_stdout = false; // the file replaces stdout, unless `console' says otherwise
@@ -229,6 +228,9 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 	}
 	// warn about the levels of the configuration that name no known level, now that the outputs have their pattern
 	warn_invalid_levels();
+	if (!PC_status(warn_about_deprecated_output)) {
+		warn("`logging.output' is deprecated in favor of the new `logging.outputs' (plural)");
+	}
 }
 
 Pdi_logger::~Pdi_logger()

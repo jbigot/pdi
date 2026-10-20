@@ -40,6 +40,9 @@ and this project adheres to
   files are installed, is renamed `INSTALL_PDICMAKEDIR`; the old name still
   works but prints a deprecation warning, as per
   [#788](https://github.com/pdidev/pdi/issues/788).
+* The `output` key of the top-level `logging` section is deprecated in favour of
+  `outputs`, and PDI warns when it is used.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Removed
 * The `BUILD_SHARED_LIBS` CMake option is no longer read: the PDI libraries are
