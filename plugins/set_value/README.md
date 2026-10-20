@@ -215,11 +215,12 @@ set_value:
 ```
 
 ### logger map {#logger_map}
-Defines settings for global PDI logger.
+Changes the settings of the %PDI logging infrastructure, that apply to the
+messages of %PDI and of all its plugins.
 |key|value|
 |:--|:----|
-|`"level"` (*optional*)   |level to set to the logger|
-|`"pattern"` (*optional*) |pattern to set to the logger|
+|`"level"` (*optional*)   |a \ref logging_level_node, the default logging level to set|
+|`"pattern"` (*optional*) |a \ref logging_pattern_node, the default pattern to set, whose references are evaluated right away|
 
 ## full configuration example {#full_config}
 
