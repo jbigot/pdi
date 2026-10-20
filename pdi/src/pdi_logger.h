@@ -106,7 +106,7 @@ class PDI_EXPORT Pdi_logger: public Logger_common
 	 *
 	 * \return the spdlog pattern
 	 *
-	 * \throw Value_error if the pattern holds a reference that does not parse
+	 * \throw Value_error if the pattern ends with a lone `%`, or holds a reference that does not parse
 	 * \throw Error as Expression::to_string does, if a reference cannot be evaluated
 	 */
 	std::string
@@ -134,7 +134,7 @@ public:
 	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known level, kind of output, or output to disable,
 	 *                       holds an unexpected key, two outputs by the same name, an output with no `kind` or a file one with no `path`, both the
 	 *                       `output` and `outputs` keys, or a `console` that is not a boolean
-	 * \throw Value_error if a pattern of the configuration holds a reference that does not parse
+	 * \throw Value_error if a pattern of the configuration ends with a lone `%`, or holds a reference that does not parse
 	 * \throw spdlog::spdlog_ex if a file of the configuration cannot be opened
 	 */
 	Pdi_logger(PC_tree_t logging_tree);
@@ -192,7 +192,7 @@ public:
 	 * \param[in] pattern the new pattern, in spdlog syntax, where `%{<REF>}` stands for the value of the $-expression `${<REF>}`
 	 * \param[in] ctx the context in which to evaluate the references, once the infrastructure is sealed
 	 *
-	 * \throw Value_error if `pattern` holds a reference that does not parse
+	 * \throw Value_error if `pattern` ends with a lone `%`, or holds a reference that does not parse
 	 * \throw Error as Expression::to_string does, if a reference cannot be evaluated
 	 */
 	void default_pattern(std::string pattern, Context& ctx) override;

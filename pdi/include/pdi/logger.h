@@ -193,7 +193,7 @@ public:
 	 * \param[in] pattern the new pattern, in spdlog syntax, where `%{<REF>}` stands for the value of the $-expression `${<REF>}`
 	 * \param[in] ctx the context in which to evaluate the references, once the infrastructure is sealed
 	 *
-	 * \throw Value_error if `pattern` holds a reference that does not parse
+	 * \throw Value_error if `pattern` ends with a lone `%`, or holds a reference that does not parse
 	 * \throw Error as Expression::to_string does, if a reference cannot be evaluated
 	 *
 	 * \deprecated this will be removed in an upcoming release. The global logging infrastructure should not be modified through loggers.

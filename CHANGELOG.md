@@ -38,6 +38,9 @@ and this project adheres to
   operation, is now an error instead of a warning; level names ignore case, and
   `warning`, `err` and `critical` are accepted too.
   Part of [#813](https://github.com/pdidev/pdi/issues/813)
+* A logging pattern ending with a lone `%` is now an error instead of being
+  ignored.
+  Part of [#813](https://github.com/pdidev/pdi/issues/813)
 
 #### Deprecated
 * The `INSTALL_CMAKEDIR` CMake variable, which sets where the PDI CMake package
@@ -98,6 +101,11 @@ and this project adheres to
 * A `pattern` set in the top-level `logging` section now applies to the messages
   of PDI, even when the MPI plugin is loaded, fixing
   [#807](https://github.com/pdidev/pdi/issues/807)
+* A logging pattern can hold `%%{` to write a literal `%{`, fixing
+  [#810](https://github.com/pdidev/pdi/issues/810)
+* A logging pattern prints the values it references as they are: a `%` in them
+  is no longer read as a pattern flag, and one holding `%{` no longer hangs PDI,
+  fixing [#811](https://github.com/pdidev/pdi/issues/811)
 * The messages of the plugins now go where the top-level `logging` section sends
   those of PDI, to the same file and in the order they are written, fixing
   [#817](https://github.com/pdidev/pdi/issues/817)
