@@ -46,7 +46,7 @@ namespace {
 void do_pc(PC_tree_t tree, PC_status_t status)
 {
 	if (status) {
-		throw Spectree_error{tree, "Configuration error #{}: {}", static_cast<int>(status), PC_errmsg()};
+		throw Spectree_error{tree, "{}", PC_errmsg()};
 	}
 }
 
