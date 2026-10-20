@@ -58,7 +58,7 @@ public:
 	/** Create a plugin logger
 	 *
 	 * \param[in] pdi_logger the PDI logger
-	 * \param[in] name the name of the plugin, that names the logger, as the `%n` flag of the pattern shows
+	 * \param[in] name the name of the plugin, the logger is named `PDI/<name>`, as the `%n` flag of the pattern shows
 	 * \param[in] logging_tree the `logging` subtree that configures the logger: a level, or a mapping with an optional `level` key; a tree in error
 	 *                         configures nothing
 	 *
