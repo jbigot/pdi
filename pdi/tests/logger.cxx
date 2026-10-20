@@ -252,6 +252,11 @@ TEST_F(LoggerTest, LevelInMapping)
 	EXPECT_EQ(written(), "shown\n");
 }
 
+TEST_F(LoggerTest, UnknownKeyThrows)
+{
+	EXPECT_THAT([&] { Pdi_logger pdi(config("{levle: info}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`levle'")));
+}
+
 TEST_F(LoggerTest, SequenceThrows)
 {
 	EXPECT_THAT([&] { Pdi_logger pdi(config("[info]")); }, ThrowsMessage<Spectree_error>(HasSubstr("sequence")));
@@ -568,6 +573,18 @@ TEST_F(LoggerTest, DefaultLevelSparesLoggersWithTheirOwnLevel)
 	EXPECT_EQ(written(), "shown\n");
 }
 
+TEST_F(LoggerTest, PluginUnknownKeyThrows)
+{
+	Pdi_logger pdi(no_config());
+	EXPECT_THAT([&] { Plugin_logger plugin(pdi, "plugin", config("{levle: info}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`levle'")));
+}
+
+TEST_F(LoggerTest, PluginPatternThrows)
+{
+	Pdi_logger pdi(no_config());
+	EXPECT_THAT([&] { Plugin_logger plugin(pdi, "plugin", config("{pattern: '%v'}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`pattern'")));
+}
+
 TEST_F(LoggerTest, PluginSequenceThrows)
 {
 	Pdi_logger pdi(no_config());
@@ -871,6 +888,11 @@ TEST_F(LoggerTest, PluginDisabledOutputs)
 	plugin.info("b");
 	EXPECT_EQ(written("o"), "PDI a\nPDI/plugin b\n");
 	EXPECT_EQ(written("p"), "PDI a\n");
+}
+
+TEST_F(LoggerTest, CoreUnknownKeyThrows)
+{
+	EXPECT_THAT([&] { Pdi_logger pdi(config("{core: {foo: 1}}")); }, ThrowsMessage<Spectree_error>(HasSubstr("`foo'")));
 }
 
 TEST_F(LoggerTest, UnknownDisabledOutputThrows)

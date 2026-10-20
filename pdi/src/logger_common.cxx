@@ -94,6 +94,8 @@ void Logger_common::setup(PC_tree_t logger_tree, const unordered_map<string, Out
 					}
 					m_disabled_outputs.emplace(std::move(disabled_name));
 				});
+			} else {
+				throw Spectree_error(key_tree, "unexpected key `{}', valid logging keys are: `level' and `disabled_outputs'", key);
 			}
 		});
 	}
