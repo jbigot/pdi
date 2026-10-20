@@ -90,7 +90,7 @@ TEST_F(PluginStoreTest, PluginLoggerUsesPdiLoggerInfrastructure)
 	use_streams(store.logger());
 	probe_logger->warn("hidden");
 	probe_logger->error("shown");
-	EXPECT_EQ(written(), "Logger-probe|error|shown\n");
+	EXPECT_EQ(written(), "PDI/Logger-probe|error|shown\n");
 }
 
 #pragma GCC diagnostic push
@@ -106,7 +106,7 @@ TEST_F(PluginStoreTest, PluginLoggerReachesPdiLogger)
 	probe_logger->default_pattern("[%n] %v", store);
 	store.logger().info("pdi");
 	probe_logger->info("probe");
-	EXPECT_EQ(written(), "[PDI] pdi\n[Logger-probe] probe\n");
+	EXPECT_EQ(written(), "[PDI] pdi\n[PDI/Logger-probe] probe\n");
 }
 
 TEST_F(PluginStoreTest, PluginLoggerSharesDefaultPatternBlocks)
@@ -119,7 +119,7 @@ TEST_F(PluginStoreTest, PluginLoggerSharesDefaultPatternBlocks)
 	probe_logger->info("msg");
 	EXPECT_THAT(
 		written_lines(),
-		ElementsAre(MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI")), MatchesRegex(default_pattern_regex(R"(\[B\])", "Logger-probe")))
+		ElementsAre(MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI")), MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI/Logger-probe")))
 	);
 }
 
