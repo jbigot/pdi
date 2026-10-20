@@ -61,18 +61,14 @@ Logger_common::Logger_common(string name)
 void Logger_common::setup(PC_tree_t logger_tree, const unordered_map<string, Output, Transparent_string_hash, equal_to<>>& outputs)
 {
 	if (is_scalar(logger_tree)) {
-		if (auto level = level_from_str(logger_tree)) {
-			m_logger.set_level(*level);
-			m_explicitly_set_logging_level = true;
-		}
+		m_logger.set_level(level_from_str(logger_tree));
+		m_explicitly_set_logging_level = true;
 	} else if (!PC_status(logger_tree)) {
 		each(logger_tree, [&](PC_tree_t key_tree, PC_tree_t value_tree) {
 			string key = to_string(key_tree);
 			if (key == "level") {
-				if (auto level = level_from_str(value_tree)) {
-					m_logger.set_level(*level);
-					m_explicitly_set_logging_level = true;
-				}
+				m_logger.set_level(level_from_str(value_tree));
+				m_explicitly_set_logging_level = true;
 			}
 		});
 	}
@@ -82,14 +78,6 @@ void Logger_common::setup(PC_tree_t logger_tree, const unordered_map<string, Out
 			m_logger.sinks().emplace_back(output.sink);
 		}
 	}
-}
-
-void Logger_common::warn_invalid_levels()
-{
-	for (auto&& name: m_invalid_levels) {
-		m_logger.warn("Invalid logging level: {}. Available: 'trace', 'debug', 'info', 'warn', 'error', 'off'.", name);
-	}
-	m_invalid_levels.clear();
 }
 
 void Logger_common::update_level(Level default_logging_level)

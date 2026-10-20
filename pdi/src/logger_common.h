@@ -25,19 +25,22 @@
 #ifndef PDI_LOGGER_COMMON_H_
 #define PDI_LOGGER_COMMON_H_
 
+#include <algorithm>
+#include <cctype>
 #include <functional>
+#include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
-#include <vector>
 
 #include <paraconf.h>
 
 #include <spdlog/common.h>
 
 #include "pdi/pdi_fwd.h"
+#include "pdi/error.h"
 #include "pdi/logger.h"
 #include "pdi/paraconf_wrapper.h"
 
@@ -77,16 +80,20 @@ protected:
 	/// Whether this logger has a level explicitly set
 	bool m_explicitly_set_logging_level = false;
 
-	/// The names that configured a level of this logger but name no known level, to warn about once the logger can write
-	std::vector<std::string> m_invalid_levels;
-
 	/** Look a level up by its name
 	 *
-	 * \param[in] name_param the name of the level, or a PC_tree_t holding it: `trace`, `debug`, `info`, `warn`, `error` or `off`
+	 * This matches names as spdlog::level::from_str does since gabime/spdlog@566b2d1 (gabime/spdlog#3535), ignoring case, except that an unknown name
+	 * is an error instead of spdlog::level::off.
 	 *
-	 * \return the level, or nullopt if `name_param` names no known level, that is then added to m_invalid_levels
+	 * \param[in] name_param the name of the level, or a PC_tree_t holding it, case insensitive: one of the names spdlog gives its levels, `warn` or
+	 *                       `err`
+	 *
+	 * \return the level
+	 *
+	 * \throw Spectree_error if `name_param` is a PC_tree_t and names no known level
+	 * \throw Value_error if `name_param` is a string and names no known level
 	 */
-	std::optional<Level> level_from_str(auto name_param)
+	static Level level_from_str(auto name_param)
 	{
 		constexpr bool parsing_spectree = std::is_same_v<std::remove_cvref_t<decltype(name_param)>, PC_tree_t>;
 		std::string name = [&] {
@@ -97,22 +104,26 @@ protected:
 			}
 		}();
 
-		static const std::unordered_map<std::string, Level> levels
-			= {{"trace", Level::trace},
-		       {"debug", Level::debug},
-		       {"info", Level::info},
-		       {"warn", Level::warn},
-		       {"error", Level::err},
-		       {"off", Level::off}};
-		auto it = levels.find(name);
-		if (it != levels.end()) return it->second;
-		m_invalid_levels.emplace_back(std::move(name));
-		return std::nullopt;
-	}
+		std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return std::tolower(c); });
 
-	/** Warn about the names of m_invalid_levels, and forget them
-	 */
-	void warn_invalid_levels();
+		static constexpr spdlog::string_view_t level_string_views[] SPDLOG_LEVEL_NAMES;
+		auto it = std::find(std::begin(level_string_views), std::end(level_string_views), name);
+		if (it != std::end(level_string_views)) return static_cast<Level>(std::distance(std::begin(level_string_views), it));
+		if (name == "warn") return Level::warn;
+		if (name == "err") return Level::err;
+		if constexpr (parsing_spectree) {
+			throw Spectree_error(
+				name_param,
+				"invalid value, `{}' does not denote a valid logging level, valid levels are: `trace', `debug', `info', `warn', `error', `off'.",
+				name
+			);
+		} else {
+			throw Value_error(
+				"invalid value, `{}' does not denote a valid logging level, valid levels are: `trace', `debug', `info', `warn', `error', `off'.",
+				name
+			);
+		}
+	}
 
 	/** Create a logger that writes to no output
 	 *
@@ -128,7 +139,7 @@ protected:
 	 * \param[in] logger_tree the configuration: a level, or a mapping with an optional `level` key; a tree in error configures nothing
 	 * \param[in] outputs the outputs of the infrastructure, by name
 	 *
-	 * \throw Spectree_error if the configuration is neither a level nor a mapping
+	 * \throw Spectree_error if the configuration is neither a level nor a mapping, or names no known level
 	 */
 	void setup(PC_tree_t logger_tree, const std::unordered_map<std::string, Output, Transparent_string_hash, std::equal_to<>>& outputs);
 

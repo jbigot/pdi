@@ -27,6 +27,10 @@ and this project adheres to
   [#785](https://github.com/pdidev/pdi/issues/785).
 * PDI is no longer tested on macOS 14, whose runners GitHub retired, as per
   [#914](https://github.com/pdidev/pdi/issues/914).
+* An invalid logging level, in a `logging` section or in a Set-value `logger`
+  operation, is now an error instead of a warning; level names ignore case, and
+  `warning`, `err` and `critical` are accepted too.
+  Part of [#813](https://github.com/pdidev/pdi/issues/813)
 
 #### Deprecated
 * The `INSTALL_CMAKEDIR` CMake variable, which sets where the PDI CMake package
