@@ -41,6 +41,7 @@
 #include "pdi/plugin.h"
 #include "pdi/ref_any.h"
 
+#include "pdi_logger.h"
 #include "plugin_store.h"
 
 namespace PDI {
@@ -55,7 +56,7 @@ private:
 	static std::unique_ptr<Data_store> s_store;
 
 	/// Global logger of PDI, should be constructed first, destroyed last
-	Logger m_logger;
+	Pdi_logger m_logger;
 
 	/// Datatype_template constructors available in PDI
 	std::unordered_map<std::string, Datatype_template_parser> m_datatype_parsers;
@@ -187,7 +188,11 @@ public:
 
 	void event(const char* name) override;
 
-	Logger& logger();
+	/** Access the PDI logger, that holds the logging infrastructure
+	 *
+	 * \return the PDI logger
+	 */
+	Pdi_logger& logger();
 
 	Datatype_template_sptr datatype(PC_tree_t node) override;
 
