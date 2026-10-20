@@ -129,7 +129,7 @@ public:
 	/** Create a PDI logger, and the infrastructure it holds
 	 *
 	 * \param[in] logging_tree the `logging` subtree of the specification tree root: a level, or a mapping with optional `level`, `pattern`, `outputs`
-	 *                         and `core` keys, or the `output` key in place of `outputs`; a tree in error configures nothing
+	 *                         and `core` keys, or the deprecated `output` key in place of `outputs`; a tree in error configures nothing
 	 *
 	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known kind of output or output to disable,
 	 *                       holds an unexpected key, two outputs by the same name, an output with no `kind` or a file one with no `path`, or both

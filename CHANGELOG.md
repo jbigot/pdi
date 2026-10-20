@@ -29,6 +29,9 @@ and this project adheres to
   Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Deprecated
+* The `output` key of the top-level `logging` section is deprecated in favour of
+  `outputs`, and PDI warns when it is used.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Removed
 * The `logging` section of a plugin no longer accepts `pattern` and `output`:
