@@ -52,6 +52,18 @@ and this project adheres to
 * The messages of the plugins now go where the top-level `logging` section sends
   those of PDI, to the same file and in the order they are written, fixing
   [#817](https://github.com/pdidev/pdi/issues/817)
+* Any YAML spelling of false, such as `OFF`, `false` or `no`, now turns the
+  console off in the `output` of a `logging` section, as `off` does, and a
+  `console` that is not a boolean is an error, fixing
+  [#818](https://github.com/pdidev/pdi/issues/818)
+* A logging pattern can hold `%%{` to write a literal `%{`, fixing
+  [#810](https://github.com/pdidev/pdi/issues/810)
+* A logging pattern prints the values it references as they are: a `%` in them
+  is no longer read as a pattern flag, and one holding `%{` no longer hangs PDI,
+  fixing [#811](https://github.com/pdidev/pdi/issues/811)
+* The logging sections of the specification tree reference now describe the
+  levels, the patterns and the outputs as PDI reads them, with examples that
+  run, fixing [#808](https://github.com/pdidev/pdi/issues/808)
 
 #### Security
 
