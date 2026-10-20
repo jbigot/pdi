@@ -130,6 +130,12 @@ Pdi_logger::Pdi_logger(PC_tree_t logging_tree)
 				m_default_pattern_source = Pattern_source::UNEVALUATED_EXPLICIT;
 			} else if (key == "core" || key == "output" || key == "outputs") {
 				// configures the outputs that need the default level and patterns, and the core logger, that needs the outputs: read after them, below
+			} else {
+				throw Spectree_error(
+					key_tree,
+					"unexpected key `{}', valid logging keys are: `level', `pattern', `outputs', `output', and `core'",
+					key
+				);
 			}
 		});
 		PC_tree_t output_tree = PC_get(logging_tree, ".output");

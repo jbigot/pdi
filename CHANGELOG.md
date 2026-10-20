@@ -21,6 +21,9 @@ and this project adheres to
   Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Changed
+* An unknown key in a `logging` section is now an error instead of being
+  ignored.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 * The `%n` flag of a logging pattern now shows `PDI/<plugin>` for the messages
   of a plugin, instead of the name of the plugin alone.
   Part of [#552](https://github.com/pdidev/pdi/issues/552)
