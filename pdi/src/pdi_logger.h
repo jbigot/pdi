@@ -132,8 +132,8 @@ public:
 	 *                         `outputs` keys, or the `output` key in place of `outputs`; a tree in error configures nothing
 	 *
 	 * \throw Spectree_error if the configuration is neither a level nor a mapping, names no known kind of output,
-	 *                       holds an unexpected key, two outputs by the same name, an output with no `kind` or a file one with no `path`, or both
-	 *                       the `output` and `outputs` keys
+	 *                       holds an unexpected key, two outputs by the same name, an output with no `kind` or a file one with no `path`, both the
+	 *                       `output` and `outputs` keys, or a `console` that is not a boolean
 	 * \throw Value_error if a pattern of the configuration holds a reference that does not parse
 	 * \throw spdlog::spdlog_ex if a file of the configuration cannot be opened
 	 */
