@@ -78,6 +78,9 @@ and this project adheres to
   Part of [#721](https://github.com/pdidev/pdi/issues/721)
 
 #### Fixed
+* `PDI::is_list`, `PDI::is_map` and `PDI::is_scalar` return false for a tree in
+  error, instead of answering for the node it was looked up from or crashing,
+  fixing [#806](https://github.com/pdidev/pdi/issues/806)
 
 #### Security
 
