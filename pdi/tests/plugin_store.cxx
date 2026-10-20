@@ -41,14 +41,18 @@ using PDI::Context;
 using PDI::Data_store;
 using PDI::Logger;
 using PDI::Plugin;
+using PDI::Spectree_error;
 using PDI::State_error;
 using PDI::to_string;
 using std::pair;
 using std::string;
 using std::unique_ptr;
 using std::unordered_set;
+using testing::AllOf;
 using testing::ElementsAre;
+using testing::HasSubstr;
 using testing::MatchesRegex;
+using testing::ThrowsMessage;
 
 namespace {
 
@@ -178,6 +182,14 @@ TEST_F(PluginStoreTest, PluginLoggerSharesDefaultPatternBlocks)
 	EXPECT_THAT(
 		written_lines(),
 		ElementsAre(MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI")), MatchesRegex(default_pattern_regex(R"(\[B\])", "PDI/Logger-probe")))
+	);
+}
+
+TEST_F(PluginStoreTest, InvalidPluginLoggerNamesThePlugin)
+{
+	EXPECT_THAT(
+		[&] { Data_store store(config("{plugins: {logger_probe: {logging: {level: verbose}}}}")); },
+		ThrowsMessage<Spectree_error>(AllOf(HasSubstr("plugin `logger_probe'"), HasSubstr("`verbose'")))
 	);
 }
 
