@@ -38,6 +38,9 @@
 #include "pdi/logger.h"
 #include "pdi/plugin.h"
 
+#include "pdi_logger.h"
+#include "plugin_logger.h"
+
 namespace PDI {
 
 /** A store used to load a set of plugins
@@ -94,7 +97,7 @@ class PDI_NO_EXPORT Plugin_store
 		 *
 		 * The plugin refers to it, so it is declared before the plugin, and thus destroyed after it, to remain valid in the plugin destructor
 		 */
-		Logger m_plugin_logger;
+		Plugin_logger m_plugin_logger;
 
 		/// The actual plugin, declared after its logger to be destroyed before it
 		std::unique_ptr<Plugin> m_loaded_plugin;
@@ -128,8 +131,8 @@ class PDI_NO_EXPORT Plugin_store
 		void ensure_loaded(Plugin_store& store, Context& ctx);
 	};
 
-	/// The PDI logger, the parent of the logger of each plugin
-	Logger& m_logger;
+	/// The PDI logger, that holds the infrastructure the logger of each plugin uses
+	Pdi_logger& m_logger;
 
 	/// The list of default path where to load the plugins
 	std::vector<std::string> m_plugin_path;
@@ -152,9 +155,9 @@ class PDI_NO_EXPORT Plugin_store
 
 public:
 	/** Builds a plugin store
-	 * \param logger the PDI logger, the parent of the logger of each plugin
+	 * \param logger the PDI logger, that holds the infrastructure the logger of each plugin uses
 	 */
-	Plugin_store(Logger& logger);
+	Plugin_store(Pdi_logger& logger);
 
 	/** Actually load the plugins
 	 *

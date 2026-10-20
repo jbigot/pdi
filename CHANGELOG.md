@@ -12,6 +12,10 @@ and this project adheres to
 ### For users
 
 #### Added
+* The top-level `logging` section can define named `outputs`, each of a `kind`,
+  `file` at a `path`, `stdout` or `stderr`, with a `level` and a `pattern` of
+  its own.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Changed
 * Improved error message in type check in Decl'NetCDF when reading scalar variable from file
@@ -34,6 +38,13 @@ and this project adheres to
 * The `BUILD_SHARED_LIBS` CMake option is no longer read: the PDI libraries are
   always shared, where setting it to `OFF` used to stop the configuration, as
   per [#789](https://github.com/pdidev/pdi/issues/789).
+* The `logging` section of a plugin no longer accepts `pattern` and `output`:
+  the messages of every plugin go to the outputs of the top-level `logging`
+  section, with their patterns.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
+* The Set-value `logger` operation no longer accepts the `evaluate` key: setting
+  a `pattern` evaluates its references right away, as per
+  [#814](https://github.com/pdidev/pdi/issues/814)
 
 #### Fixed
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
@@ -71,6 +82,15 @@ and this project adheres to
 * A parallel NetCDF found through its own CMake configuration is no longer taken
   for a sequential one when no prefix path points at its headers, as per
   [#771](https://github.com/pdidev/pdi/issues/771).
+* A level set by the Set-value `logger` operation now applies to the messages of
+  the plugins whose `logging` sets no level, not only to those of PDI, fixing
+  [#815](https://github.com/pdidev/pdi/issues/815)
+* A `pattern` set in the top-level `logging` section now applies to the messages
+  of PDI, even when the MPI plugin is loaded, fixing
+  [#807](https://github.com/pdidev/pdi/issues/807)
+* The messages of the plugins now go where the top-level `logging` section sends
+  those of PDI, to the same file and in the order they are written, fixing
+  [#817](https://github.com/pdidev/pdi/issues/817)
 
 #### Security
 * PDI builds again against paraconf 1.2.0 with `-Werror=format-security`, and
@@ -83,6 +103,11 @@ and this project adheres to
 #### Added
 * Tests check that an array type accepts `order: C` and `order: c` and rejects
   any other order, as per [#758](https://github.com/pdidev/pdi/issues/758)
+* Added unit tests of the logger of PDI and of those of the plugins: their
+  levels, patterns and outputs, as configured and as changed afterwards, and of
+  plugin loading, that check the logger each plugin is given uses the logging
+  infrastructure of PDI.
+  Part of [#721](https://github.com/pdidev/pdi/issues/721)
 
 #### Changed
 * The API tests project chooses how it gets PDI with `API_TESTS_PDI`, `FIND` or
@@ -114,10 +139,23 @@ and this project adheres to
   A plugin's constructor must now accept an additional `PDI::Logger&` parameter
   (before `PDI::Context&`), available afterwards through the inherited
   `Plugin::logger()` accessor.
+  `PDI::Logger` is now an abstract class that can be neither copied nor moved: a
+  plugin writes through it with `trace`, `debug`, `info`, `warn`, `error` and
+  the new `log`, and adds a block to the default pattern with
+  `add_default_pattern_block` while the plugins are loaded, a `PDI::State_error`
+  afterwards; `level`, `pattern`, `global_pattern`, `add_pattern_block`,
+  `add_pattern_global_block`, `evaluate_pattern`, `evaluate_global_pattern` and
+  `real_logger` are gone.
   `Datatype_template::load_basic_datatypes` takes the logger to warn through.
-  Part of [#721](https://github.com/pdidev/pdi/issues/721)
+  This completes [#721](https://github.com/pdidev/pdi/issues/721)
 
 #### Deprecated
+* Setting the default logging level or the default pattern through the logger of
+  a plugin, with `PDI::Logger::default_level` and
+  `PDI::Logger::default_pattern`, is deprecated: a plugin should not change the
+  logging of PDI as a whole.
+  `default_pattern` now takes the context in which to evaluate the references of
+  the pattern. Part of [#721](https://github.com/pdidev/pdi/issues/721)
 * `PDI::TimerEventHandler` and the `PLUGIN_API_VERSION`,
   `PLUGIN_API_VERSION_MAJOR`, `PLUGIN_API_VERSION_MINOR` and
   `PLUGIN_API_VERSION_PATCH` macros are deprecated in favor of their
