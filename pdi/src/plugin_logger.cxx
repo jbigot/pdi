@@ -30,6 +30,8 @@
 
 #include <paraconf.h>
 
+#include "pdi/fmt.h"
+
 #include "pdi_logger.h"
 
 #include "plugin_logger.h"
@@ -40,7 +42,7 @@ using std::string_view;
 namespace PDI {
 
 Plugin_logger::Plugin_logger(Pdi_logger& pdi_logger, string_view name, PC_tree_t logging_tree)
-	: Logger_common(string(name))
+	: Logger_common(fmt::format("PDI/{}", name))
 	, m_pdi_logger(&pdi_logger)
 {
 	setup(logging_tree, pdi_logger.m_outputs);

@@ -20,6 +20,9 @@ and this project adheres to
 #### Changed
 * Split the example of HDF5 between serial and parallel versions, 
   to match NetCDF [#822](https://github.com/pdidev/pdi/issues/822)
+* The `%n` flag of a logging pattern now shows `PDI/<plugin>` for the messages
+  of a plugin, instead of the name of the plugin alone.
+  Part of [#552](https://github.com/pdidev/pdi/issues/552)
 
 #### Deprecated
 
