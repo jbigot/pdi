@@ -90,6 +90,10 @@ and this project adheres to
   `real_logger` are gone.
   `Datatype_template::load_basic_datatypes` takes the logger to warn through.
   This completes [#721](https://github.com/pdidev/pdi/issues/721)
+* `PDI::to_bool` now accepts every YAML 1.1 spelling of a boolean, `on`, `off`,
+  `y` and `n` included, and new unit tests cover each spelling.
+  This works around
+  [pdidev/paraconf#6](https://github.com/pdidev/paraconf/issues/6)
 
 #### Deprecated
 * Setting the default logging level or the default pattern through the logger of
