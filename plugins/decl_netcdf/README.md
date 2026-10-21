@@ -222,6 +222,25 @@ When compression is enabled, you can also set the variable's chunk size by `chun
 |:-------------|:-----------------------------------------------|
 |attribute name|`$-expression` value to be written as attribute |
 
+The attribute `_NoFill` of a variable is not written to the file, it is interpreted as by the `ncgen` utility of NetCDF.
+Its value is `true` or `false` (also `yes`/`no`, `on`/`off`), or an integer where any non-zero value means true.
+When it is true, the variable is created without a fill value, as with `nc_def_var_fill(NC_NOFILL)`.
+When it is false or absent, the variable keeps the default fill behavior of NetCDF.
+A variable of a record type larger than 64 KiB can only be written with `_NoFill` set to true, NetCDF is otherwise unable to store its fill value.
+The fill mode of a variable cannot be changed once it is created: when a variable already exists in the file, a different `_NoFill` is ignored with a warning.
+When reading, the `_NoFill` attribute is read into an integer (or a Fortran `logical`) that receives 1 when the variable has no fill value and 0 otherwise.
+
+Configuration example:
+```yaml
+plugins:
+  decl_netcdf:
+    file: "file_name.nc"
+    variables:
+      big_record:
+        attributes:
+          _NoFill: true
+```
+
 
 ### write subtree {#decl_netcdf_write}
 
