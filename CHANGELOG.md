@@ -12,6 +12,8 @@ and this project adheres to
 ### For users
 
 #### Added
+* Decl'NetCDF interprets a `_NoFill` attribute of a variable as `ncgen` does: a true value creates the variable without a fill value instead of writing the attribute.
+  This lets Decl'NetCDF write a variable of a record type larger than 64 KiB, which NetCDF cannot create with a fill value, as per [#433](https://github.com/pdidev/pdi/issues/433).
 
 #### Changed
 * Split the example of HDF5 between serial and parallel versions, 

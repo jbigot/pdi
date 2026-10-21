@@ -1,6 +1,7 @@
 /*******************************************************************************
  * Copyright (C) 2020-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
+ * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +30,9 @@
 #include <mpi.h>
 #include <netcdf_par.h>
 #endif
+#include <algorithm>
 #include <iostream>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -406,10 +409,29 @@ void Dnc_netcdf_file::define_variable(const Dnc_variable& variable)
 	}
 	int dest_id = group_it->second;
 
+	// `_NoFill' is interpreted as by ncgen when the variable is defined, it is never stored as an attribute
+	std::optional<bool> no_fill;
+	if (auto&& no_fill_it = std::ranges::find(variable.attributes(), "_NoFill", &Dnc_attribute::name); no_fill_it != variable.attributes().end()) {
+		no_fill = no_fill_it->to_long() != 0;
+	}
+
 	nc_id var_id;
 	if (nc_inq_varid(dest_id, variable_name.c_str(), &var_id) == NC_NOERR) {
 		// variable already defined
 		m_ctx.logger().debug("Variable `{}' already defined in (nc_id = {})", variable.path(), dest_id);
+		if (no_fill) {
+			// the fill mode cannot be changed once the variable is created, check that the one requested is the one it has
+			int current_no_fill;
+			nc_try(
+				nc_inq_var_fill(dest_id, var_id, &current_no_fill, nullptr),
+				"cannot inquire fill mode of variable `{}' in (nc_id = {})",
+				variable_name,
+				dest_id
+			);
+			if (*no_fill != (current_no_fill != 0)) {
+				m_ctx.logger().warn("Variable `{}' already exists, its fill mode cannot be changed and `_NoFill' is ignored", variable.path());
+			}
+		}
 	} else {
 		// get variable type
 		PDI::Datatype_sptr variable_type = variable.type();
@@ -519,6 +541,16 @@ void Dnc_netcdf_file::define_variable(const Dnc_variable& variable)
 				dest_id
 			);
 		}
+		if (no_fill.value_or(false)) {
+			// this is what lets HDF5 hold a compound type larger than 64 KiB, for which it cannot store a fill value
+			m_ctx.logger().trace("Disabling fill value of `{}' variable", variable_name);
+			nc_try(
+				nc_def_var_fill(dest_id, var_id, NC_NOFILL, nullptr),
+				"cannot disable fill value of variable `{}' in (nc_id = {})",
+				variable_name,
+				dest_id
+			);
+		}
 		m_ctx.logger().trace("Variable `{}' defined (var_id = {})", variable.path(), var_id);
 	}
 
@@ -533,6 +565,9 @@ void Dnc_netcdf_file::define_variable(const Dnc_variable& variable)
 	// set the attributes
 	m_ctx.logger().trace("Putting attributes ({}), to `{}' variable", variable.attributes().size(), variable_name);
 	for (auto&& attribute: variable.attributes()) {
+		if (attribute.name() == "_NoFill") {
+			continue;
+		}
 		m_ctx.logger().trace("Putting attribute {} to `{}' variable", attribute.name(), variable_name);
 		this->put_attribute(dest_id, var_id, attribute);
 	}
@@ -542,7 +577,16 @@ void Dnc_netcdf_file::get_attribute(nc_id src_id, nc_id var_id, const Dnc_attrib
 {
 	if (PDI::Ref_w ref_w = attribute.value()) {
 		m_ctx.logger().trace("Getting `{}' attribute from (nc_id = {}/{})", attribute.name(), src_id, var_id);
-		if (auto&& scalar_type = std::dynamic_pointer_cast<const PDI::Scalar_datatype>(ref_w.type())) {
+		if (var_id != NC_GLOBAL && attribute.name() == "_NoFill") {
+			// not stored in the file, the fill mode of the variable is reported as a boolean
+			auto&& scalar_type = std::dynamic_pointer_cast<const PDI::Scalar_datatype>(ref_w.type());
+			if (!scalar_type || (scalar_type->kind() != PDI::Scalar_kind::SIGNED && scalar_type->kind() != PDI::Scalar_kind::UNSIGNED)) {
+				throw PDI::Type_error{"Decl_netcdf plugin: `_NoFill' attribute must be read into an integer, not {}", ref_w.type()->debug_string()};
+			}
+			int no_fill;
+			nc_try(nc_inq_var_fill(src_id, var_id, &no_fill, nullptr), "cannot inquire fill mode of variable (nc_id = {}/{})", src_id, var_id);
+			ref_w.scalar_assign(no_fill != 0);
+		} else if (auto&& scalar_type = std::dynamic_pointer_cast<const PDI::Scalar_datatype>(ref_w.type())) {
 			// get scalar attribute
 			nc_try(
 				nc_get_att(src_id, var_id, attribute.name().c_str(), ref_w.get()),
