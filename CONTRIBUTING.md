@@ -122,10 +122,27 @@ Before submitting, check the formatting, which is the first thing CI verifies an
 
 It configures and builds the distribution from scratch, runs the whole test suite, installs it, then configures, builds and runs `tests/cmake_tests`
 against that installation, so it also checks that the installed package is usable through `find_package`.
-It takes no argument and builds in a fresh `pdibuild.XXXXX` directory created in the current directory, so it leaves your own build tree alone.
+Run directly, it builds in a fresh `pdibuild.XXXXX` directory created in the current directory, so it leaves your own build tree alone.
 Set `TEST_DIR` to build somewhere specific, `MAKEFLAGS` to control the parallelism, and `EXCLUDED_PDI_TESTS` to skip tests.
 CI runs that same script inside the project docker images across a matrix of compilers, MPI implementations and dependency sources, so running it
 before submitting is the closest you can get to knowing CI will pass.
+
+`--container <image>` runs it inside one of those images instead, with docker or else podman:
+
+```bash
+./bin/build_and_run_all_tests --container ghcr.io/pdidev/ubuntu/rolling/openmpi/all:v4
+```
+
+The script then calls itself inside the image, set up as the CI does it: sources mounted read-only, build in an executable tmpfs, the image's own
+user, `MAKEFLAGS` defaulting to `-j 4`.
+`PDI_PLUGIN_PATH` (CI sets it to `/tmp/pdi_plugins` on half of its runs), `CMAKE_FLAGS`, `CTEST_FLAGS` and `EXCLUDED_PDI_TESTS` are passed on if set.
+`TEST_DIR` is ignored, the build happens in the container's tmpfs.
+`-e NAME=VALUE`, as in `docker run`, sets an environment variable in the container over the defaults above, for instance
+`-e PDI_PLUGIN_PATH=/tmp/pdi_plugins` to reproduce the other half of CI's runs, or `-e TEST_DIR=<dir>` to build elsewhere.
+The container is removed at the end.
+`--ctest-dir <dir>` first copies the JUnit reports to `<dir>`; it defaults to `CTEST_DIR` if that is set, and it is an error to give both.
+`--cidfile <file>` writes the container id to a location you choose, and `--no-rm` keeps the container so that you can inspect it or copy more out of
+it yourself.
 
 ## Project structure
 

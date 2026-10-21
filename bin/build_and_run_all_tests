@@ -2,6 +2,7 @@
 #=============================================================================
 # Copyright (C) 2022-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
 # Copyright (C) 2020 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
+# Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
 #
 # All rights reserved.
 #
@@ -29,7 +30,206 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #=============================================================================
 
-set -xe
+set -e
+
+
+
+# Gather arguments
+
+usage() {
+	cat <<-EOF
+	Usage: $0 [--container <image> [--ctest-dir <dir>] [--cidfile <file>] [--no-rm] [-e <name>[=<value>]]...]
+
+	Configure, build and test the whole PDI distribution.
+
+	  --container <image>  run this very script inside <image> (with docker, or else podman), set up as the CI does it
+	  --ctest-dir <dir>    copy the JUnit test reports out of the container to <dir>; defaults to the CTEST_DIR environment variable if set,
+	                       which is an error if --ctest-dir is also given
+	  --cidfile <file>     write the id of the container to <file>, which must not exist yet, instead of a temporary file
+	  --no-rm              keep the container once done (the default is to remove it), to inspect it or copy files out of it
+	  -e, --env <name>[=<value>]
+	                       set the environment variable <name> to <value> in the container, after (so over) everything set by default,
+	                       like the option of docker run; -e<name>=<value> and --env=<name>=<value> work too,
+	                       and a bare <name> passes on the value from the host
+	  -h, --help           show this help
+	EOF
+}
+
+CONTAINER_IMAGE=""
+CTEST_DIR_OPT=""
+CIDFILE=""
+REMOVE_CONTAINER=1
+CONTAINER_ENV_OPTS=()
+while [[ $# -gt 0 ]]
+do
+	case "$1" in
+	--container)
+		if [[ $# -lt 2 ]]; then usage >&2; exit 2; fi
+		CONTAINER_IMAGE="$2"
+		shift 2
+		;;
+	--container=*)
+		CONTAINER_IMAGE="${1#--container=}"
+		shift
+		;;
+	--ctest-dir)
+		if [[ $# -lt 2 ]]; then usage >&2; exit 2; fi
+		CTEST_DIR_OPT="$2"
+		shift 2
+		;;
+	--ctest-dir=*)
+		CTEST_DIR_OPT="${1#--ctest-dir=}"
+		shift
+		;;
+	--cidfile)
+		if [[ $# -lt 2 ]]; then usage >&2; exit 2; fi
+		CIDFILE="$2"
+		shift 2
+		;;
+	--cidfile=*)
+		CIDFILE="${1#--cidfile=}"
+		shift
+		;;
+	--no-rm)
+		REMOVE_CONTAINER=0
+		shift
+		;;
+	-e|--env)
+		if [[ $# -lt 2 ]]; then usage >&2; exit 2; fi
+		CONTAINER_ENV_OPTS+=("$2")
+		shift 2
+		;;
+	--env=*)
+		CONTAINER_ENV_OPTS+=("${1#--env=}")
+		shift
+		;;
+	-e?*)
+		CONTAINER_ENV_OPTS+=("${1#-e}")
+		shift
+		;;
+	-h|--help)
+		usage
+		exit 0
+		;;
+	*)
+		echo "Error: unknown argument: $1" >&2
+		usage >&2
+		exit 2
+		;;
+	esac
+done
+
+
+if [[ -z "${CONTAINER_IMAGE}" && ( -n "${CTEST_DIR_OPT}" || -n "${CIDFILE}" || "${REMOVE_CONTAINER}" = 0 || ${#CONTAINER_ENV_OPTS[@]} -gt 0 ) ]]
+then
+	echo "Error: --ctest-dir, --cidfile, --no-rm and -e/--env only make sense with --container" >&2
+	exit 2
+fi
+
+if [[ -n "${CTEST_DIR_OPT}" && -n "${CTEST_DIR:-}" ]]
+then
+	echo "Error: both --ctest-dir and the CTEST_DIR environment variable are set, use only one" >&2
+	exit 2
+fi
+
+set -x
+
+
+
+# Run in a container
+
+if [[ -n "${CONTAINER_IMAGE}" ]]
+then
+	# Same setup as .github/actions/test/action.yml: sources read-only in /src, build in an executable tmpfs, image's own user,
+	# CI's parallelism and report directory.
+	# The script then calls itself in there, without --container.
+	if command -v docker > /dev/null
+	then
+		CONTAINER_ENGINE=docker
+	elif command -v podman > /dev/null
+	then
+		CONTAINER_ENGINE=podman
+	else
+		echo "Error: neither docker nor podman found in PATH" >&2
+		exit 127
+	fi
+
+	SRCDIR="$(cd "$(dirname "$0")/.." && pwd)"
+	CTEST_DIR_HOST="${CTEST_DIR_OPT:-${CTEST_DIR:-}}"
+
+	# Remove the container (or leave it, with --no-rm) however we exit: end of the run, failure of a step, interruption
+	CIDDIR=""
+	INTERRUPTED=0
+	cleanup() {
+		if [[ -s "${CIDFILE}" ]]
+		then
+			if [[ "${REMOVE_CONTAINER}" = 1 ]]
+			then
+				"${CONTAINER_ENGINE}" rm -f "$(cat "${CIDFILE}")" > /dev/null || true
+			else
+				if [[ "${INTERRUPTED}" = 1 ]]; then "${CONTAINER_ENGINE}" kill "$(cat "${CIDFILE}")" > /dev/null || true; fi
+				echo "Container kept: $(cat "${CIDFILE}") (id in ${CIDFILE}), remove it with: ${CONTAINER_ENGINE} rm $(cat "${CIDFILE}")" >&2
+			fi
+		fi
+		if [[ -n "${CIDDIR}" ]]; then rm -rf "${CIDDIR}"; fi
+	}
+	trap cleanup EXIT
+	trap 'INTERRUPTED=1; exit 130' INT
+	trap 'INTERRUPTED=1; exit 143' TERM
+	if [[ -z "${CIDFILE}" ]]
+	then
+		CIDDIR="$(mktemp -d)"
+		CIDFILE="${CIDDIR}/cid"
+	fi
+
+	if [[ -n "${TEST_DIR:-}" ]]
+	then
+		echo "Warning: TEST_DIR is ignored with --container, the build happens in a tmpfs of the container; use --env TEST_DIR=<dir> to override it there" >&2
+	fi
+
+	# Fail now rather than after the whole run
+	if [[ -n "${CTEST_DIR_HOST}" ]]; then mkdir -p "${CTEST_DIR_HOST}"; fi
+
+	# Also passed when set on the host: PDI_PLUGIN_PATH (CI sets /tmp/pdi_plugins on half of its runs), CMAKE_FLAGS, CTEST_FLAGS, EXCLUDED_PDI_TESTS
+	CONTAINER_ENV=(-e "MAKEFLAGS=${MAKEFLAGS:--j 4}" -e CTEST_DIR=/tmp/tests_output -e TEST_DIR=/tmp_dir_test)
+	for VAR in PDI_PLUGIN_PATH CMAKE_FLAGS CTEST_FLAGS EXCLUDED_PDI_TESTS
+	do
+		if [[ -n "${!VAR+x}" ]]; then CONTAINER_ENV+=(-e "${VAR}"); fi
+	done
+
+	for ENV_OPT in "${CONTAINER_ENV_OPTS[@]}"
+	do
+		CONTAINER_ENV+=(-e "${ENV_OPT}")
+	done
+
+	# In the background, as the shell only handles a signal once its foreground command is done
+	RESULT=0
+	"${CONTAINER_ENGINE}" run \
+		--cidfile="${CIDFILE}" \
+		--security-opt label=disable \
+		-v "${SRCDIR}:/src:ro" \
+		--tmpfs /tmp_dir_test:exec,mode=1777 \
+		"${CONTAINER_ENV[@]}" \
+		"${CONTAINER_IMAGE}" \
+		/src/bin/build_and_run_all_tests &
+	wait "$!" || RESULT=$?
+
+	# Like CI, which publishes them: bring the reports back.
+	# "export" rather than "cp" because the latter fails with a read-only mount under rootless docker.
+	COPY_FAILED=0
+	if [[ -n "${CTEST_DIR_HOST}" ]]
+	then
+		if ! ( set -o pipefail; "${CONTAINER_ENGINE}" export "$(cat "${CIDFILE}")" | tar -x -C "${CTEST_DIR_HOST}" --strip-components=2 tmp/tests_output )
+		then
+			echo "Warning: could not copy the test reports out of the container, they may not exist (for instance if the configuration failed)" >&2
+			COPY_FAILED=1
+		fi
+	fi
+
+	# An error beats a silent fallback, but the status of a failed run is the more informative
+	if [[ "${RESULT}" = 0 && "${COPY_FAILED}" = 1 ]]; then RESULT=1; fi
+	exit "${RESULT}"
+fi
 
 
 

@@ -36,6 +36,8 @@ and this project adheres to
 ### For plugin developers
 
 #### Added
+* `bin/build_and_run_all_tests --container <image>` runs the tests inside a CI image, set up as the CI does it, as per
+  [#NNN](https://github.com/pdidev/pdi/issues/NNN).
 
 #### Changed
 * Merged `Callbacks` into `Global_context` and renamed the callback functions,
