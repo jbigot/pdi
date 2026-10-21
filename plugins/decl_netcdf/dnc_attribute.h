@@ -69,6 +69,12 @@ public:
 	 * \return Ref created from value
 	 */
 	PDI::Ref value() const;
+
+	/** Evaluates the value as an integer, `true' and `false' are 1 and 0
+	 *
+	 * \return the integer value
+	 */
+	long to_long() const;
 };
 
 } // namespace decl_netcdf

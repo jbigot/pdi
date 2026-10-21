@@ -105,6 +105,10 @@ plugins:
   decl_netcdf:
     - file: test_05.nc
       on_event: write
+      variables:
+        vector_data_serialized:
+          attributes:
+            _NoFill: true
       write: [vector_data_serialized, int_array_serialized]
     - file: test_05.nc
       on_event: read

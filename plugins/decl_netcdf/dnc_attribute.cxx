@@ -47,4 +47,13 @@ PDI::Ref Dnc_attribute::value() const
 	return m_value.to_ref(m_ctx);
 }
 
+long Dnc_attribute::to_long() const
+{
+	try {
+		return m_value.to_long(m_ctx);
+	} catch (...) {
+		PDI::rethrow_with_context(std::current_exception(), "while evaluating attribute `{}', ", m_name);
+	}
+}
+
 } // namespace decl_netcdf
