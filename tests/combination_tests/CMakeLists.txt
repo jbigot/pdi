@@ -71,7 +71,5 @@ if("${BUILD_DECL_NETCDF_PLUGIN}" AND "${BUILD_SERIALIZE_PLUGIN}")
 add_executable(test_05_C test_05.c)
 target_link_libraries(test_05_C paraconf::paraconf PDI::PDI_C)
 add_test(NAME test_05_C COMMAND "$<TARGET_FILE:test_05_C>" "${CMAKE_CURRENT_SOURCE_DIR}/test_05.yml")
-#TODO: NetCDF error https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/issues/433
-set_tests_properties(test_05_C PROPERTIES DISABLED TRUE)
 
 endif("${BUILD_DECL_NETCDF_PLUGIN}" AND "${BUILD_SERIALIZE_PLUGIN}")
