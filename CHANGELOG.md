@@ -56,6 +56,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The MPI plugin reference uses the name under which the plugin shares the rank
+  metadata, and documents `Comm_c2f` and `Comm_f2c` in place of the deprecated
+  `transtype`.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
