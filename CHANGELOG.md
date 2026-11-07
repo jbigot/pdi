@@ -56,6 +56,8 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The Trace plugin reference shows where the plugin writes its trace, and in
+  which format, and documents its `logging` key.
 * The Timer plugin reference documents the sequence form of its configuration,
   the plugins that emit timer events, the format of its output file, and that
   nothing is written to it when it cannot be locked.
