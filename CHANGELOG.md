@@ -56,6 +56,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The JSON plugin reference gives a valid configuration example, shows the file
+  the plugin writes, with a mustache template that matches its output, and
+  documents its configuration forms and where its `logging` key can go.
 * The User-code plugin reference gives examples with the access rights they need.
 * The Decl'HDF5 plugin reference documents `mpio` as a plain string, fixing
   [#889](https://github.com/pdidev/pdi/issues/889). It also documents that its
