@@ -12,6 +12,8 @@ and this project adheres to
 ### For users
 
 #### Added
+* The JSON plugin has a page of examples, apart from its reference, which
+  replaces its custom formatting example with one whose output is that of a run.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
