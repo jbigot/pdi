@@ -22,6 +22,8 @@ and this project adheres to
   programs and specification trees that give parameters to a program, count
   events, compute new values from old ones, emit events for other plugins and
   show the iteration in the log, with their output.
+* The JSON plugin has a page of examples, apart from its reference, which
+  replaces its custom formatting example with one whose output is that of a run.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
@@ -75,6 +77,9 @@ and this project adheres to
 * The Set-value plugin reference gives examples that the plugin runs, where they
   used to fail on a record given as a sequence, or put `set_value` outside
   `plugins`.
+* The JSON plugin reference gives a valid configuration example, shows the file
+  the plugin writes, with a mustache template that matches its output, and
+  documents its configuration forms and where its `logging` key can go.
 
 #### Security
 
