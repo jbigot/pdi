@@ -80,7 +80,8 @@ and this project adheres to
   the plugin writes, with a mustache template that matches its output, and
   documents its configuration forms and where its `logging` key can go.
 * The Decl'NetCDF plugin reference documents that the data it reads and writes
-  must be dense.
+  must be dense, and that the attributes of a variable are read whatever the
+  form of `read`.
 
 #### Security
 
