@@ -59,6 +59,9 @@ and this project adheres to
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies, fixing
   [#915](https://github.com/pdidev/pdi/issues/915).
+* The Pycall plugin reference gives examples with working Python code, and
+  documents how the plugin exposes values and handles errors, part of
+  [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
