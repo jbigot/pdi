@@ -83,6 +83,8 @@ and this project adheres to
 * The JSON plugin reference gives a valid configuration example, shows the file
   the plugin writes, with a mustache template that matches its output, and
   documents its configuration forms and where its `logging` key can go.
+* The Decl'NetCDF plugin reference documents that the data it reads and writes
+  must be dense.
 
 #### Security
 
