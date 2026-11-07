@@ -93,6 +93,8 @@ and this project adheres to
   the plugin writes, with a mustache template that matches its output, and
   documents its configuration forms and where its `logging` key can go, part of
   [#916](https://github.com/pdidev/pdi/issues/916).
+* The Decl'NetCDF plugin reference documents that the data it reads and writes
+  must be dense, part of [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
