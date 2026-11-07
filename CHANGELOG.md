@@ -12,6 +12,8 @@ and this project adheres to
 ### For users
 
 #### Added
+* The examples of the User-code plugin move to a page of their own, apart from
+  its reference, with one more, that calls a function on some iterations only.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
