@@ -7,69 +7,20 @@ The Pycall plugin calls Python code written in the YAML file, when some data is 
 The structure of its configuration:
 ```yaml
 plugins:
-  pycall:           // name of plugin
-    on_event:       // run script on event 
-      testing:      // name of an event
-        with:       // data alias
-        exec:       // python code which will be executed when the event is called
-    on_data:        // run script on data share
-      data_name:    // python code which will be executed when data_name is shared
+  pycall:           # name of the plugin
+    on_event:       # run code when an event is emitted
+      testing:      # name of the event
+        with:       # values exposed to the code, and their Python names
+        exec:       # Python code to execute when the event is emitted
+    on_data:        # run code when a data is shared
+      data_name:    # Python code to execute when data_name is shared
 ```
-
-### Plugin tree {#pycall_plugin_tree}
-
-The root of plugin configuration (named `pycall`), is a dictionary that contains the following keys:
-- \ref logging_node
-- \ref pycall_on_event
-- \ref pycall_on_data
-
-### on_event {#pycall_on_event}
-
-This option allows to execute written python code when specific event is called.
-
-```yaml
-data: {a: {type: array, subtype: int, size: 3}}
-plugins:
-  pycall:
-    on_event:
-      testing:
-        with: { a_python: $a }
-        exec: \"print(' * [P] I received    $a =',a_python); a_python[1]=7; print(' * [P] changed it to $a =',a_python);\"
-```
-In this example pycall will run script on `testing` event. In the next step in `with` section alias name for data is generated. `a` will be `a_python` for execusion of the python code. Finally `exec` contains python code that will be executed on `testing` event.
-
-There is also an option to set a list of executions:
-```yaml
-data: {a: {type: array, subtype: int, size: 3}}
-plugins:
-  pycall:
-    on_event:
-      testing:
-        - exec: #some_python_script
-          with: { a: $a }
-        - exec: #some_other_python_script
-          with: { b: $a }
-```
-
-### on_data {#pycall_on_data}
-
-This option allows to execute written python code when specific data is shared. 
-
-```yaml
-data: {a: {type: array, subtype: int, size: 3}}
-plugins:
-  pycall:
-    on_data:
-      a: print(' * [P] I received    $a =',a); a[1]=7; print(' * [P] changed it to $a =',a);\"
-```
-
-The `on_data` is a dictionary that contains data name with the python script that will be executed on share.
 
 ## Examples {#pycall_ex}
 
-Full example of pycall plugin. For siplicity yaml file was included with c code in one file instead of creating separate files.
+A full example of the Pycall plugin, with its specification tree and the C code that uses it.
 
-Yaml file named your_file:
+Specification tree:
 ```yaml
 logging: trace
 data: {a: {type: array, subtype: int, size: 3}}
@@ -78,11 +29,11 @@ plugins:
     on_event:
       testing:
         with: { a_python: $a }
-        exec: \"print(' * [P] I received    $a =',a_python); a_python[1]=7; print(' * [P] changed it to $a =',a_python);\"
+        exec: "print(' * [P] I received    $a =',a_python); a_python[1]=7; print(' * [P] changed it to $a =',a_python);"
 ```
 
-C++ code:
-```cpp
+C code:
+```c
 	int a[3] = {1, 2, 3};
 	
 	printf(" * [C] starting with $a = [%d %d %d]\n", a[0], a[1], a[2]);
@@ -93,13 +44,140 @@ C++ code:
 	
 	printf(" * [C] now I see     $a = [%d %d %d]\n", a[0], a[1], a[2]);
 ```
-Output from the program:
+Output of the program:
 ```
  * [C] starting with $a = [1 2 3]
-[PDI][13:51:26] *** trace: Sharing `a' Ref with rights: R = true, W = true
-[PDI][13:51:26] *** trace: Calling `a' share. Callbacks to call: 0
-[PDI][13:51:26] *** trace: Calling `testing' event. Callbacks to call: 1
+[13:51:26][PDI] *** trace: Sharing `a' Ref with rights: R = true, W = true
+[13:51:26][PDI] *** trace: Calling `a' share. Callbacks to call: 0
+[13:51:26][PDI] *** trace: Calling `testing' event. Callbacks to call: 1
  * [P] I received    $a = [1 2 3]
  * [P] changed it to $a = [1 7 3]
  * [C] now I see     $a = [1 7 3]
 ```
+
+## `@pycall` {#pycall_config}
+
+A mapping.
+Use it, as the value of `plugins.pycall` (see \ref spectree_pdi_plugins_plugin_name), to give the Python code to execute, and when.
+
+The code is executed in the scope of the `__main__` Python module, where the `pdi` Python module is also available under the name `pdi`.
+Variables defined by the code, and values exposed to it, remain in that scope and are visible to the code executed afterwards.
+An exception raised by the Python code is logged as an error; it does not interrupt the program.
+
+**Example:**
+
+```yaml
+plugins:
+  pycall:
+    on_event:
+      my_event:           # <- code run when my_event is emitted...
+        exec: "print('my_event was emitted')"
+    on_data:
+      my_data: "print(my_data)"   # <- ... and when my_data is shared
+```
+
+
+### `@pycall.on_event.<event_name>` {#pycall_on_event_event_name}
+
+Either a single \ref pycall_pycode or a sequence of them.
+Use `on_event.<event_name>` to execute the code, in order, each time the event named `<event_name>` is emitted.
+
+**Example:**
+
+```yaml
+on_event:
+  testing:                # <- a single piece of code...
+    exec: "print(a_python); a_python[1] = 7"
+    with: {a_python: $a}
+```
+
+The code sees the value of `a` as `a_python`, and can change it if `a` is shared with write access.
+
+
+**Example:**
+
+```yaml
+on_event:
+  testing:                # <- ... or a sequence of them, run in order
+    - exec: "print(x)"
+      with: {x: $a}
+    - exec: "print(y)"
+      with: {y: $b}
+```
+
+
+### `@pycall.on_data.<data_name>` {#pycall_on_data_data_name}
+
+A scalar.
+Use `on_data.<data_name>` to execute this Python code each time the data named `<data_name>` is shared.
+The data is exposed to the code as the variable named `<data_name>`.
+
+**Example:**
+
+```yaml
+on_data:
+  a: "print(' * [P] I received $a =', a)"   # <- run each time a is shared, which it sees as a
+```
+
+
+### `@pycall.logging` {#pycall_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugins_plugin_name_logging.
+
+**Example:**
+
+```yaml
+logging: debug            # <- the logger of the Pycall plugin
+on_data:
+  a: "print(a)"
+```
+
+
+## `@pycode` {#pycall_pycode}
+
+A piece of Python code to execute, and the values it sees: a mapping with the keys below.
+You can use it in \ref pycall_on_event_event_name.
+
+**Example:**
+
+```yaml
+on_event:
+  my_event:
+    exec: "print(x * 2)"  # <- this mapping is a piece of code, and the values it sees
+    with: {x: $my_data}
+```
+
+
+### `@pycode.exec` {#pycall_pycode_exec}
+
+*Required.*
+A scalar.
+Use `exec` to give the Python code to execute.
+
+**Example:**
+
+```yaml
+exec: "import numpy; print(numpy.sum(a))"   # <- the Python code
+with: {a: $my_array}
+```
+
+
+### `@pycode.with.<python_name>` {#pycall_pycode_with_python_name}
+
+*Optional.*
+A \ref spectree_expression.
+Use `with.<python_name>` to expose its value to the Python code as the variable named `<python_name>`.
+`with` can be omitted: no value is then exposed for this execution of the code.
+
+**Example:**
+
+```yaml
+exec: "print(x, n)"
+with:
+  x: $my_data             # <- the value of my_data, seen as x
+  n: $size
+```
+
+

@@ -59,6 +59,8 @@ and this project adheres to
 * The MPI plugin reference uses the name under which the plugin shares the rank
   metadata, and documents `Comm_c2f` and `Comm_f2c` in place of the deprecated
   `transtype`.
+* The Pycall plugin reference gives examples with working Python code, and
+  documents how the plugin exposes values and handles errors.
 * The JSON plugin reference gives a valid configuration example, shows the file
   the plugin writes, with a mustache template that matches its output, and
   documents its configuration forms and where its `logging` key can go.
