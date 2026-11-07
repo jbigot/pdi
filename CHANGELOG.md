@@ -14,6 +14,8 @@ and this project adheres to
 #### Added
 
 #### Changed
+* The API reference no longer lists the deprecated macros, nor those that
+  serve the implementation of `PDI_PLUGIN` and the plugin API version.
 
 #### Deprecated
 
@@ -36,6 +38,8 @@ and this project adheres to
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
 * The User-code plugin reference gives examples with the access rights they need.
+* The API reference names the deprecated statuses `PDI_UNAVAILABLE`,
+  `PDI_ERR_CONFIG` and `PDI_ERR_RIGHT`, instead of their deprecation macro.
 
 #### Security
 
