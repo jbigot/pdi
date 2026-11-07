@@ -59,6 +59,12 @@ and this project adheres to
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies, fixing
   [#915](https://github.com/pdidev/pdi/issues/915).
+* The Decl'HDF5 plugin reference documents `mpio` as a plain string. It also
+  documents that its compression and checksum filters need a chunked dataset,
+  when subfiling applies, and that a dataset has no unlimited dimension, and no
+  longer links its `error` collision policy to the C API's error handling. This
+  fixes [#889](https://github.com/pdidev/pdi/issues/889), part of
+  [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
