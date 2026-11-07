@@ -69,6 +69,10 @@ and this project adheres to
   longer links its `error` collision policy to the C API's error handling. This
   fixes [#889](https://github.com/pdidev/pdi/issues/889), part of
   [#916](https://github.com/pdidev/pdi/issues/916).
+* The Decl'NetCDF plugin reference lists its `when` and `deflate` file keys,
+  gives group attributes in the form the plugin reads, and documents when it
+  compresses and chunks a variable, part of
+  [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
