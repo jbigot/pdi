@@ -52,6 +52,8 @@ and this project adheres to
   [#895](https://github.com/pdidev/pdi/issues/895).
 
 #### Changed
+* The plugin API reference documents the overloads of a function together,
+  under the function's name, with a description of what they share.
 
 #### Deprecated
 * The `TEST_DIR` and `CTEST_DIR` environment variables of

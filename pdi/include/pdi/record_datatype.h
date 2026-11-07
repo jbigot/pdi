@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020-2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -58,6 +58,10 @@ public:
 		std::string m_name;
 
 	public:
+		/// \name Member
+		/// Construct a new member
+		///@{
+
 		/** Construct a new member
 		 *
 		 * \param displacement offset or distance in byte from the Record_datatype start
@@ -71,6 +75,8 @@ public:
 		 * \param o the Member to copy
 		 */
 		Member(const Member& o);
+
+		///@}
 
 		/** Access the offset or distance in byte from the Record_datatype start
 		 *
@@ -135,9 +141,15 @@ public:
 
 	void* data_from_dense_copy(void* to, const void*) const override;
 
+	/// \name member
+	/// Access the type, or the type and value, of the member with the provided name
+	///@{
+
 	Datatype_sptr member(const char* name) const override;
 
 	std::pair<void*, Datatype_sptr> member(const char* name, void* data) const override;
+
+	///@}
 
 	void destroy_data(void*) const override;
 

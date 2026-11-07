@@ -42,6 +42,7 @@
 
 namespace PDI {
 
+/// \cond
 namespace {
 
 /** The type returned by a reference with R/W access
@@ -73,6 +74,8 @@ using ref_access_t = typename Ref_access<R, W>::type;
 
 } // namespace
 
+/// \endcond
+
 /** A common base for all references, whatever their access privileges.
  *
  * This ensure all reference, even with different type because of differing
@@ -101,6 +104,10 @@ protected:
 		/// Nullification notifications registered on this instance
 		std::unordered_map<const Reference_base*, std::function<void(Ref)> > m_notifications;
 
+		/// \name Referenced_buffer
+		/// Constructs a new buffer descriptor
+		///@{
+
 		/** Constructs a new buffer descriptor
 		 *
 		 * \param deleter the function to use to deallocate the buffer memory
@@ -118,6 +125,8 @@ protected:
 		Referenced_buffer(const Referenced_buffer&) = delete;
 
 		Referenced_buffer(Referenced_buffer&&) = delete;
+
+		///@}
 
 		~Referenced_buffer()
 		{
@@ -141,6 +150,10 @@ protected:
 
 		/// Type of the data
 		Datatype_sptr m_type;
+
+		/// \name Referenced_data
+		/// Constructs a new data descriptor
+		///@{
 
 		/** Constructs a new data descriptor from an already referenced buffer.
 		 *
@@ -185,6 +198,8 @@ protected:
 		Referenced_data(const Referenced_data&) = delete;
 
 		Referenced_data(Referenced_data&&) = delete;
+
+		///@}
 	};
 
 	/** Pointer on the data content, can be null if the ref is null
@@ -204,6 +219,10 @@ protected:
 	// generation of all 4 variants of `Ref_any::copy`
 	static Ref do_copy(Ref_r ref);
 
+	/// \name Reference_base
+	/// Constructs a null reference; a reference can be neither copied nor moved at this level
+	///@{
+
 	/** Constructs a null reference
 	 */
 	Reference_base() noexcept
@@ -214,9 +233,17 @@ protected:
 
 	Reference_base(Reference_base&&) = delete;
 
+	///@}
+
+	/// \name operator=
+	/// A reference can be neither copied nor moved at this level
+	///@{
+
 	Reference_base& operator= (const Reference_base&) = delete;
 
 	Reference_base& operator= (Reference_base&&) = delete;
+
+	///@}
 
 public:
 	/** accesses the type of the referenced raw data
@@ -243,6 +270,10 @@ class PDI_EXPORT Ref_any: public Reference_base
 public:
 	template <bool OR, bool OW>
 	friend class Ref_any;
+
+	/// \name Ref_any
+	/// Constructs a reference: a null one, a copy of an existing one, or one to currently unreferenced data
+	///@{
 
 	/** Constructs a null reference
 	 */
@@ -306,9 +337,15 @@ public:
 		}
 	}
 
+	///@}
+
 	/** Destructor
 	 */
 	~Ref_any() { reset(); }
+
+	/// \name operator=
+	/// Moves or copies a reference into this one
+	///@{
 
 	Ref_any& operator= (Ref_any&& other) noexcept
 	{
@@ -337,6 +374,12 @@ public:
 		return *this;
 	}
 
+	///@}
+
+	/// \name operator==
+	/// Checks whether two references point to the same content
+	///@{
+
 	bool operator== (const Reference_base& o) const noexcept
 	{
 		is_null();
@@ -356,6 +399,12 @@ public:
 		return m_content == get_content(o);
 	}
 
+	///@}
+
+	/// \name operator!=
+	/// Checks whether two references point to different contents
+	///@{
+
 	bool operator!= (const Ref_any& o) const noexcept
 	{
 		is_null();
@@ -374,6 +423,8 @@ public:
 		is_null();
 		return m_content != get_content(o);
 	}
+
+	///@}
 
 	bool operator< (const Reference_base& o) const noexcept
 	{
@@ -398,6 +449,10 @@ public:
 		is_null();
 		return m_content >= get_content(o);
 	}
+
+	/// \name operator[]
+	/// Creates a sub-reference to a member, an element or a slice of the referenced content
+	///@{
 
 	/** Create a sub-reference to a member in case the content behind the ref is a record
 	 *
@@ -455,6 +510,8 @@ public:
 		return result;
 	}
 
+	///@}
+
 	/** Create a reference to the pointed content in case the ref type is a reference.
 	 *
 	 * \return a reference to the dereferenced data
@@ -485,6 +542,10 @@ public:
 	 */
 	operator ref_access_t<R, W> () const { return get(); }
 
+	/// \name get
+	/// Offers access to the referenced raw data
+	///@{
+
 	/** Offers access to the referenced raw data, throws on null references
 	 *
 	 * \return a pointer to the referenced raw data
@@ -504,6 +565,8 @@ public:
 		if (is_null()) return nullptr;
 		return m_content->m_data;
 	}
+
+	///@}
 
 	/** Returns a scalar value of type T taken from the data buffer
 	 *  \return value taken from the data buffer
