@@ -14,6 +14,21 @@ and this project adheres to
 #### Added
 
 #### Changed
+* The specification tree reference, and that of each plugin, documents the tree
+  as a set of *blocks*, written `@name`: `@pdi` for the root of the tree, one
+  per plugin for its configuration, such as `@decl_hdf5`, and one for each part
+  documented once, such as a datatype, a logger configuration, or the file and
+  I/O descriptions of Decl'HDF5 and Decl'NetCDF. Each key has a section of its
+  own under its block, named after its path from that block, as per
+  [#730](https://github.com/pdidev/pdi/issues/730).
+* The specification tree reference, and that of each plugin, documents the keys
+  that accept either a single value or a sequence of values as such: the include
+  directives, the plugin path, the sizes of arrays, the file descriptions of
+  Decl'HDF5, Decl'NetCDF and JSON, and the writes, reads, events and function
+  lists of several plugins.
+* The specification tree reference, and that of each plugin, gives an example
+  for each key: a minimal configuration of its block, its line commented. The
+  values of a key that takes one of a fixed set of them are listed in a table.
 * Improved error message in type check in Decl'NetCDF when reading scalar variable from file
   as requested [#731](https://github.com/pdidev/pdi/issues/731)
 * Split the example of HDF5 between serial and parallel versions, 
@@ -34,6 +49,13 @@ and this project adheres to
   per [#789](https://github.com/pdidev/pdi/issues/789).
 
 #### Fixed
+* The specification tree reference now describes logging as PDI implements it,
+  with a working example, fixing [#808](https://github.com/pdidev/pdi/issues/808).
+* The specification tree reference now lists the datatypes PDI has, and only
+  those, fixing [#841](https://github.com/pdidev/pdi/issues/841).
+* The specification tree reference now gives tuple examples that PDI accepts,
+  marks the required keys of arrays, tuples and includes as such, and documents
+  the type spellings, literals and redefinition rules PDI applies.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 

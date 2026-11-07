@@ -19,7 +19,7 @@ plugins:
 ### Plugin tree {#pycall_plugin_tree}
 
 The root of plugin configuration (named `pycall`), is a dictionary that contains the following keys:
-- \ref logging_node
+- \ref spectree_logging
 - \ref pycall_on_event
 - \ref pycall_on_data
 

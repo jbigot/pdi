@@ -292,7 +292,7 @@ The root of `user-code` plugin is a dictionary that contains the following keys:
 
 |key|value|
 |:--|:----|
-|`"logging"`  (*optional*)|a \ref logging_node|
+|`"logging"`  (*optional*)|a \ref spectree_logging|
 |`"on_data"`  (*optional*)|a \ref on_data_node    |
 |`"on_event"` (*optional*)|a \ref on_event_node   |
 |`".*"`       (*optional*)| *anything*            |
