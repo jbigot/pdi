@@ -54,6 +54,7 @@ set(DOXYGEN_INPUT
 		"${PDI_SOURCE_DIR}/../plugins/decl_hdf5/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/decl_hdf5/examples.md"
 		"${PDI_SOURCE_DIR}/../plugins/decl_netcdf/README.md"
+		"${PDI_SOURCE_DIR}/../plugins/decl_netcdf/examples.md"
 		"${PDI_SOURCE_DIR}/../plugins/mpi/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/timer/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/trace/README.md"
