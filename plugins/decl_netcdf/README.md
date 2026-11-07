@@ -318,6 +318,7 @@ write: [field]
 
 A \ref decl_netcdf_ncio.
 Use `write.<data_name>` to write the descriptor named `<data_name>`.
+Its datatype must be dense, without `subsize` or `start`: Decl'NetCDF writes its whole buffer.
 
 \warning To write a record datatype, its `+decl_netcdf.type` attribute must be set to the name of the NetCDF compound type.
 
@@ -376,6 +377,7 @@ write: [field, iter]      # <- field and iter, each to the variable of the same 
 
 A \ref decl_netcdf_ncio.
 Use `read.<data_name>` to read into the descriptor named `<data_name>`.
+Its datatype must be dense, as for \ref decl_netcdf_ncfile_write_data_name.
 
 **Example:**
 
