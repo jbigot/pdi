@@ -14,6 +14,8 @@ and this project adheres to
 #### Added
 
 #### Changed
+* The API reference no longer lists the deprecated macros, nor those that
+  serve the implementation of `PDI_PLUGIN` and the plugin API version.
 * Improved error message in type check in Decl'NetCDF when reading scalar variable from file
   as requested [#731](https://github.com/pdidev/pdi/issues/731)
 * Split the example of HDF5 between serial and parallel versions, 
@@ -34,6 +36,8 @@ and this project adheres to
   per [#789](https://github.com/pdidev/pdi/issues/789).
 
 #### Fixed
+* The API reference names the deprecated statuses `PDI_UNAVAILABLE`,
+  `PDI_ERR_CONFIG` and `PDI_ERR_RIGHT`, instead of their deprecation macro.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
