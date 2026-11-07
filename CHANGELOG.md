@@ -72,7 +72,9 @@ and this project adheres to
 * The Set-value plugin reference gives examples that the plugin runs, where they
   used to fail on a record given as a sequence, or put `set_value` outside
   `plugins`.
-* The User-code plugin reference gives examples with the access rights they need.
+* The User-code plugin reference gives examples that are valid YAML, with the
+  access rights they need, and puts `when` in the function lists, where the
+  plugin reads it.
 * The Decl'HDF5 plugin reference documents `mpio` as a plain string, fixing
   [#889](https://github.com/pdidev/pdi/issues/889). It also documents that its
   compression and checksum filters need a chunked dataset, when subfiling

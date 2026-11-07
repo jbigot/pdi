@@ -18,7 +18,7 @@ emitted, or when some data becomes available.
 For the `user-code` plugin to work properly, the application code and the specification tree must follow
 several conventions.
 
-First, each function name in specification tree must be a valid function name (watch out for [name mangling](https://en.wikipedia.org/wiki/Name_mangling)). Please do not use any PDI yaml key for the function name. (e.g., `when`, `file`, etc.)
+First, each function name in the specification tree must be the name of a symbol of the program (watch out for [name mangling](https://en.wikipedia.org/wiki/Name_mangling)). A function cannot be named `when`: this key is reserved for the condition of a function list.
 
 Second, these functions **cannot** take any argument or return any value (*i.e.* their type must be `void(void)`). Use aliases to pass input and output variables instead.
 
@@ -64,11 +64,11 @@ plugins:
 
 Output:
 ```console
-[PDI][User-code][13:40:55] *** info: Plugin loaded successfully
-[PDI][13:40:55] *** info: Initialization successful
+[13:40:55][User-code] *** info: Plugin loaded successfully
+[13:40:55][PDI] *** info: Initialization successful
 Hello world!
-[PDI][13:40:55] *** info: Finalization
-[PDI][User-code][13:40:55] *** info: Closing plugin
+[13:40:55][PDI] *** info: Finalization
+[13:40:55][User-code] *** info: Closing plugin
 ```
 
 ### Handling input {#handling_input_node}
@@ -113,11 +113,11 @@ plugins:
 
 Output:
 ```console
-[PDI][User-code][13:49:30] *** info: Plugin loaded successfully
-[PDI][13:49:30] *** info: Initialization successful
+[13:49:30][User-code] *** info: Plugin loaded successfully
+[13:49:30][PDI] *** info: Initialization successful
 I've got number 42.
-[PDI][13:49:30] *** info: Finalization
-[PDI][User-code][13:49:30] *** info: Closing plugin
+[13:49:30][PDI] *** info: Finalization
+[13:49:30][User-code] *** info: Closing plugin
 
 ```
 
@@ -161,11 +161,11 @@ plugins:
 
 The output does not change:
 ```console
-[PDI][User-code][13:52:15] *** info: Plugin loaded successfully
-[PDI][13:52:15] *** info: Initialization successful
+[13:52:15][User-code] *** info: Plugin loaded successfully
+[13:52:15][PDI] *** info: Initialization successful
 I've got number 42.
-[PDI][13:52:15] *** info: Finalization
-[PDI][User-code][13:52:15] *** info: Closing plugin
+[13:52:15][PDI] *** info: Finalization
+[13:52:15][User-code] *** info: Closing plugin
 ```
 
 ### Handling output {#handling_output_node}
@@ -213,12 +213,12 @@ plugins:
 
 Output:
 ```console
-[PDI][User-code][13:53:51] *** info: Plugin loaded successfully
-[PDI][13:53:51] *** info: Initialization successful
+[13:53:51][User-code] *** info: Plugin loaded successfully
+[13:53:51][PDI] *** info: Initialization successful
 Before expose, number = 42.
 After expose, number = 52.
-[PDI][13:53:51] *** info: Finalization
-[PDI][User-code][13:53:51] *** info: Closing plugin
+[13:53:51][PDI] *** info: Finalization
+[13:53:51][User-code] *** info: Closing plugin
 
 ```
 
@@ -279,102 +279,176 @@ plugins:
 
 Output:
 ```console
-[PDI][User-code][13:58:20] *** info: Plugin loaded successfully
-[PDI][13:58:20] *** info: Initialization successful
+[13:58:20][User-code] *** info: Plugin loaded successfully
+[13:58:20][PDI] *** info: Initialization successful
 Before calculation, foo = 4, bar = 5, res1 = 0, res2 = 0.
 After calculation, foo = 4, bar = 5, res1 = 9, res2 = 20.
-[PDI][13:58:20] *** info: Finalization
-[PDI][User-code][13:58:20] *** info: Closing plugin
+[13:58:20][PDI] *** info: Finalization
+[13:58:20][User-code] *** info: Closing plugin
 ```
 
-## Configuration grammar {#conf_grammar_node}
+## `@user_code` {#user_code_config}
 
-The root of `user-code` plugin is a dictionary that contains the following keys:
+A mapping.
+Use it, as the value of `plugins.user_code` (see \ref spectree_pdi_plugins_plugin_name), to give the functions to call, and when.
+Keys not listed here are ignored.
 
-|key|value|
-|:--|:----|
-|`"logging"`  (*optional*)|a \ref logging_node|
-|`"on_data"`  (*optional*)|a \ref on_data_node    |
-|`"on_event"` (*optional*)|a \ref on_event_node   |
-|`".*"`       (*optional*)| *anything*            |
+**Example:**
 
-* the `on_data` key specifies the list of descriptors that, when they become available, 
-will cause the specified functions to be called,
-* the `on_event` key specifies the list of events on which to call the specified functions,
-* additional keys are ignored.
-
-### on_data {#on_data_node}
-
-A \ref on_data_node is a dictionary that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"when"` (*optional*)|a $-expression defines a condition for executing the function|
-|`".*"` (*optional*)|a \ref function_list_node|
-
-* each key identifies the name of a descriptor, which will trigger specified functions when it becomes available.
-
-If a data is used to trigger multiple functions and some functions should be executed only if the `when` condition is satisfied, then we can use the list-styled syntex of the yaml:
 ```yaml
-plugins:                       
-    user_code:                   
-        on_data:                   
-            - my_data:                 
-                when: `$cond>1`
-                fun1: {in: $desc2, out: $desc3}
-            - my_data:
-                fun2: {}
-                fun3: {out: $desc2}
+plugins:
+  user_code:
+    on_event:
+      checkpoint:         # <- functions called on an event...
+        write_checkpoint: {}
+    on_data:
+      field:              # <- ... and when data is shared
+        process_field: {input: $field}
 ```
 
-In this exmaple, `fun2` and `fun3` will be executed when `my_data` is shared to PDI. However, `fun1` will only be executed when `my_data` is shared and also `$cond>1`.
 
-### on_event {#on_event_node}
+### `@user_code.on_event` {#user_code_on_event}
 
-A \ref on_event_node is a dictionary that contains the following keys:
+*Optional.*
+A mapping.
+Use `on_event` to call functions when events are emitted.
+It can also be a sequence of single-key mappings, which has the same meaning and lets an event appear more than once.
 
-|key|value|
-|:--|:----|
-|`"when"` (*optional*)|a $-expression defines a condition for executing the function|
-|`".*"` (*optional*)|a \ref function_list_node|
+**Example:**
 
-* each key identifies the name of an event, which will trigger specified functions when it occurs.
-
-If an event is used to trigger multiple functions and some functions should be executed only if the `when` condition is satisfied, then we can use the list-styled syntex of the yaml:
 ```yaml
-plugins:                       
-    user_code:                   
-        on_event:                   
-            - my_event:                 
-                when: `$cond>1`
-                fun1: {in: $desc2, out: $desc3}
-            - my_event:
-                fun2: {}
-                fun3: {out: $desc2}
+on_event:                 # <- functions called on events
+  checkpoint:
+    write_checkpoint: {}
 ```
 
-In this exmaple, `fun2` and `fun3` will be executed when `my_event` is issued. However, `fun1` will only be executed when `my_evnet` is issued and also `$cond>1`.
 
-### function_list {#function_list_node}
+### `@user_code.on_event.<event_name>` {#user_code_on_event_event_name}
 
-A \ref function_list_node is a dictionary that contains the following keys:
+Either a single \ref user_code_function_list or a sequence of them.
+Use `on_event.<event_name>` to call the functions each time the event named `<event_name>` is emitted.
 
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a \ref function_param_list_node|
+**Example:**
 
-* each key identifies the name of a function, which will be called on specified event or data,
-* **NOTE**: these functions **can not** take any arguments or return any value (i.e. their type must be `void(void)`).
+```yaml
+on_event:
+  - my_event:             # <- two function lists for the same event, in the sequence form
+      when: $cond > 1
+      fun1: {in: $desc2, out: $desc3}
+  - my_event:
+      fun2: {}
+```
 
-### function_param_list {#function_param_list_node}
+`fun2` is called each time `my_event` is emitted, `fun1` only if, in addition, `$cond > 1`.
 
-A \ref function_param_list_node is a dictionary that contains the following keys:
 
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a $-expression referencing a data|
+### `@user_code.on_data` {#user_code_on_data}
 
-* each key identifies the name of a descriptor alias, which will be available during function execution.
+*Optional.*
+A mapping.
+Use `on_data` to call functions when data are shared.
+It can also be a sequence of single-key mappings, which has the same meaning and lets a data appear more than once.
+
+**Example:**
+
+```yaml
+on_data:                  # <- functions called when data is shared
+  field:
+    process_field: {input: $field}
+```
+
+
+### `@user_code.on_data.<data_name>` {#user_code_on_data_data_name}
+
+Either a single \ref user_code_function_list or a sequence of them.
+Use `on_data.<data_name>` to call the functions each time the data named `<data_name>` is shared.
+
+**Example:**
+
+```yaml
+on_data:
+  field:                  # <- called each time field is shared
+    process_field: {input: $field}
+    report: {}
+```
+
+
+### `@user_code.logging` {#user_code_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugins_plugin_name_logging.
+
+**Example:**
+
+```yaml
+logging: debug            # <- the logger of the User-code plugin
+on_event:
+  checkpoint:
+    write_checkpoint: {}
+```
+
+
+## `@function_list` {#user_code_function_list}
+
+A *function list*: a mapping with the keys below, giving the functions to call, in order, and an optional condition.
+You can use it in \ref user_code_on_event_event_name and \ref user_code_on_data_data_name.
+
+**Example:**
+
+```yaml
+on_event:
+  step:                   # <- this mapping is a function list
+    when: $iter > 0
+    compute: {in: $field, out: $result}
+    report: {}
+```
+
+
+### `@function_list.when` {#user_code_function_list_when}
+
+*Optional.*
+A \ref spectree_expression.
+Use `when` to call the functions of the list only under a condition.
+It is evaluated for each function, once its aliases are exposed, and the function is only called if it is true.
+An error while evaluating it is logged and does not interrupt the program.
+
+**Example:**
+
+```yaml
+when: $iter % 10 = 0      # <- the functions are only called every 10 iterations
+report: {}
+```
+
+
+### `@function_list.<function_name>` {#user_code_function_list_function_name}
+
+A mapping, empty (`{}`) when the function needs no alias.
+Use `<function_name>` to call the function named `<function_name>`, with the aliases to expose while it runs.
+The function must be of type `void(void)` and its symbol exported, see \ref dependencies_node.
+A function cannot be named `when`: this key is reserved for the condition of the list.
+
+**Example:**
+
+```yaml
+compute: {in: $field}     # <- calls compute(), with field shared as in while it runs
+report: {}                # <- calls report(), with nothing shared
+```
+
+
+### `@function_list.<function_name>.<alias_name>` {#user_code_function_list_function_name_alias_name}
+
+A \ref spectree_expression.
+Use `<alias_name>` to share its value under the name `<alias_name>` while the function runs.
+
+**Example:**
+
+```yaml
+compute:
+  in: $field              # <- compute() accesses field as in
+  out: $result            #    and result as out
+```
+
 
 ## Specification tree example {#full_spec_tree_example_node}
 
@@ -389,14 +463,14 @@ plugins:
     user_code:                   
         on_data:                   
             desc1:                 
-                when: `$cond>1`
+                when: '$cond>1'
                 fun1: {in: $desc2, out: $desc3}
             desc2:
                 fun2: {}
                 fun3: {out: $desc2}
         on_event:                  
             event1:                 
-                when: `$cond<1`     
+                when: '$cond<1'     
                 fun2: {}
             event2:
                 fun4: {param1: $desc2, param2: $desc1, param3: $desc3}
