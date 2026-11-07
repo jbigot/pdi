@@ -60,6 +60,7 @@ set(DOXYGEN_INPUT
 		"${PDI_SOURCE_DIR}/../plugins/pycall/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/serialize/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/set_value/README.md"
+		"${PDI_SOURCE_DIR}/../plugins/set_value/examples.md"
 		"${PDI_SOURCE_DIR}/../plugins/json/README.md")
 
 set(DOXY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../..")

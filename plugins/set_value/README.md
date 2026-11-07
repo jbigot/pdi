@@ -10,6 +10,10 @@ It can:
 4. set data: give new values to data that is already shared,
 5. emit an event.
 
+This page is the reference of its configuration, one section per key.
+\subpage set_value_examples "Set_value examples" shows, one approach at a time, how to combine them into whole specification trees, and how
+the values it sets are computed from the old ones.
+
 ## `@set_value` {#set_value_config}
 
 A mapping with the keys below.
@@ -276,119 +280,3 @@ Use `<data_name>` to give the value of the data named `<data_name>`, either:
     id: 3
     position: [1.0, 2.0, 3.0]
 ```
-
-
-## Full configuration example {#full_config}
-
-```yaml
-metadata:
-  array_size: int64
-
-data:
-  record_data:
-    type: record
-    buffersize: 36
-    members:
-      scalar_data: 
-        disp: 0
-        type: int
-      array_data:
-        disp: 4
-        type: array
-        size: $array_size
-        subtype: int
-
-plugins:
-  set_value:
-    on_init:
-      - expose:
-        - array_size: 3
-      - share:
-        - record_data:
-            scalar_data: 0
-            array_data: [0, 0, 0]
-    on_event:
-      event_1_name:
-        - set:
-          - record_data:
-              scalar_data: 3
-              array_data: [1, 2, 3]
-    on_finalize:
-      - release: [record_data]
-```
-
-## Using old values to set new ones {#old_to_new}
-### Incrementing a value {#increment}
-The new values can be computed from the old ones, even those of the data being set, for example to
-increment a scalar.
-
-```yaml
-data:
-  value_int:
-    type: int
-  int_array:
-    size: 3
-    subtype: int
-    type: array
-plugins:
-  set_value:
-    on_event:
-      init:
-        - share:
-          - value_int: 0
-          - int_array: [1, 2, 3]
-      increment:
-        - set:
-          - value_int: "$value_int + 1"
-          - int_array: ["$int_array[0] + 1", "$int_array[1] + 1", "$int_array[2] + 1"]
-    on_finalize:
-      - release: [value_int, int_array]
-```
-After the `init` and `increment` events, `value_int` equals 1, and `int_array` [2, 3, 4].
-
-### Getting the old value {#increment_in_array}
-The new value of a data is only set once all its elements are evaluated. So when an element of an
-array depends on another element of the same array, it gets the old value of that element:
-
-```yaml
-metadata:
-  int_array:
-    size: 3
-    subtype: int
-    type: array
-plugins:
-  set_value:
-    on_event:
-      init:
-        - expose:
-          - int_array: [0, 0, 0]
-      increment:
-        - expose:
-          - int_array: ["$int_array[0] + 1", "$int_array[0] + 1", "$int_array[1] + 1"]
-```
-After the `init` and `increment` events, all the elements of `int_array` equal `1`,
-because `int_array[0]` is only updated once all the elements are evaluated.
-
-### Getting the new value {#update_array_after_scalar}
-
-```yaml
-metadata:
-  int_scalar: int
-  int_array:
-    size: 3
-    subtype: int
-    type: array
-plugins:
-  set_value:
-    on_event:
-      init:
-        - expose:
-          - int_scalar: 0
-          - int_array: [0, 0, 0]
-      increment:
-        - expose:
-          - int_scalar: $int_scalar+1
-          - int_array: ["$int_scalar", "$int_scalar", "$int_scalar"]
-```
-After the `init` and `increment` events, all the elements of `int_array` equal `1`,
-because the data of a value list are set in order: `int_scalar` has its new value when `int_array` is evaluated.
