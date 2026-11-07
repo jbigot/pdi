@@ -30,6 +30,8 @@ and this project adheres to
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
 * The User-code plugin reference gives examples with the access rights they need.
+* The Decl'HDF5 plugin reference no longer links its `error` collision policy to
+  the C API's error handling.
 
 #### Security
 
