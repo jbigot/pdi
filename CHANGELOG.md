@@ -22,6 +22,8 @@ and this project adheres to
   show the iteration in the log, with their output.
 * The examples of the User-code plugin move to a page of their own, apart from
   its reference, with one more, that calls a function on some iterations only.
+* The JSON plugin has a page of examples, apart from its reference, which
+  replaces its custom formatting example with one whose output is that of a run.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
