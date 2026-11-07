@@ -61,6 +61,9 @@ and this project adheres to
   compression and checksum filters need a chunked dataset, when subfiling
   applies, and that a dataset has no unlimited dimension, and no longer links
   its `error` collision policy to the C API's error handling.
+* The Decl'NetCDF plugin reference lists its `when` and `deflate` file keys,
+  gives group attributes in the form the plugin reads, and documents when it
+  compresses and chunks a variable.
 
 #### Security
 
