@@ -1,7 +1,7 @@
 # Decl'NetCDF examples {#Decl_NetCDF_examples}
 
 These examples show, one approach at a time, how to write and read NetCDF files with the \ref Decl_NetCDF_plugin "Decl'NetCDF plugin".
-Each one is a whole specification tree, that you can run as is; the \ref Decl_NetCDF_plugin "reference" documents each of their keys.
+Each one is a whole specification tree, that you can run as is; the \ref Decl_NetCDF_reference "reference" documents each of their keys.
 They follow the same steps as the \ref Decl_HDF5_examples "Decl'HDF5 examples", with the same program.
 
 ## The program {#decl_netcdf_ex_program}

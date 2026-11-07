@@ -53,19 +53,24 @@ set(DOXYGEN_INPUT
 		"${PDI_SOURCE_DIR}/../tutorial/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/decl_hdf5/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/decl_hdf5/examples.md"
+		"${PDI_SOURCE_DIR}/../plugins/decl_hdf5/reference.md"
 		"${PDI_SOURCE_DIR}/../plugins/decl_netcdf/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/decl_netcdf/examples.md"
+		"${PDI_SOURCE_DIR}/../plugins/decl_netcdf/reference.md"
 		"${PDI_SOURCE_DIR}/../plugins/mpi/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/timer/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/trace/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/user_code/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/user_code/examples.md"
+		"${PDI_SOURCE_DIR}/../plugins/user_code/reference.md"
 		"${PDI_SOURCE_DIR}/../plugins/pycall/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/serialize/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/set_value/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/set_value/examples.md"
+		"${PDI_SOURCE_DIR}/../plugins/set_value/reference.md"
 		"${PDI_SOURCE_DIR}/../plugins/json/README.md"
-		"${PDI_SOURCE_DIR}/../plugins/json/examples.md")
+		"${PDI_SOURCE_DIR}/../plugins/json/examples.md"
+		"${PDI_SOURCE_DIR}/../plugins/json/reference.md")
 
 set(DOXY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 cmake_path(NORMAL_PATH DOXY_ROOT)

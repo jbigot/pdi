@@ -1,7 +1,7 @@
 # Set_value examples {#set_value_examples}
 
 These examples show, one approach at a time, what the \ref set_value_plugin "Set_value plugin" can do.
-Each one is a whole program and specification tree, that you can run as is; the \ref set_value_plugin "reference" documents each of their keys.
+Each one is a whole program and specification tree, that you can run as is; the \ref set_value_reference "reference" documents each of their keys.
 
 Compile each program as described in \ref compilation_of__app, and run it with the specification tree as its argument, in an environment set up
 for %PDI (see \ref running_app):
