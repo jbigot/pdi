@@ -16,6 +16,10 @@ and this project adheres to
   from their reference: whole specification trees, run on one program, that
   each show one approach, from writing data when it is shared to parallel I/O
   and restarting from a checkpoint, with the files they produce.
+* The Set_value plugin has a page of examples, apart from its reference: whole
+  programs and specification trees that give parameters to a program, count
+  events, compute new values from old ones, emit events for other plugins and
+  show the iteration in the log, with their output.
 * The examples of the User-code plugin move to a page of their own, apart from
   its reference, with one more, that calls a function on some iterations only.
 
@@ -62,6 +66,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The Set-value plugin reference gives examples that the plugin runs, where they
+  used to fail on a record given as a sequence, or put `set_value` outside
+  `plugins`.
 * The User-code plugin reference gives examples that are valid YAML, with the
   access rights they need, and puts `when` in the function lists, where the
   plugin reads it.
