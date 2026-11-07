@@ -16,6 +16,8 @@ and this project adheres to
   from their reference: whole specification trees, run on one program, that
   each show one approach, from writing data when it is shared to parallel I/O
   and restarting from a checkpoint, with the files they produce.
+* The examples of the User-code plugin move to a page of their own, apart from
+  its reference, with one more, that calls a function on some iterations only.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
@@ -60,6 +62,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The User-code plugin reference gives examples that are valid YAML, with the
+  access rights they need, and puts `when` in the function lists, where the
+  plugin reads it.
 * The Decl'HDF5 plugin reference documents `mpio` as a plain string, fixing
   [#889](https://github.com/pdidev/pdi/issues/889). It also documents that its
   compression and checksum filters need a chunked dataset, when subfiling

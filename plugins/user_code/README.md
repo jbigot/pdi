@@ -1,402 +1,190 @@
 # The user-code plugin {#user_code_plugin}
 
-The `user-code` plugin enables one to call a user-defined function 
-when a specified event occur or certain data becomes available.
+The `user-code` plugin calls user-defined functions when a given event is
+emitted, or when some data becomes available.
+
+This page is the reference of its configuration, one section per key.
+\subpage user_code_examples "User-code examples" shows, one approach at a time, how to combine them with your code.
 
 ## Important notes {#important_notes_node}
 
-* Make sure to compile your program with `Wl,--export-dynamic` or `-rdynamic`
-  flag (in CMake set `ENABLE_EXPORTS` to `TRUE` using `set_target_properties`
-  command) in order to generate necessary symbols.
-* Make sure you use the proper access rights in your function in \ref PDI_access
-  (PDI_IN for reading, PDI_OUT for writing).
-* Descriptor aliases enables one to use different descriptors without the need
-  to recompile the code.
+* Make sure to compile your program with the `-Wl,--export-dynamic` or `-rdynamic`
+  flag (in CMake, set the `ENABLE_EXPORTS` property to `TRUE` with the
+  `set_target_properties` command), so that its symbols are exported.
+* Make sure to use the proper access rights in the calls to \ref PDI_access of your
+  functions (`PDI_IN` for reading, `PDI_OUT` for writing, `PDI_INOUT` for both).
+* Aliases make it possible to pass different data to a function without
+  recompiling the code.
 
 ## Dependencies between the code and the specification tree {#dependencies_node}
 
-To ensure proper work of the `user-code` plugin, there are several conventions to follow in the application 
-code and the specification tree.
+For the `user-code` plugin to work properly, the application code and the specification tree must follow
+several conventions.
 
-First, each function name in specification tree must be a valid function name (watch out for [name mangling](https://en.wikipedia.org/wiki/Name_mangling)). Please do not use any PDI yaml key for the function name. (e.g., `when`, `file`, etc.)
+First, each function name in the specification tree must be the name of a symbol of the program (watch out for [name mangling](https://en.wikipedia.org/wiki/Name_mangling)). A function cannot be named `when`: this key is reserved for the condition of a function list.
 
-Second, these functions **can not** take any arguments or return any value (i.e. their type must be `void(void)`). Use descriptors for passing input/output variables instead.
+Second, these functions **cannot** take any argument or return any value (*i.e.* their type must be `void(void)`). Use aliases to pass input and output variables instead.
 
-Third, function's symbols **must** be exported to make them accessible by `user-code` plugin. To do this, compile your program as described in \ref important_notes_node.
+Third, the symbols of the functions **must** be exported, for the `user-code` plugin to find them. To do so, compile your program as described in \ref important_notes_node.
 
-## Use examples {#use_examples_node}
+## `@user_code` {#user_code_config}
 
-This section shows a simple examples with the use of a `user-code` plugin.
+A mapping.
+Use it, as the value of `plugins.user_code` (see \ref spectree_pdi_plugins_plugin_name), to give the functions to call, and when.
+Keys not listed here are ignored.
 
-### Hello world! {#hello_world_node}
+**Example:**
 
-First, we will call simple function without the use of descriptors to print "Hello world!"
-on "print" event.
-
-hello_world.c:
-```C
-#include <stdio.h>
-#include <pdi.h>
-
-void hello_world(void)
-{
-    printf("Hello world!\n");
-}
-
-int main(int argc, char* argv[])
-{
-    PC_tree_t conf = PC_parse_path("hello_world.yml");
-    PDI_init(conf);
-    PDI_event("print");
-    PDI_finalize();
-    return 0;
-}
-```
-
-hello_world.yml:
 ```yaml
 plugins:
-    user_code:
-        on_event:
-            print:
-                hello_world: {}
+  user_code:
+    on_event:
+      checkpoint:         # <- functions called on an event...
+        write_checkpoint: {}
+    on_data:
+      field:              # <- ... and when data is shared
+        process_field: {input: $field}
 ```
 
-output:
-```console
-[PDI][User-code][13:40:55] *** info: Plugin loaded successfully
-[PDI][13:40:55] *** info: Initialization successful
-Hello world!
-[PDI][13:40:55] *** info: Finalization
-[PDI][User-code][13:40:55] *** info: Closing plugin
-```
 
-### Handling input {#handling_input_node}
+### `@user_code.on_event` {#user_code_on_event}
 
-Now we will pass some input data to the function.
+*Optional.*
+A mapping.
+Use `on_event` to call functions when events are emitted.
+It can also be a sequence of single-key mappings, which has the same meaning and lets an event appear more than once.
 
-print_number.c:
-```C
-#include <stdio.h>
-#include <pdi.h>
-
-void print_number(void)
-{
-    void* input; PDI_access("input", &input, PDI_IN);
-    printf("I've got number %d.\n", *((int*)input));
-    PDI_release("input");
-}
-
-int main(int argc, char* argv[])
-{
-    PC_tree_t conf = PC_parse_path("print_number.yml");
-    PDI_init(conf);
-    int number = 42;
-    PDI_share("number", &number, PDI_OUT);
-    PDI_event("print");
-    PDI_reclaim("number");
-    PDI_finalize();
-    return 0;
-}
-```
-
-print_number.yml:
-```yaml
-data:
-    number: int
-plugins:
-    user_code:
-        on_event:
-            print:
-                print_number: {input: $number}
-```
-
-output:
-```console
-[PDI][User-code][13:49:30] *** info: Plugin loaded successfully
-[PDI][13:49:30] *** info: Initialization successful
-I've got number 42.
-[PDI][13:49:30] *** info: Finalization
-[PDI][User-code][13:49:30] *** info: Closing plugin
-
-```
-
-We can simplify this example by using `on_data` to print value of number
-when it is shared to %PDI.
-
-print_number.c:
-```C
-#include <stdio.h>
-#include <pdi.h>
-
-void print_number(void)
-{
-    void* input; PDI_access("input", &input, PDI_IN);
-    printf("I've got number %d.\n", *((int*)input));
-    PDI_release("input");
-}
-
-int main(int argc, char* argv[])
-{
-    PC_tree_t conf = PC_parse_path("print_number.yml");
-    PDI_init(conf);
-    int number = 42;
-    PDI_expose("number", &number, PDI_OUT);
-    //PDI_event is no longer necessary and PDI_share/PDI_reclaim can be simplified to PDI_expose
-    PDI_finalize();
-    return 0;
-}
-```
-
-print_number.yml:
-```yaml
-data:
-    number: int
-plugins:
-    user_code:
-        on_data:
-            number:
-                print_number: {input: $number}
-```
-
-output does not change:
-```console
-[PDI][User-code][13:52:15] *** info: Plugin loaded successfully
-[PDI][13:52:15] *** info: Initialization successful
-I've got number 42.
-[PDI][13:52:15] *** info: Finalization
-[PDI][User-code][13:52:15] *** info: Closing plugin
-```
-
-### Handling output {#handling_output_node}
-
-Output handling is very similar to the input handling, the only
-difference are the access rights. In this example we will call
-`add_ten` function when `number` is shared to %PDI.
-
-adding_to_number.c:
-```C
-#include <stdio.h>
-#include <pdi.h>
-
-void add_ten(void)
-{
-    void* input; PDI_access("input", &input, PDI_OUT);
-    *((int*)input) += 10;
-    PDI_release("input");
-}
-
-int main(int argc, char* argv[])
-{
-    PC_tree_t conf = PC_parse_path("adding_to_number.yml");
-    PDI_init(conf);
-    int number = 42;
-    printf("Before expose, number = %d.\n", number);
-    PDI_expose("number", &number, PDI_IN);
-    printf("After expose, number = %d.\n", number);
-    PDI_finalize();
-    return 0;
-}
-```
-
-adding_to_number.yml:
-```yaml
-data:
-    number: int
-plugins:
-    user_code:
-        on_data:
-            number:
-                add_ten: {input: $number}
-```
-
-output:
-```console
-[PDI][User-code][13:53:51] *** info: Plugin loaded successfully
-[PDI][13:53:51] *** info: Initialization successful
-Before expose, number = 42.
-After expose, number = 52.
-[PDI][13:53:51] *** info: Finalization
-[PDI][User-code][13:53:51] *** info: Closing plugin
-
-```
-
-### Multiple input/output data {#multiple_inout_data_node}
-
-In this example we will use multiple data in function. We will add 
-and multiply two given numbers and return the results on event "calculate".
-
-calculate.c:
-```C
-#include <stdio.h>
-#include <pdi.h>
-
-void sum_and_multiply(void)
-{
-    void* number1; PDI_access("number1", &number1, PDI_IN);
-    void* number2; PDI_access("number2", &number2, PDI_IN);
-    void* sum;     PDI_access("sum", &sum, PDI_OUT);
-    void* product; PDI_access("product", &product, PDI_OUT);
-    *((int*)sum) = *((int*)number1) + *((int*)number2);
-    *((int*)product) = *((int*)number1) * *((int*)number2);
-    PDI_release("number1");
-    PDI_release("number2");
-    PDI_release("sum");
-    PDI_release("product");
-}
-
-int main(int argc, char* argv[])
-{
-    PC_tree_t conf = PC_parse_path("calculate.yml");
-    PDI_init(conf);
-    int foo = 4, bar = 5, res1 = 0, res2 = 0;
-    printf("Before calculation, foo = %d, bar = %d, res1 = %d, res2 = %d.\n", foo, bar, res1, res2);
-    PDI_multi_expose("calculate", 
-        "foo", &foo, PDI_OUT,
-        "bar", &bar, PDI_OUT,
-        "res1", &res1, PDI_IN,
-        "res2", &res2, PDI_IN, NULL);
-    printf("After calculation, foo = %d, bar = %d, res1 = %d, res2 = %d.\n", foo, bar, res1, res2);
-    PDI_finalize();
-    return 0;
-}
-```
-
-calculate.yml:
-```yaml
-data:
-    foo: int
-    bar: int
-    res1: int
-    res2: int
-plugins:
-    user_code:
-        on_event:
-            calculate:
-                sum_and_multiply: {number1: $foo, number2: $bar, sum: $res1, product: $res2}
-```
-
-output:
-```console
-[PDI][User-code][13:58:20] *** info: Plugin loaded successfully
-[PDI][13:58:20] *** info: Initialization successful
-Before calculation, foo = 4, bar = 5, res1 = 0, res2 = 0.
-After calculation, foo = 4, bar = 5, res1 = 9, res2 = 20.
-[PDI][13:58:20] *** info: Finalization
-[PDI][User-code][13:58:20] *** info: Closing plugin
-```
-
-## Configuration grammar {#conf_grammar_node}
-
-The root of `user-code` plugin is a dictionary that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"logging"`  (*optional*)|a \ref spectree_logging|
-|`"on_data"`  (*optional*)|a \ref on_data_node    |
-|`"on_event"` (*optional*)|a \ref on_event_node   |
-|`".*"`       (*optional*)| *anything*            |
-
-* the `on_data` key specifies the list of descriptors that, when they become available, 
-will cause the specified functions to be called,
-* the `on_event` key specifies the list of events on which to call the specified functions,
-* additional keys are ignored.
-
-### on_data {#on_data_node}
-
-A \ref on_data_node is a dictionary that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"when"` (*optional*)|a $-expression defines a condition for executing the function|
-|`".*"` (*optional*)|a \ref function_list_node|
-
-* each key identifies the name of a descriptor, which will trigger specified functions when it becomes available.
-
-If a data is used to trigger multiple functions and some functions should be executed only if the `when` condition is satisfied, then we can use the list-styled syntex of the yaml:
-```yaml
-plugins:                       
-    user_code:                   
-        on_data:                   
-            - my_data:                 
-                when: `$cond>1`
-                fun1: {in: $desc2, out: $desc3}
-            - my_data:
-                fun2: {}
-                fun3: {out: $desc2}
-```
-
-In this exmaple, `fun2` and `fun3` will be executed when `my_data` is shared to PDI. However, `fun1` will only be executed when `my_data` is shared and also `$cond>1`.
-
-### on_event {#on_event_node}
-
-A \ref on_event_node is a dictionary that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"when"` (*optional*)|a $-expression defines a condition for executing the function|
-|`".*"` (*optional*)|a \ref function_list_node|
-
-* each key identifies the name of an event, which will trigger specified functions when it occurs.
-
-If an event is used to trigger multiple functions and some functions should be executed only if the `when` condition is satisfied, then we can use the list-styled syntex of the yaml:
-```yaml
-plugins:                       
-    user_code:                   
-        on_event:                   
-            - my_event:                 
-                when: `$cond>1`
-                fun1: {in: $desc2, out: $desc3}
-            - my_event:
-                fun2: {}
-                fun3: {out: $desc2}
-```
-
-In this exmaple, `fun2` and `fun3` will be executed when `my_event` is issued. However, `fun1` will only be executed when `my_evnet` is issued and also `$cond>1`.
-
-### function_list {#function_list_node}
-
-A \ref function_list_node is a dictionary that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a \ref function_param_list_node|
-
-* each key identifies the name of a function, which will be called on specified event or data,
-* **NOTE**: these functions **can not** take any arguments or return any value (i.e. their type must be `void(void)`).
-
-### function_param_list {#function_param_list_node}
-
-A \ref function_param_list_node is a dictionary that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a $-expression referencing a data|
-
-* each key identifies the name of a descriptor alias, which will be available during function execution.
-
-## Specification tree example {#full_spec_tree_example_node}
+**Example:**
 
 ```yaml
-metadata:
-    cond: int
-data:
-    desc1: int                          
-    desc2: float                   
-    desc3: double                  
-plugins:                       
-    user_code:                   
-        on_data:                   
-            desc1:                 
-                when: `$cond>1`
-                fun1: {in: $desc2, out: $desc3}
-            desc2:
-                fun2: {}
-                fun3: {out: $desc2}
-        on_event:                  
-            event1:                 
-                when: `$cond<1`     
-                fun2: {}
-            event2:
-                fun4: {param1: $desc2, param2: $desc1, param3: $desc3}
+on_event:                 # <- functions called on events
+  checkpoint:
+    write_checkpoint: {}
+```
+
+
+### `@user_code.on_event.<event_name>` {#user_code_on_event_event_name}
+
+Either a single \ref user_code_function_list or a sequence of them.
+Use `on_event.<event_name>` to call the functions each time the event named `<event_name>` is emitted.
+
+**Example:**
+
+```yaml
+on_event:
+  - my_event:             # <- two function lists for the same event, in the sequence form
+      when: $cond > 1
+      fun1: {in: $desc2, out: $desc3}
+  - my_event:
+      fun2: {}
+```
+
+`fun2` is called each time `my_event` is emitted, `fun1` only if, in addition, `$cond > 1`.
+
+
+### `@user_code.on_data` {#user_code_on_data}
+
+*Optional.*
+A mapping.
+Use `on_data` to call functions when data are shared.
+It can also be a sequence of single-key mappings, which has the same meaning and lets a data appear more than once.
+
+**Example:**
+
+```yaml
+on_data:                  # <- functions called when data is shared
+  field:
+    process_field: {input: $field}
+```
+
+
+### `@user_code.on_data.<data_name>` {#user_code_on_data_data_name}
+
+Either a single \ref user_code_function_list or a sequence of them.
+Use `on_data.<data_name>` to call the functions each time the data named `<data_name>` is shared.
+
+**Example:**
+
+```yaml
+on_data:
+  field:                  # <- called each time field is shared
+    process_field: {input: $field}
+    report: {}
+```
+
+
+### `@user_code.logging` {#user_code_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugins_plugin_name_logging.
+
+**Example:**
+
+```yaml
+logging: debug            # <- the logger of the User-code plugin
+on_event:
+  checkpoint:
+    write_checkpoint: {}
+```
+
+
+## `@function_list` {#user_code_function_list}
+
+A *function list*: a mapping with the keys below, giving the functions to call, in order, and an optional condition.
+You can use it in \ref user_code_on_event_event_name and \ref user_code_on_data_data_name.
+
+**Example:**
+
+```yaml
+on_event:
+  step:                   # <- this mapping is a function list
+    when: $iter > 0
+    compute: {in: $field, out: $result}
+    report: {}
+```
+
+
+### `@function_list.when` {#user_code_function_list_when}
+
+*Optional.*
+A \ref spectree_expression.
+Use `when` to call the functions of the list only under a condition.
+It is evaluated for each function, once its aliases are exposed, and the function is only called if it is true.
+An error while evaluating it is logged and does not interrupt the program.
+
+**Example:**
+
+```yaml
+when: $iter % 10 = 0      # <- the functions are only called every 10 iterations
+report: {}
+```
+
+
+### `@function_list.<function_name>` {#user_code_function_list_function_name}
+
+A mapping, empty (`{}`) when the function needs no alias.
+Use `<function_name>` to call the function named `<function_name>`, with the aliases to expose while it runs.
+The function must be of type `void(void)` and its symbol exported, see \ref dependencies_node.
+A function cannot be named `when`: this key is reserved for the condition of the list.
+
+**Example:**
+
+```yaml
+compute: {in: $field}     # <- calls compute(), with field shared as in while it runs
+report: {}                # <- calls report(), with nothing shared
+```
+
+
+### `@function_list.<function_name>.<alias_name>` {#user_code_function_list_function_name_alias_name}
+
+A \ref spectree_expression.
+Use `<alias_name>` to share its value under the name `<alias_name>` while the function runs.
+
+**Example:**
+
+```yaml
+compute:
+  in: $field              # <- compute() accesses field as in
+  out: $result            #    and result as out
 ```
