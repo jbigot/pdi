@@ -12,6 +12,9 @@ Decl'NetCDF plugin allows you to:
 7. Read/write only part of NetCDF variable by hyperslab definition.
 8. Read/write in parallel mode using MPI.
 
+This page is the reference of its configuration, one section per key.
+\subpage Decl_NetCDF_examples "Decl'NetCDF examples" shows, one approach at a time, how to combine them into whole specification trees.
+
 ## `@decl_netcdf` {#decl_netcdf_config}
 
 Either a single \ref decl_netcdf_ncfile or a sequence of them.
@@ -541,78 +544,4 @@ Use `<attribute_name>` to write the attribute named `<attribute_name>` with this
 ```yaml
 units: kelvin             # <- written as is
 step: $iter               # <- written from, or read into, the iter data
-```
-
-
-## Full configuration example {#decl_netcdf_full_config}
-
-```yaml
-metadata:
-  var_attr: float
-  group1_attr: float
-  group1_data_attr: float
-data:
-  int_submatrix_top:
-    type: array
-    subtype: int
-    size: [4, 8]
-  int_submatrix_bottom:
-    type: array
-    subtype: int
-    size: [4, 8]
-plugins:
-  decl_netcdf:
-    - file: "example.nc"
-      on_event: "write"
-      groups:
-        group_1:
-          attributes:
-            some_attr: $group1_attr
-        group_1/data:
-          attributes:
-            some_attr: $group1_data_attr
-      variables:
-        group_1/data/int_matrix:
-          type: array
-          subtype: int
-          size: [8, 8]
-          dimensions: ["height", "width"]
-          attributes:
-            custom_attr: $var_attr
-      write: 
-        int_submatrix_top:
-          variable: group_1/data/int_matrix
-          variable_selection:
-            start: [0, 0]
-            subsize: [4, 8]
-        int_submatrix_bottom:
-          variable: group_1/data/int_matrix
-          variable_selection:
-            start: [4, 0]
-            subsize: [4, 8]
-    - file: "example.nc"
-      on_event: "read"
-      groups:
-        group_1/data:
-          attributes:
-            some_attr: $custom_attr
-      variables:
-        group_1/data/int_matrix:
-          type: array
-          subtype: int
-          size: [8, 8]
-          dimensions: ["height", "width"]
-          attributes:
-            custom_attr: $var_attr
-      read: 
-        int_submatrix_top:
-          variable: group_1/data/int_matrix
-          variable_selection:
-            start: [0, 0]
-            subsize: [4, 8]
-        int_submatrix_bottom:
-          variable: group_1/data/int_matrix
-          variable_selection:
-            start: [4, 0]
-            subsize: [4, 8]
 ```
