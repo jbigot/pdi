@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020-2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -122,6 +122,10 @@ public:
 	 */
 	virtual void* data_from_dense_copy(void* to, const void* from) const = 0;
 
+	/// \name index
+	/// Access the type, or the type and value, of the element at the provided index
+	///@{
+
 	/** Access the type of the element at the provided index
 	 *
 	 * \param index the index where to look
@@ -136,6 +140,12 @@ public:
 	 * \return the Datatype and address of the indexed sub-element
 	 */
 	virtual std::pair<void*, Datatype_sptr> index(size_t index, void* data) const;
+
+	///@}
+
+	/// \name slice
+	/// Access the type, or the type and value, of the slice of elements between the provided indices
+	///@{
 
 	/** Access the type of the elements slice between the provided indices
 	 *
@@ -154,6 +164,12 @@ public:
 	 */
 	virtual std::pair<void*, Datatype_sptr> slice(size_t start_index, size_t end_index, void* data) const;
 
+	///@}
+
+	/// \name member
+	/// Access the type, or the type and value, of the member with the provided name
+	///@{
+
 	/** Access the type of the member with the provided name
 	 *
 	 * \param name the name of the member to access
@@ -169,6 +185,12 @@ public:
 	 */
 	virtual std::pair<void*, Datatype_sptr> member(const char* name, void* data) const;
 
+	///@}
+
+	/// \name dereference
+	/// Access the type, or the type and value, of the content referenced by this datatype
+	///@{
+
 	/** Access the type referenced by this
 	 *
 	 * \return the Datatype referenced
@@ -181,6 +203,8 @@ public:
 	 * \return the Datatype and address referenced
 	 */
 	virtual std::pair<void*, Datatype_sptr> dereference(void* data) const;
+
+	///@}
 
 	/** Delete data whose type is described by the Datatype.
 	 *

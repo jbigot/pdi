@@ -47,6 +47,10 @@ class PDI_EXPORT Expression
 	Expression(std::unique_ptr<Impl>);
 
 public:
+	/// \name Expression
+	/// Builds an expression
+	///@{
+
 	/** Builds an empty expression
 	 *
 	 * No operation can be used on an empty expression, it can only be assigned to
@@ -101,9 +105,15 @@ public:
 	 */
 	Expression(PC_tree_t expr);
 
+	///@}
+
 	/** Destroys an expression
 	 */
 	~Expression();
+
+	/// \name operator=
+	/// Copies or moves an expression
+	///@{
 
 	/** Copies an expression
 	 *
@@ -118,6 +128,8 @@ public:
 	 * \return *this
 	 */
 	Expression& operator= (Expression&& expr);
+
+	///@}
 
 	/** Summation operator of an expression
 	 *
@@ -178,6 +190,10 @@ public:
 	 */
 	std::string to_string(Context& ctx) const;
 
+	/// \name to_ref
+	/// Evaluates an expression as a data reference
+	///@{
+
 	/** Evaluates an expression as a data reference
 	 *
 	 * \param ctx the context in which to evaluate the expression
@@ -192,6 +208,8 @@ public:
 	 * \return the data reference
 	 */
 	Ref to_ref(Context& ctx, Datatype_sptr type) const;
+
+	///@}
 
 	/** Parses a string that starts with `$' and represents a reference expression
 	 *

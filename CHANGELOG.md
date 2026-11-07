@@ -102,6 +102,8 @@ and this project adheres to
   This is part of [#721](https://github.com/pdidev/pdi/issues/721)
 * `<pdi/plugin.h>` no longer declares anything at global scope. Fixes
   [#756](https://github.com/pdidev/pdi/issues/756)
+* The plugin API reference documents the overloads of a function together,
+  under the function's name, with a description of what they share.
 
 #### Deprecated
 * `PDI::TimerEventHandler` and the `PLUGIN_API_VERSION`,

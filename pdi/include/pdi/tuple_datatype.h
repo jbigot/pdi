@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2021-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -55,6 +55,10 @@ public:
 		Datatype_sptr m_type;
 
 	public:
+		/// \name Element
+		/// Construct a new element
+		///@{
+
 		/** Construct a new element
 		 *
 		 * \param offset offset in byte from the Tuple_datatype start
@@ -67,6 +71,8 @@ public:
 		 * \param o the element to copy
 		 */
 		Element(const Element& o);
+
+		///@}
 
 		/** Access the offset in byte from the Tuple_datatype start
 		 *
@@ -130,13 +136,25 @@ public:
 
 	void* data_from_dense_copy(void*, const void*) const override;
 
+	/// \name index
+	/// Access the type, or the type and value, of the element at the provided index
+	///@{
+
 	Datatype_sptr index(size_t) const override;
 
 	std::pair<void*, Datatype_sptr> index(size_t, void*) const override;
 
+	///@}
+
+	/// \name slice
+	/// Access the type, or the type and value, of the slice of elements between the provided indices
+	///@{
+
 	Datatype_sptr slice(size_t, size_t) const override;
 
 	std::pair<void*, Datatype_sptr> slice(size_t, size_t, void*) const override;
+
+	///@}
 
 	void destroy_data(void*) const override;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020-2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -148,6 +148,10 @@ private:
 	);
 
 public:
+	/// \name make
+	/// Creates a new scalar datatype
+	///@{
+
 	/** Creates new scalar datatype
 	 *
 	 * \param[in] kind kind of the scalar datatype
@@ -184,6 +188,8 @@ public:
 		std::function<void(void*) > destroy,
 		const Attributes_map& attributes = {}
 	);
+
+	///@}
 };
 
 const auto UNDEF_TYPE = Scalar_datatype::make(Scalar_kind::UNKNOWN, 0);
