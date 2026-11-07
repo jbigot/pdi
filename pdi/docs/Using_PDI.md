@@ -64,7 +64,7 @@ Every used plugin in application needs to be found by %PDI.
 %PDI will search for plugins in 4 steps (it will use the first plugin found):
 
 1. `PDI_PLUGIN_PATH` environment variable that is colon separated list with paths,
-2. `plugin_path` subtree in specification tree: \ref plugin_path_map_node,
+2. `plugin_path` subtree in specification tree: \ref spectree_pdi_plugin_path,
 3. the directory relative to the installation of %PDI shared library `libpdi.so`,
 4. `LD_LIBRARY_PATH` environment variable that is colon separated list.
 
