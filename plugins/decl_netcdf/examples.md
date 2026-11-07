@@ -1,12 +1,11 @@
 # Decl'NetCDF examples {#Decl_NetCDF_examples}
 
-These examples show, one approach at a time, how to write and read NetCDF files with the \ref Decl_NetCDF_plugin "Decl'NetCDF plugin".
-Each one is a whole specification tree, that you can run as is; the \ref Decl_NetCDF_reference "reference" documents each of their keys.
-They follow the same steps as the \ref Decl_HDF5_examples "Decl'HDF5 examples", with the same program.
+Each example demonstrates one feature of the \ref Decl_NetCDF_plugin "Decl'NetCDF plugin", with a whole specification tree that you can run
+as is; the \ref Decl_NetCDF_reference "reference" documents each of their keys.
 
 ## The program {#decl_netcdf_ex_program}
 
-All the examples but the last one use the same program: only their specification tree differs.
+All the examples but two use the same program: only their specification tree differs.
 Each MPI process owns a block of 4x6 values, with a layer of ghost cells all around it, that it updates over 3 iterations.
 To make the files easy to read, each value tells where it comes from: 100 times the iteration, plus 10 times the global row, plus the column,
 and the ghost cells hold -1.
@@ -265,6 +264,100 @@ group: results {
   		:nprocs = 1 ;
   		:rank = 0 ;
   } // group results
+}
+```
+
+## Writing records, and reading attributes back {#decl_netcdf_ex_records}
+
+A record is written as a NetCDF compound type, whose name its datatype gives in its `+decl_netcdf.type` attribute.
+An attribute is written from a $-expression, and read back into the data that the same $-expression references: here `time`, written with the
+particles on the `save` event, and read with them on the `load` event.
+This example has a program of its own.
+
+```c
+#include <stdio.h>
+#include <pdi.h>
+
+struct particle {
+	int id;
+	double position[3];
+};
+
+int main(int argc, char* argv[])
+{
+	PDI_init(PC_parse_path(argv[1]));
+
+	struct particle particles[2] = {{1, {0.5, 1.5, 2.5}}, {2, {3., 4., 5.}}};
+	double time = 0.25;
+	PDI_multi_expose("save",
+	    "time", &time, PDI_OUT,
+	    "particles", particles, PDI_OUT,
+	    NULL);
+
+	struct particle loaded[2] = {{0}};
+	double loaded_time = 0;
+	PDI_multi_expose("load",
+	    "time", &loaded_time, PDI_INOUT,
+	    "particles", loaded, PDI_IN,
+	    NULL);
+	printf("at time %g, particle %d was at (%g, %g, %g)\n",
+	       loaded_time, loaded[1].id, loaded[1].position[0],
+	       loaded[1].position[1], loaded[1].position[2]);
+
+	PDI_finalize();
+	return 0;
+}
+```
+
+```yaml
+metadata:
+  time: double
+data:
+  particles:
+    type: array
+    size: 2
+    subtype:
+      type: struct
+      +decl_netcdf.type: particle_t  # the name of the compound type
+      members:
+        - id: int
+        - position: {type: array, subtype: double, size: 3}
+plugins:
+  decl_netcdf:
+    - file: particles.nc
+      on_event: save
+      variables:
+        particles:
+          attributes:
+            time: $time          # written from time
+      write: [particles]
+    - file: particles.nc
+      on_event: load
+      variables:
+        particles:
+          attributes:
+            time: $time          # read into time
+      read: [particles]
+```
+
+```text
+$ ./particles particles.yml
+at time 0.25, particle 2 was at (3, 4, 5)
+$ ncdump particles.nc
+netcdf particles {
+types:
+  compound particle_t {
+    int id ;
+    double position(3) ;
+  }; // particle_t
+dimensions:
+	particles_0 = 2 ;
+variables:
+	particle_t particles(particles_0) ;
+		particles:time = 0.25 ;
+data:
+
+ particles = {1, {0.5, 1.5, 2.5}}, {2, {3, 4, 5}} ;
 }
 ```
 

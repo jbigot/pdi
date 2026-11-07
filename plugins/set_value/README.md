@@ -12,5 +12,5 @@ It can:
 
 ## Documentation {#set_value_documentation}
 
-* \subpage set_value_examples "Set_value examples" shows, one approach at a time, how to use the plugin, with whole programs and specification trees.
+* \subpage set_value_examples "Set_value examples" demonstrates its features one at a time, with whole programs and specification trees.
 * \subpage set_value_reference "Set_value configuration reference" documents each key of its configuration.

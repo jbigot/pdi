@@ -1,8 +1,7 @@
 # User-code examples {#user_code_examples}
 
-These examples show, one approach at a time, how to call your own functions with the \ref user_code_plugin "user-code plugin".
-Each one is a whole program and specification tree, that you can run as is; the \ref user_code_reference "reference" documents each of their
-keys.
+Each example demonstrates one feature of the \ref user_code_plugin "user-code plugin", which calls your own functions, with a whole program
+and specification tree that you can run as is; the \ref user_code_reference "reference" documents each of their keys.
 
 Compile each program as described in \ref compilation_of__app, with its symbols exported, as \ref important_notes_node says, and run it in an
 environment set up for %PDI (see \ref running_app).
