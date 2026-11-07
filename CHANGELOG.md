@@ -50,7 +50,6 @@ and this project adheres to
 * `find_package(PDI)` now sets `PDI_<component>_FOUND` for each component
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
-* The User-code plugin reference gives examples with the access rights they need.
 * The specification tree reference now describes logging as PDI implements it,
   with a working example, fixing [#808](https://github.com/pdidev/pdi/issues/808).
 * The specification tree reference now lists the datatypes PDI has, and only
@@ -59,6 +58,9 @@ and this project adheres to
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies, fixing
   [#915](https://github.com/pdidev/pdi/issues/915).
+* The User-code plugin reference gives examples that are valid YAML, with the
+  access rights they need, and puts `when` in the function lists, where the
+  plugin reads it, part of [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
