@@ -57,8 +57,11 @@ and this project adheres to
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
 * The User-code plugin reference gives examples with the access rights they need.
-* The Decl'HDF5 plugin reference no longer links its `error` collision policy to
-  the C API's error handling.
+* The Decl'HDF5 plugin reference documents `mpio` as a plain string, fixing
+  [#889](https://github.com/pdidev/pdi/issues/889). It also documents that its
+  compression and checksum filters need a chunked dataset, when subfiling
+  applies, and that a dataset has no unlimited dimension, and no longer links
+  its `error` collision policy to the C API's error handling.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
