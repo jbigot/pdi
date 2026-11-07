@@ -44,7 +44,6 @@ and this project adheres to
 * `find_package(PDI QUIET COMPONENTS Fortran)` no longer prints the deprecation
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
-* The User-code plugin reference gives examples with the access rights they need.
 * The specification tree reference now describes logging as PDI implements it,
   with a working example, fixing [#808](https://github.com/pdidev/pdi/issues/808).
 * The specification tree reference now lists the datatypes PDI has, and only
@@ -52,6 +51,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The User-code plugin reference gives examples that are valid YAML, with the
+  access rights they need, and puts `when` in the function lists, where the
+  plugin reads it.
 
 #### Security
 
