@@ -10,5 +10,5 @@ declarative interface to a large subset of it.
 
 ## Documentation {#decl_hdf5_documentation}
 
-* \subpage Decl_HDF5_examples "Decl'HDF5 examples" shows, one approach at a time, how to use the plugin, with whole programs and specification trees.
+* \subpage Decl_HDF5_examples "Decl'HDF5 examples" demonstrates its features one at a time, with whole programs and specification trees.
 * \subpage Decl_HDF5_reference "Decl'HDF5 configuration reference" documents each key of its configuration.

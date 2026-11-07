@@ -14,5 +14,5 @@ With the Decl'NetCDF plugin, you can:
 
 ## Documentation {#decl_netcdf_documentation}
 
-* \subpage Decl_NetCDF_examples "Decl'NetCDF examples" shows, one approach at a time, how to use the plugin, with whole programs and specification trees.
+* \subpage Decl_NetCDF_examples "Decl'NetCDF examples" demonstrates its features one at a time, with whole programs and specification trees.
 * \subpage Decl_NetCDF_reference "Decl'NetCDF configuration reference" documents each key of its configuration.

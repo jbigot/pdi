@@ -1,8 +1,7 @@
 # Decl'HDF5 examples {#Decl_HDF5_examples}
 
-These examples show, one approach at a time, how to write and read HDF5 files with the \ref Decl_HDF5_plugin "Decl'HDF5 plugin".
-Each one is a whole specification tree, that you can run as is; the \ref Decl_HDF5_reference "reference" documents each of their keys.
-They follow the same steps as the Decl'HDF5 part of the \ref Hands_on "tutorial", which lets you write them yourself.
+Each example demonstrates one feature of the \ref Decl_HDF5_plugin "Decl'HDF5 plugin", with a whole specification tree that you can run as
+is; the \ref Decl_HDF5_reference "reference" documents each of their keys.
 
 ## The program {#decl_hdf5_ex_program}
 
@@ -62,7 +61,8 @@ Compile it as described in \ref compilation_of__app, and run it with the specifi
 mpirun -np 1 ./main simple.yml
 ```
 
-All the examples run on a single process unless they say otherwise, and the outputs shown are those of `h5dump` and `h5ls`.
+All the examples run on a single process unless they say otherwise, and the outputs shown are those of `h5dump` and `h5ls`, or the log of
+the program.
 
 ## Writing data when it is shared {#decl_hdf5_ex_simple}
 
@@ -147,6 +147,36 @@ field_2                  Dataset {6, 8}
 size                     Dataset {2}
 ```
 
+## Writing a data several times {#decl_hdf5_ex_several}
+
+A sequence of I/O descriptions writes the data once for each of them, each with its own keys: here, always to the same dataset, and at the even
+iterations to a dataset of its own.
+
+```yaml
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  decl_hdf5:
+    file: output_${rank}.h5
+    write:
+      field:
+        - dataset: field_last    # at each iteration
+        - dataset: field_${iter} # and at the even ones
+          when: $iter % 2 = 0
+```
+
+```text
+$ h5ls output_0.h5
+field_0                  Dataset {6, 8}
+field_2                  Dataset {6, 8}
+field_last               Dataset {6, 8}
+```
+
 ## Writing on an event, to groups {#decl_hdf5_ex_event}
 
 Without \ref decl_hdf5_h5file_on_event, the file is opened and closed for each data written.
@@ -185,6 +215,58 @@ $ h5ls -r output_0.h5
 /iter2                   Group
 /iter2/field             Dataset {6, 8}
 /iter2/iter              Dataset {SCALAR}
+```
+
+## Writing attributes {#decl_hdf5_ex_attributes}
+
+\ref decl_hdf5_h5io_attributes_attribute_name writes attributes along with a dataset, each from a $-expression.
+\ref decl_hdf5_h5io_attribute writes a data to an attribute instead of a dataset: here `iter`, to an attribute of the dataset of the current
+iteration.
+The file is written on the `iteration` event, so that the dataset exists when its attribute is written.
+
+```yaml
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  decl_hdf5:
+    file: output_${rank}.h5
+    on_event: iteration
+    write:
+      field:
+        dataset: field_${iter}
+        attributes:              # written with the dataset
+          rank: $rank
+      iter:
+        attribute: field_${iter}#iteration  # iter, to the iteration attribute
+```
+
+```text
+$ h5dump -A -d field_1 output_0.h5
+HDF5 "output_0.h5" {
+DATASET "field_1" {
+   DATATYPE  H5T_IEEE_F64LE
+   DATASPACE  SIMPLE { ( 6, 8 ) / ( 6, 8 ) }
+   ATTRIBUTE "iteration" {
+      DATATYPE  H5T_STD_I32LE
+      DATASPACE  SCALAR
+      DATA {
+      (0): 1
+      }
+   }
+   ATTRIBUTE "rank" {
+      DATATYPE  H5T_STD_I32LE
+      DATASPACE  SCALAR
+      DATA {
+      (0): 0
+      }
+   }
+}
+}
 ```
 
 ## Leaving the ghost cells out {#decl_hdf5_ex_memory_selection}
@@ -314,69 +396,10 @@ GROUP "/" {
 }
 ```
 
-## Writing one file from all processes {#decl_hdf5_ex_parallel}
+## Describing datasets by a pattern {#decl_hdf5_ex_regex}
 
-With a \ref decl_hdf5_h5file_communicator, all its processes access the file together, with parallel HDF5.
-The \ref mpi_plugin "MPI plugin" defines `$MPI_COMM_WORLD`.
-Each process writes its block to its own rows of a dataset that holds those of all processes.
-
-```yaml
-metadata:
-  rank: int
-  nprocs: int
-  size: {type: array, subtype: int, size: 2}
-  iter: int
-data:
-  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
-plugins:
-  mpi: ~
-  decl_hdf5:
-    file: output.h5                  # one file for all processes
-    communicator: $MPI_COMM_WORLD
-    datasets:
-      field:                         # the blocks of all processes
-        type: array
-        subtype: double
-        size: ['$nprocs * $size[0]', '$size[1]']
-    write:
-      field:
-        when: $iter = 2
-        memory_selection:
-          size: ['$size[0]', '$size[1]']
-          start: [1, 1]
-        dataset_selection:           # the rows of this process
-          start: ['$rank * $size[0]', 0]
-```
-
-The size of the dataset selection defaults to that of the memory selection, since they have the same number of dimensions.
-With 2 processes:
-
-```text
-$ mpirun -np 2 ./main parallel.yml
-$ h5dump output.h5
-HDF5 "output.h5" {
-GROUP "/" {
-   DATASET "field" {
-      DATATYPE  H5T_IEEE_F64LE
-      DATASPACE  SIMPLE { ( 8, 6 ) / ( 8, 6 ) }
-      DATA {
-      (0,0): 200, 201, 202, 203, 204, 205,
-      (1,0): 210, 211, 212, 213, 214, 215,
-      (2,0): 220, 221, 222, 223, 224, 225,
-      (3,0): 230, 231, 232, 233, 234, 235,
-      (4,0): 240, 241, 242, 243, 244, 245,
-      (5,0): 250, 251, 252, 253, 254, 255,
-      (6,0): 260, 261, 262, 263, 264, 265,
-      (7,0): 270, 271, 272, 273, 274, 275
-      }
-   }
-}
-}
-```
-
-## Describing datasets with attributes {#decl_hdf5_ex_attributes}
-
-\ref decl_hdf5_h5io_attributes_attribute_name writes attributes along with the dataset, each from a $-expression.
+A key of \ref decl_hdf5_h5file_datasets_dataset_regex is a regular expression: it describes every dataset whose whole name it matches.
+Here, every `field_<n>` dataset is created with single-precision values, to which HDF5 converts the data.
 
 ```yaml
 metadata:
@@ -389,33 +412,102 @@ data:
 plugins:
   decl_hdf5:
     file: output_${rank}.h5
+    datasets:
+      'field_[0-9]+':            # field_0, field_1...
+        type: array
+        subtype: float
+        size: ['$size[0] + 2', '$size[1] + 2']
     write:
       field:
         dataset: field_${iter}
-        attributes:              # written with each dataset
-          iteration: $iter
-          rank: $rank
 ```
 
 ```text
-$ h5dump -A -d field_2 output_0.h5
+$ h5dump -H -d field_2 output_0.h5
 HDF5 "output_0.h5" {
 DATASET "field_2" {
+   DATATYPE  H5T_IEEE_F32LE
+   DATASPACE  SIMPLE { ( 6, 8 ) / ( 6, 8 ) }
+}
+}
+```
+
+## Handling files and datasets that already exist {#decl_hdf5_ex_collision}
+
+\ref decl_hdf5_h5file_collision_policy chooses what happens when a file or a dataset to write already exists; by default, it is written into.
+Here, `error` refuses to overwrite the files of a previous run, one per iteration:
+
+```yaml
+logging: {pattern: '[%n] %v'}  # a shorter log
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  decl_hdf5:
+    file: output_${rank}_${iter}.h5
+    collision_policy: error
+    write: [field]
+```
+
+```text
+$ ./main no_overwrite.yml
+[Decl'HDF5] Plugin loaded successfully
+[PDI] Initialization successful
+[PDI] Finalization
+[Decl'HDF5] Closing plugin
+$ ./main no_overwrite.yml
+[Decl'HDF5] Plugin loaded successfully
+[PDI] Initialization successful
+[PDI] System error: Unable to share `field', Unable to share `field', while sharing `field', Filename collision `output_0_0.h5': File already exists
+[PDI] Finalization
+[Decl'HDF5] Closing plugin
+[PDI] Remaining 1 reference(s) to `iter' in PDI after program end
+```
+
+\ref decl_hdf5_h5io_collision_policy sets it for one write: here, `field_first` keeps the value of the first iteration, while `field_last` is
+overwritten.
+
+```yaml
+logging: {pattern: '[%n] %v'}  # a shorter log
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  decl_hdf5:
+    file: output_${rank}.h5
+    write:
+      field:
+        - dataset: field_last
+        - dataset: field_first
+          collision_policy: skip # written once, then left as it is
+```
+
+```text
+$ ./main first.yml
+[Decl'HDF5] Plugin loaded successfully
+[PDI] Initialization successful
+[PDI] Finalization
+[Decl'HDF5] Closing plugin
+$ h5dump -d field_first output_0.h5
+HDF5 "output_0.h5" {
+DATASET "field_first" {
    DATATYPE  H5T_IEEE_F64LE
    DATASPACE  SIMPLE { ( 6, 8 ) / ( 6, 8 ) }
-   ATTRIBUTE "iteration" {
-      DATATYPE  H5T_STD_I32LE
-      DATASPACE  SCALAR
-      DATA {
-      (0): 2
-      }
-   }
-   ATTRIBUTE "rank" {
-      DATATYPE  H5T_STD_I32LE
-      DATASPACE  SCALAR
-      DATA {
-      (0): 0
-      }
+   DATA {
+   (0,0): -1, -1, -1, -1, -1, -1, -1, -1,
+   (1,0): -1, 0, 1, 2, 3, 4, 5, -1,
+   (2,0): -1, 10, 11, 12, 13, 14, 15, -1,
+   (3,0): -1, 20, 21, 22, 23, 24, 25, -1,
+   (4,0): -1, 30, 31, 32, 33, 34, 35, -1,
+   (5,0): -1, -1, -1, -1, -1, -1, -1, -1
    }
 }
 }
@@ -465,6 +557,68 @@ GROUP "/" {
       }
       ALLOCATION_TIME {
          H5D_ALLOC_TIME_INCR
+      }
+   }
+}
+}
+```
+
+## Writing one file from all processes {#decl_hdf5_ex_parallel}
+
+With a \ref decl_hdf5_h5file_communicator, all its processes access the file together, with parallel HDF5.
+The \ref mpi_plugin "MPI plugin" defines `$MPI_COMM_WORLD`.
+Each process writes its block to its own rows of a dataset that holds those of all processes.
+
+```yaml
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  mpi: ~
+  decl_hdf5:
+    file: output.h5                  # one file for all processes
+    communicator: $MPI_COMM_WORLD
+    datasets:
+      field:                         # the blocks of all processes
+        type: array
+        subtype: double
+        size: ['$nprocs * $size[0]', '$size[1]']
+    write:
+      field:
+        when: $iter = 2
+        memory_selection:
+          size: ['$size[0]', '$size[1]']
+          start: [1, 1]
+        dataset_selection:           # the rows of this process
+          start: ['$rank * $size[0]', 0]
+        mpio: INDEPENDENT            # each process writes on its own
+```
+
+The size of the dataset selection defaults to that of the memory selection, since they have the same number of dimensions.
+\ref decl_hdf5_h5io_mpio lets each process write without waiting for the others, instead of all of them together.
+With 2 processes:
+
+```text
+$ mpirun -np 2 ./main parallel.yml
+$ h5dump output.h5
+HDF5 "output.h5" {
+GROUP "/" {
+   DATASET "field" {
+      DATATYPE  H5T_IEEE_F64LE
+      DATASPACE  SIMPLE { ( 8, 6 ) / ( 8, 6 ) }
+      DATA {
+      (0,0): 200, 201, 202, 203, 204, 205,
+      (1,0): 210, 211, 212, 213, 214, 215,
+      (2,0): 220, 221, 222, 223, 224, 225,
+      (3,0): 230, 231, 232, 233, 234, 235,
+      (4,0): 240, 241, 242, 243, 244, 245,
+      (5,0): 250, 251, 252, 253, 254, 255,
+      (6,0): 260, 261, 262, 263, 264, 265,
+      (7,0): 270, 271, 272, 273, 274, 275
       }
    }
 }

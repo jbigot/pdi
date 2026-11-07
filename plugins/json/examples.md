@@ -1,8 +1,8 @@
 # JSON examples {#JSON_examples}
 
-These examples show, one approach at a time, how to export data with the \ref JSON_plugin "JSON plugin", and how to turn its output into a
-format of your own.
-Each one is a whole specification tree, that you can run as is; the \ref JSON_reference "reference" documents each of their keys.
+Each example demonstrates one feature of the \ref JSON_plugin "JSON plugin", with a whole specification tree that you can run as is; the
+\ref JSON_reference "reference" documents each of their keys.
+The last one turns its output into a format of your own.
 
 ## The program {#json_ex_program}
 
