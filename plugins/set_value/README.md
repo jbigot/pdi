@@ -10,215 +10,273 @@ It can:
 4. set data: give new values to data that is already shared,
 5. emit an event.
 
-## Configuration grammar {#set_value_configuration}
+## `@set_value` {#set_value_config}
 
-At its root, the Set_value configuration is made of:
+A mapping with the keys below.
+Use it, as the value of `plugins.set_value` (see \ref spectree_pdi_plugins_plugin_name), to give the operations to execute, and when.
 
-|key|value|
-|:--|:----|
-|`"logging"` (*optional*)|a \ref logging_node|
-|`"on_init"` (*optional*)|a list of \ref value_operation|
-|`"on_event"` (*optional*)|an \ref on_event_map_node|
-|`"on_data"` (*optional*)|an \ref on_data_map_node|
-|`"on_finalize"` (*optional*)|a list of \ref value_operation|
-
-### on_init {#on_init_list_node}
-
-Specifies a list of operation to do in \ref PDI_init function.
-`on_init` is a list of \ref value_operation s.
+**Example:**
 
 ```yaml
 plugins:
-  set_value:
+  set_value:              # <- operations to execute in PDI_init and in PDI_finalize
     on_init:
-      - set: ... # value_list
-      - share: ... # value_list
-      - expose: ... # value_list
-      - release: ... # value_list
-      - event: ... # value
-      - logger: ... # logger_map
-```
-
-### on_event {#on_event_map_node}
-
-Specifies a map of events that will trigger the values set.
-`on_event`  is a map with event name as a key and \ref value_operation list as map value.
-
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a list of \ref value_operation|
-
-```yaml
-plugins:
-  set_value:
-    on_event:
-      event_1_name:
-        - set: ... # value_list
-        - share: ... # value_list
-        - expose: ... # value_list
-        - release: ... # value_list
-        - event: ... # value
-      event_2_name:
-        - set: ... # value_list
-        - share: ... # value_list
-        - expose: ... # value_list
-        - release: ... # value_list
-        - event: ... # value
-```
-
-### on_data {#on_data_map_node}
-
-Specifies a map of data that on share will trigger the values set.
-`on_data`  is a map with data/metadata name as a key and \ref value_operation as map value.
-
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a list of \ref value_operation|
-
-```yaml
-metadata:
-  metadata_1_name: ... # metadata_type
-data:
-  data_1_name: ...  # data_type
-plugins:
-  set_value:
-    on_data:
-      data_1_name:
-        - set: ... # value_list
-        - share: ... # value_list
-        - expose: ... # value_list
-        - release: ... # value_list
-        - event: ... # value
-      metadata_1_name:
-        - set: ... # value_list
-        - share: ... # value_list
-        - expose: ... # value_list
-        - release: ... # value_list
-        - event: ... # value
-```
-
-### on_finalize {#on_finalize_list_node}
-
-Specifies a list of operation to do in \ref PDI_finalize function.
-`on_finalize` is a list of \ref value_operation s.
-
-```yaml
-plugins:
-  set_value:
+      - share:
+          - counter: 0
     on_finalize:
-      - set: ... # value_list
-      - share: ... # value_list
-      - expose: ... # value_list
-      - release: ... # value_list
-      - event: ... # value
+      - release: [counter]
 ```
 
-### value operation {#value_operation}
-A value operation is specified as a key-value pair (a **mapping** whose content
-is a single key-value pair).
-It defines an operation to execute inside a \ref value_list.
 
-|key|value|
-|:--|:----|
-|`"set"` (*optional*)|a \ref value_list|
-|`"share"` (*optional*)|a \ref value_list|
-|`"expose"` (*optional*)|a \ref value_list|
-|`"release"` (*optional*)|a list with data to release|
-|`"event"` (*optional*)|an event name to call|
-|`"logger"` (*optional*)|a \ref logger_map|
+### `@set_value.on_init` {#set_value_on_init}
 
+*Optional.*
+A \ref set_value_operations.
+Use `on_init` to execute the operations in \ref PDI_init, once all data and metadata are declared.
+
+**Example:**
+
+```yaml
+on_init:                  # <- run in PDI_init
+  - share:
+      - counter: 0
+on_finalize:
+  - release: [counter]
+```
+
+
+### `@set_value.on_event.<event_name>` {#set_value_on_event_event_name}
+
+A \ref set_value_operations.
+Use `on_event.<event_name>` to execute the operations each time the event named `<event_name>` is emitted.
+
+**Example:**
+
+```yaml
+on_event:
+  increment:              # <- run each time the increment event is emitted
+    - set:
+        - counter: $counter + 1
+```
+
+
+### `@set_value.on_data.<data_name>` {#set_value_on_data_data_name}
+
+A \ref set_value_operations.
+Use `on_data.<data_name>` to execute the operations each time the data or metadata named `<data_name>` is shared.
+
+**Example:**
+
+```yaml
+on_data:
+  field:                  # <- run each time field is shared
+    - expose:
+        - field_shared: 1
+```
+
+
+### `@set_value.on_finalize` {#set_value_on_finalize}
+
+*Optional.*
+A \ref set_value_operations.
+Use `on_finalize` to execute the operations in \ref PDI_finalize.
+
+**Example:**
+
+```yaml
+on_finalize:              # <- run in PDI_finalize
+  - event: finalizing
+```
+
+
+### `@set_value.logging` {#set_value_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugins_plugin_name_logging.
+
+**Example:**
+
+```yaml
+logging: debug            # <- the logger of the Set-value plugin
+on_init:
+  - event: initialized
+```
+
+
+## `@operations` {#set_value_operations}
+
+An *operation list*: a **sequence**, even of a single operation, whose elements are executed in order.
+Each element is a mapping with a single key: the kind of operation, documented below.
+You can use it in \ref set_value_on_init, \ref set_value_on_event_event_name,
+\ref set_value_on_data_data_name and \ref set_value_on_finalize.
+
+**Example:**
+
+```yaml
+on_event:
+  step:                   # <- this sequence is an operation list, run in order
+    - set:
+        - counter: $counter + 1
+    - event: counter_incremented
+```
+
+
+### `@operations[*].set` {#set_value_operations_item_set}
+
+A \ref set_value_value_list.
+Use `set` to set the values of data that are already shared, with write access.
+
+**Example:**
+
+```yaml
+- set:                    # <- counter is already shared, with write access
+    - counter: $counter + 1
+```
+
+
+### `@operations[*].share` {#set_value_operations_item_share}
+
+A \ref set_value_value_list.
+Use `share` to share the values, with read and write access.
 
 \warning
-Share is always done with read and write rights.
-Plugin allocates memory by `malloc`.
-If you reclaim the data, you should deallocate it with `free`.
+The plugin allocates the memory itself, and frees it when the data is released.
+If you reclaim the data instead, %PDI no longer manages that memory.
 
-### value list {#value_list}
-Is a list of the
-- \ref scalar_value,
-- \ref array_value,
-- \ref record_value  
-
-as elements. The order of the elements is important. The descriptors will
-be set in the same order as given in the yaml file.
-
-### scalar value {#scalar_value}
-
-Is a map of descriptor name as a key, and a value to set as a value:
-
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a scalar value to set|
+**Example:**
 
 ```yaml
-metadata:
-  scalar_name: int
-set_value:
-  on_init:
-    - expose:
-      - scalar_name: 42
+- share:                  # <- allocates buffer and shares it, until it is released
+    - buffer: [0, 0, 0]
 ```
 
-### array value {#array_value}
-Is a map of descriptor name as a key, and a list of values to set as a value:
 
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a list of value to set|
+### `@operations[*].expose` {#set_value_operations_item_expose}
+
+A \ref set_value_value_list.
+Use `expose` to expose the values: each data is shared, then released immediately.
+
+**Example:**
 
 ```yaml
-metadata:
-  array_name:
-    type: array
-    size: 4
-    subtype: int
-
-plugins:
-  set_value:
-    on_init:
-      - expose:
-        - array_name: [2, 3, 4, 5]
+- expose:                 # <- shares step, then releases it
+    - step: 1
 ```
 
-### record value {#record_value}
-Is a map of descriptor name as a key, and a list of members to set as a value.
-Each member consist of an inner `value_list`. The order of the members is unrestricted,
-but the plugin will set the values to the members in the same order.
 
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a map with member name as key and a value to set as value|
+### `@operations[*].release` {#set_value_operations_item_release}
+
+A sequence of scalars.
+Use `release` to release the data it names.
+
+**Example:**
 
 ```yaml
-metadata:
-  record_name:
-    type: record
-    buffersize: 16
-    members:
-      member_1:
-        disp: 0
-        type: array
-        size: 3
-        subtype: int
-      member_2:
-        disp: 12
-        type: int
-
-set_value:
-  on_init:
-    - expose:
-      - record_name:
-          member_2: 3 # int member
-          member_1: [1, 2, 3] # array of ints member
+- release: [buffer]       # <- releases buffer, shared by an earlier share operation
 ```
 
-### logger map {#logger_map}
-Defines settings for global PDI logger.
-|key|value|
-|:--|:----|
-|`"level"` (*optional*)   |level to set to the logger|
-|`"pattern"` (*optional*) |pattern to set to the logger|
-|`"evaluate"` (*optional*) |if true evaluate the logger pattern|
+
+### `@operations[*].event` {#set_value_operations_item_event}
+
+A scalar.
+Use `event` to emit the event it names.
+
+**Example:**
+
+```yaml
+- event: checkpoint       # <- emits checkpoint, for the other plugins
+```
+
+
+### `@operations[*].logger.level` {#set_value_operations_item_logger_level}
+
+*Optional.*
+A \ref spectree_expression, evaluated each time the operation is executed.
+Use `logger.level` to change the level of the logger of %PDI to one of those of \ref spectree_logging_level.
+
+**Example:**
+
+```yaml
+- logger:
+    level: debug          # <- PDI logs in detail from now on
+```
+
+
+### `@operations[*].logger.pattern` {#set_value_operations_item_logger_pattern}
+
+*Optional.*
+A scalar.
+Use `logger.pattern` to change the pattern of the logger of %PDI and of those of the plugins that do not set their own.
+
+**Example:**
+
+```yaml
+- logger:
+    pattern: "[%n] %v"    # <- a shorter pattern from now on
+```
+
+
+### `@operations[*].logger.evaluate` {#set_value_operations_item_logger_evaluate}
+
+*Optional.*
+A \ref spectree_expression, evaluated once, at initialization.
+Use `logger.evaluate` to evaluate the logger pattern again each time the operation is executed, if it is true, so that the pattern shows the
+current values of the data it references.
+
+**Example:**
+
+```yaml
+- logger:
+    pattern: "[iteration %{iter}][%n] %v"
+    evaluate: 1           # <- the iteration in the pattern is updated each time this operation runs
+```
+
+
+## `@value_list` {#set_value_value_list}
+
+A *value list*: a sequence of single-key mappings, handled in order.
+You can use it in \ref set_value_operations_item_set, \ref set_value_operations_item_share and \ref set_value_operations_item_expose.
+
+**Example:**
+
+```yaml
+- share:
+    - step: 0             # <- this sequence is a value list, handled in order
+    - position: [0.0, 0.0, 0.0]
+```
+
+
+### `@value_list[*].<data_name>` {#set_value_value_list_item_data_name}
+
+A \ref spectree_expression, or a sequence or mapping of them, converted to the type of the data named `<data_name>`.
+Use `<data_name>` to give the value of the data named `<data_name>`, either:
+* a scalar, to set a scalar data,
+* a sequence of values, to set an array,
+* a mapping associating each member name with its value, to set a record.
+
+**Example:**
+
+```yaml
+- step: 42                # <- a scalar
+```
+
+
+**Example:**
+
+```yaml
+- position: [1.0, 2.0, 3.0]   # <- an array
+```
+
+
+**Example:**
+
+```yaml
+- particle:               # <- a record, member by member
+    id: 3
+    position: [1.0, 2.0, 3.0]
+```
+
 
 ## Full configuration example {#full_config}
 
@@ -247,14 +305,14 @@ plugins:
         - array_size: 3
       - share:
         - record_data:
-          - scalar_data: 0
-          - array_data: [0, 0, 0]
+            scalar_data: 0
+            array_data: [0, 0, 0]
     on_event:
       event_1_name:
         - set:
           - record_data:
-            - scalar_data: 3
-            - array_data: [1, 2, 3]
+              scalar_data: 3
+              array_data: [1, 2, 3]
     on_finalize:
       - release: [record_data]
 ```
