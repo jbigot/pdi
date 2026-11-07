@@ -87,6 +87,8 @@ and this project adheres to
   states that a dataset it creates without a description has the size of the
   memory selection: it has that of the data. It documents that `size_of` reads
   into an array of `int64`.
+* The Decl'NetCDF plugin reference documents that the data it reads and writes
+  must be dense.
 * The Decl'NetCDF plugin reference lists its `when` and `deflate` file keys,
   gives group attributes in the form the plugin reads, and documents when it
   compresses and chunks a variable.
