@@ -20,6 +20,8 @@ and this project adheres to
   programs and specification trees that give parameters to a program, count
   events, compute new values from old ones, emit events for other plugins and
   show the iteration in the log, with their output.
+* The examples of the User-code plugin move to a page of their own, apart from
+  its reference, with one more, that calls a function on some iterations only.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
