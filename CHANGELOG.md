@@ -36,6 +36,8 @@ and this project adheres to
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
 * The User-code plugin reference gives examples with the access rights they need.
+* The Decl'HDF5 plugin reference no longer links its `error` collision policy to
+  the C API's error handling, part of [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
