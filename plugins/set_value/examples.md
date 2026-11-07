@@ -1,7 +1,7 @@
 # Set_value examples {#set_value_examples}
 
-These examples show, one approach at a time, what the \ref set_value_plugin "Set_value plugin" can do.
-Each one is a whole program and specification tree, that you can run as is; the \ref set_value_reference "reference" documents each of their keys.
+Each example demonstrates one feature of the \ref set_value_plugin "Set_value plugin", with a whole program and specification tree that you
+can run as is; the \ref set_value_reference "reference" documents each of their keys.
 
 Compile each program as described in \ref compilation_of__app, and run it with the specification tree as its argument, in an environment set up
 for %PDI (see \ref running_app):
@@ -10,7 +10,8 @@ for %PDI (see \ref running_app):
 ./params params.yml
 ```
 
-The outputs shown leave out the messages that %PDI and the plugins log by default, but in \ref set_value_ex_logger, which is about them.
+The outputs shown leave out the messages that %PDI and the plugins log by default, but in \ref set_value_ex_logger and
+\ref set_value_ex_level, which are about them.
 
 ## Giving parameters to the program {#set_value_ex_params}
 
@@ -374,4 +375,45 @@ $ ./loop logger.yml
 [iteration 1][PDI] Finalization
 [iteration 1][Trace] Goodbye!
 [iteration 1][Set-value] Closing plugin
+```
+
+## Changing the log level {#set_value_ex_level}
+
+The plugin can change the level of the logger of %PDI: here, %PDI logs what it does in detail from the share of `iter` to that of `field`
+only, and the plugin warns each time it changes the level.
+This example runs the program of \ref set_value_ex_events.
+
+```yaml
+logging: {pattern: '[%n] %l: %v'}
+metadata:
+  iter: int
+data:
+  field: {type: array, subtype: double, size: 3}
+plugins:
+  set_value:
+    on_data:
+      iter:
+        - logger:
+            level: trace         # from iter's share
+      field:
+        - logger:
+            level: info          # to field's
+```
+
+```text
+$ ./loop level.yml
+[Set-value] info: Plugin loaded successfully
+[PDI] info: Initialization successful
+[Set-value] warning: Changing level to trace
+[PDI] trace: Calling `iter' data remove. Callbacks to call: 0
+[PDI] trace: Sharing `field' Ref with rights: R = true, W = false
+[PDI] trace: Calling `field' share. Callbacks to call: 1
+[Set-value] warning: Changing level to info
+[Set-value] warning: Changing level to trace
+[PDI] trace: Calling `iter' data remove. Callbacks to call: 0
+[PDI] trace: Sharing `field' Ref with rights: R = true, W = false
+[PDI] trace: Calling `field' share. Callbacks to call: 1
+[Set-value] warning: Changing level to info
+[PDI] info: Finalization
+[Set-value] info: Closing plugin
 ```

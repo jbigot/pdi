@@ -26,5 +26,5 @@ Third, the symbols of the functions **must** be exported, for the `user-code` pl
 
 ## Documentation {#user_code_documentation}
 
-* \subpage user_code_examples "User-code examples" shows, one approach at a time, how to use the plugin, with whole programs and specification trees.
+* \subpage user_code_examples "User-code examples" demonstrates its features one at a time, with whole programs and specification trees.
 * \subpage user_code_reference "User-code configuration reference" documents each key of its configuration.
