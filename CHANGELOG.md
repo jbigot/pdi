@@ -14,6 +14,8 @@ and this project adheres to
 #### Added
 
 #### Changed
+* The API reference no longer lists the deprecated macros, nor those that
+  serve the implementation of `PDI_PLUGIN` and the plugin API version.
 
 #### Deprecated
 
@@ -30,6 +32,8 @@ and this project adheres to
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
 * The User-code plugin reference gives examples with the access rights they need.
+* The API reference names the deprecated statuses `PDI_UNAVAILABLE`,
+  `PDI_ERR_CONFIG` and `PDI_ERR_RIGHT`, instead of their deprecation macro.
 
 #### Security
 
