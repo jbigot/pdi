@@ -1,0 +1,67 @@
+#=============================================================================
+# Copyright (C) 2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the names of CEA, nor the names of the contributors may be used to
+#   endorse or promote products derived from this software without specific
+#   prior written  permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#=============================================================================
+
+cmake_minimum_required(VERSION 3.22...4.2)
+
+if(NOT TARGET GTest::gtest)
+	option(INSTALL_GTEST "Enable installation of googletest. (Projects embedding googletest may want to turn this OFF.)" OFF)
+	add_subdirectory("../../../vendor/googletest-56efe39/" "googletest" EXCLUDE_FROM_ALL)
+endif()
+include(GoogleTest)
+
+# Add the plugin path to PDI_PLUGIN_PATH
+set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY TEST_INCLUDE_FILE "${CMAKE_CURRENT_BINARY_DIR}/TestPath.cmake")
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/TestPath.cmake"
+     CONTENT "
+set(PDI_PLUGIN_PATH \"\$ENV{PDI_PLUGIN_PATH}\")\n
+if(\"x\${PDI_PLUGIN_PATH}x\" STREQUAL xx)\n
+set(ENV{PDI_PLUGIN_PATH} \"\$<TARGET_FILE_DIR:pdi_decl_netcdf_plugin>\")\n
+else()\n
+set(ENV{PDI_PLUGIN_PATH} \"\$<TARGET_FILE_DIR:pdi_decl_netcdf_plugin>:\${PDI_PLUGIN_PATH}\")\n
+endif()
+"
+)
+
+# Runs the specification trees of the examples page (examples.md) with the programs it describes, and checks the files they write.
+
+add_executable(decl_netcdf_examples decl_netcdf_examples.cxx)
+target_link_libraries(decl_netcdf_examples PDI::PDI_C NetCDF::NetCDF GTest::gtest)
+target_compile_definitions(decl_netcdf_examples PRIVATE "EXAMPLES_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+target_compile_features(decl_netcdf_examples PRIVATE cxx_std_17)
+if("${BUILD_NETCDF_PARALLEL}")
+	target_link_libraries(decl_netcdf_examples MPI::MPI_C)
+	target_compile_definitions(decl_netcdf_examples PRIVATE EXAMPLES_MPI)
+endif()
+gtest_discover_tests(decl_netcdf_examples)
+
+if("${BUILD_NETCDF_PARALLEL}")
+	add_test(NAME decl_netcdf_examples_mpi COMMAND "${MPIEXEC}" "${MPIEXEC_NUMPROC_FLAG}" 2 ${MPIEXEC_PREFLAGS} "$<TARGET_FILE:decl_netcdf_examples>" ${MPIEXEC_POSTFLAGS} --gtest_filter=DeclNetcdfExamples.parallel)
+	set_property(TEST decl_netcdf_examples_mpi PROPERTY TIMEOUT 30)
+	set_property(TEST decl_netcdf_examples_mpi PROPERTY PROCESSORS 2)
+endif()

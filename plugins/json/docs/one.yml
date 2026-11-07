@@ -1,0 +1,9 @@
+metadata:
+  step: int
+data:
+  temp: {type: array, subtype: double, size: [2, 3]}
+plugins:
+  #! [json]
+  json:
+    step: step.json            # step, to step.json
+  #! [json]

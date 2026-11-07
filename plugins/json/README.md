@@ -59,5 +59,5 @@ See `example/json.yml`.
 
 ## Documentation {#json_documentation}
 
-* \subpage JSON_examples "JSON examples" demonstrates its features one at a time, with whole programs and specification trees.
+* \subpage JSON_examples "JSON examples" demonstrates its features one at a time, each with the part of the specification tree that configures it.
 * \subpage JSON_reference "JSON configuration reference" documents each key of its configuration.

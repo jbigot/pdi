@@ -1,0 +1,22 @@
+metadata:
+  rank: int
+  dims: {type: array, subtype: int, size: 3}
+data:
+  field: {type: array, subtype: double, size: ['$dims[1]', '$dims[2]']}
+plugins:
+  #! [decl_netcdf]
+  decl_netcdf:
+    file: history_${rank}.nc
+    variables:
+      field:                     # the history, in the file
+        type: array
+        subtype: double
+        size: ['$dims[0]', '$dims[1]', '$dims[2]']
+    read:
+      dims:
+        size_of: field           # the size of the field variable
+      field:
+        variable_selection:      # its last step
+          start: ['$dims[0] - 1', 0, 0]
+          subsize: [1, '$dims[1]', '$dims[2]']
+  #! [decl_netcdf]

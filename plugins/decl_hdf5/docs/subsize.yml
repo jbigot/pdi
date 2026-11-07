@@ -1,0 +1,21 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  #! [data]
+  field:
+    type: array
+    subtype: double
+    size: ['$size[0] + 2', '$size[1] + 2']
+    subsize: ['$size[0]', '$size[1]']  # the part of the array that is the data
+    start: [1, 1]
+  #! [data]
+plugins:
+  #! [decl_hdf5]
+  decl_hdf5:
+    file: output_${rank}.h5
+    when: $iter = 2
+    write: [field]
+  #! [decl_hdf5]

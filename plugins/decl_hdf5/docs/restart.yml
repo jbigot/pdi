@@ -1,0 +1,16 @@
+metadata:
+  rank: int
+  dims: {type: array, subtype: int64, size: 2}
+data:
+  iter: int
+  field: {type: array, subtype: double, size: ['$dims[0]', '$dims[1]']}
+plugins:
+  #! [decl_hdf5]
+  decl_hdf5:
+    - file: checkpoint_${rank}.h5
+      read:
+        dims: {size_of: field}   # the size of the field dataset
+    - file: checkpoint_${rank}.h5
+      on_event: restart
+      read: [iter, field]
+  #! [decl_hdf5]

@@ -1,0 +1,15 @@
+logging: {pattern: '[%n] %v'}    # before the first iteration
+metadata:
+  iter: int
+data:
+  field: {type: array, subtype: double, size: 3}
+plugins:
+  trace: ~
+  #! [set_value]
+  set_value:
+    on_data:
+      iter:                      # each time iter is shared
+        - logger:
+            pattern: '[iteration %{iter}][%n] %v'
+            evaluate: 1
+  #! [set_value]

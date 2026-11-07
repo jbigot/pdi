@@ -1,0 +1,21 @@
+metadata:
+  step: int
+  mesh:
+    type: struct
+    members:
+      - dimensions: {type: array, subtype: int, size: 2}
+      - spacings: {type: array, subtype: double, size: 2}
+data:
+  temp:
+    type: array
+    subtype: double
+    size: ['$mesh.dimensions[0]', '$mesh.dimensions[1]']
+plugins:
+  #! [json]
+  json:
+    - file: setup.json
+      write: [mesh]
+    - file: steps.json
+      when: $step % 2 = 0        # only at the even steps
+      write: [step, temp]
+  #! [json]

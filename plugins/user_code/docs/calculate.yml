@@ -1,0 +1,12 @@
+data:
+  foo: int
+  bar: int
+  res1: int
+  res2: int
+plugins:
+  #! [user_code]
+  user_code:
+    on_event:
+      calculate:
+        sum_and_multiply: {number1: $foo, number2: $bar, sum: $res1, product: $res2}
+  #! [user_code]
