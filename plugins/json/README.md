@@ -12,7 +12,7 @@ It supports not only basic data types such as scalar, array, record, tuple, and 
 It ensures a JSON valid format at all times, even if the simulation crashes and PDI is not finalized, due to its incremental writing. **Warning:** this may result in increased disk bandwidth and may not be ideal for a performance-sensitive context. 
 <!-- You might then want to consider using the `xxxxx` option to use the open file once behavior, instead of rewriting at each call. This would cause invalid JSON if simulation crashes or PDI's finalization is not called. But then you are using JSON anyways ... -->
 
-Conditionnal writing is supported.
+Conditional writing is supported.
 
 The write to file is only triggered when a variable is shared to PDI with read permission given.
 
@@ -20,46 +20,146 @@ Note that is written to this file the variable whichever variables listed in the
 
 The JSON plugin doesn't yet support the function of waiting for multiple variables to be readable before writing them.
 
-## Configuration grammar {#json_configuration_grammar}
-
-There are two syntax for the JSON configuration file:
-First one is `var_name: file_path.json`, as for example :
+## Example of a JSON configuration {#json_configuration_grammar}
 
 ```yaml
 plugins:
   json:
-    data1: file_path.json 
+    - data1: file_path.json
+    - file: file_path_${iteration}.json
+      when: $iteration % 10 = 0
+      write: [data2, data3]
 ```
 
-The second one starts with `- file: file_path.json` with arguments below
+More examples are given in `example/json.yml`.
 
-|key|value|
-|:--|:----|
-|`"file"` (*mandatory*)| Name of the output file|
-|`"write"` (*mandatory*)| The variables to be writen|
-|`"when"` (*optional*)| Indicate some kind of condition|
+## `@json` {#json_config}
 
-For example,
+Either a single \ref json_jsonfile or a sequence of them.
+Use it, as the value of `plugins.json` (see \ref spectree_pdi_plugins_plugin_name), to describe the writes to execute.
+
+The file holds a JSON array, with one object per write, whose only key is the name of the variable.
+If the file already exists, the new objects are appended to its array.
+
+A variable is written each time it is shared with read permission.
+
+**Example:**
+
+```yaml
+plugins:
+  json:                   # <- a single file description...
+    my_data: my_data.json
+```
+
+
+**Example:**
+
+```yaml
+plugins:
+  json:                   # <- ... or a sequence of them
+    - my_data: my_data.json
+    - file: all.json
+      write: [data1, data2]
+```
+
+
+### `@json.logging` {#json_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugins_plugin_name_logging.
+It is only taken into account when `@json` is a single \ref json_jsonfile, not a sequence.
+The plugin itself does not expect it: in a file description whose first key is `file`, it is an error, and as the first key of a file
+description, it is read as a \ref json_jsonfile_data_name.
+It can therefore only follow the data name of a single file description of the `<data_name>` form.
+
+**Example:**
+
+```yaml
+my_data: my_data.json
+logging: debug          # <- after the data name
+```
+
+## `@jsonfile` {#json_jsonfile}
+
+The writes to one file, either:
+* a mapping with a single key, \ref json_jsonfile_data_name, that writes one variable,
+* a mapping whose first key is \ref json_jsonfile_file, with the \ref json_jsonfile_write and \ref json_jsonfile_when keys, and no
+  other key.
+You can use it in \ref json_config.
+
+**Example:**
 
 ```yaml
 plugins:
   json:
-    - file: file_path.json
-      when: iteration % 10 = 0 # This is optional
-      write: [data1, data2, ...]
+    - my_data: my_data.json   # <- a file description of the <data_name> form
+    - file: all.json          # <- a file description of the file form
+      write: [data1, data2]
 ```
 
-Note : By default, if the key "when" is not specified, a true condition is set so that the variable is written every time PDI is granted read permission.
-Examples of those two syntax are given in `example/json.yml`.
+
+### `@jsonfile.<data_name>` {#json_jsonfile_data_name}
+
+A \ref spectree_expression.
+Use `<data_name>` to write the variable named `<data_name>` to the file at this path.
+
+**Example:**
+
+```yaml
+step: step_${rank}.json   # <- writes step to a file per process
+```
+
+
+### `@jsonfile.file` {#json_jsonfile_file}
+
+*Required, first key of its mapping.*
+A \ref spectree_expression.
+Use `file` to give the path of the file where to write the variables listed in \ref json_jsonfile_write.
+
+**Example:**
+
+```yaml
+file: output_${rank}.json # <- first key: this file description is of the file form
+write: [temp, step]
+```
+
+
+### `@jsonfile.write` {#json_jsonfile_write}
+
+*Required*: without it, nothing is written to the file.
+A sequence of scalars.
+Use `write` to name the variables to write to \ref json_jsonfile_file.
+
+**Example:**
+
+```yaml
+file: output.json
+write: [temp, step]       # <- each written when it is shared
+```
+
+
+### `@jsonfile.when` {#json_jsonfile_when}
+
+*Optional.*
+A \ref spectree_expression.
+Use `when` to set a condition, evaluated each time a variable of \ref json_jsonfile_write is about to be written.
+The variable is only written if the condition is true.
+By default, the variables are written each time they are shared with read permission.
+
+**Example:**
+
+```yaml
+file: output.json
+when: $step % 10 = 0      # <- one share out of ten
+write: [temp]
+```
+
 
 ## Install and test the JSON plugin ! {#json_test_plugin}
 The JSON plugin relies on the [nlohmann/json](https://github.com/nlohmann/json) library to output data to JSON format.
-The json library is included in the PDI repo as a submodule. To get the source code of this external library, one needs to do, from the root of PDI:
-```bash
-git submodule init
-git submodule update
-```
-Next, users can activate the json_plugin by adding `BUILD_JSON_PLUGIN=ON` option to the PDI configuration commande.
+This library is included in the PDI distribution, and is built along with the plugin when it is not found on the system.
+To build the plugin, add the `BUILD_JSON_PLUGIN=ON` option to the PDI configuration command.
 
 Once the plugin installed, the easiest way to test the plugin is referring to the example section, which provides a full somewhat realistic C simulation code, where PDI is enabled and the JSON plugin is used. This one can be found in `example`.
 
@@ -113,68 +213,71 @@ For the sake of the example, let's imagine the following code, creating which pe
 <!-- \image html simulation_yaml_light.png width=800px -->
 
 ```yaml
-types: # [...] including config_t description
-    metadata: {rank: int, step: int}
-    data:
-        simulation_name: { type: array, subtype: char, size: 512 }
-        max_steps: int
-        mesh_config:
-            type: struct
-            members:
-            - dimensions: { type: array, subtype: int, size: 3}
-            - spacings: { type: array, subtype: int, size: 3}
+metadata: {rank: int, step: int}
+data:
+    simulation_name: { type: array, subtype: char, size: 512 }
+    max_steps: int
+    mesh_config:
+        type: struct
+        members:
+        - dimensions: { type: array, subtype: int, size: 3}
+        - spacings: { type: array, subtype: double, size: 3}
 
-        temp: # the main temperature field
-        - type: array
-        - subtype: double
-        - size: '$mesh_config.dimensions'
+    temp: # the main temperature field
+        type: array
+        subtype: double
+        size: ['$mesh_config.dimensions[0]', '$mesh_config.dimensions[1]', '$mesh_config.dimensions[2]']
 
 plugins:
     json:
     - file: data-$rank.json
-      write: [step, temp]
-      when: '$step > 0
+      write: [simulation_name, max_steps, mesh_config, rank, step, temp]
 ```
 
 ### JSON output
-If we run this code as is, the following JSON file would get generated.
+Running this code as is generates the following JSON file, with one object per variable written.
 
 <!-- \image html json_json_light.png width=800px -->
 
 ```json
-[{
-    "simulation_name": "Heat_transfer_simulation",
-    "max_steps": 10,
+[
+{
+    "simulation_name": "Heat_transfer_simulation"
+},
+{
+    "max_steps": 10
+},
+{
     "mesh_config": {
         "dimensions": [100, 100, 50],
-        "spacing": [0.1, 0.1, 0.1]
-    },
-    "rank": 7,
+        "spacings": [0.1, 0.1, 0.1]
+    }
 },
 {
-    "step" : 1,
+    "rank": 7
+},
+{
+    "step": 0
+},
+{
     "temp": [75.3, 74.7, 76.1, ..., 54.2, 55.6]
-},
-{
-    "step" :2,
-    "temp" :[01.8, 89.6, 92.7, ..., 12.5, 13.7]
 },
 ...
 ]
 ```
 
-We can use this output json file to generate our custom format. For example, we can rely on [mustache](https://mustache.github.io/) to do so.
+We can use this JSON output file to generate our custom format, for example with [mustache](https://mustache.github.io/), once the objects have
+been gathered into a single one, with the iterations under a `temperature_data` key.
 
 ### Mustache code
 <!-- \image html json_mustache_light.png width=800px -->
 
 ```mstch
 Simulation {{simulation_name}} of {{max_steps}} iterations.
-Mesh configuration was of {{mesh_config.dimensions}} dimensions and {{mesh_config.spacing}} spacings
+Mesh configuration was of {{mesh_config.dimensions}} dimensions and {{mesh_config.spacings}} spacings
 {{#temperature_data}}
-    At step {{step}}:
-    temp was [{{#temp}}{{.}}{{#last}}{{^last}},{{/last}}{{/temp}}]
-{{/temperature_datal}}
+At step {{step}}, temp was [{{#temp}}{{.}}{{#last}}{{^last}},{{/last}}{{/temp}}]
+{{/temperature_data}}
 ```
 
 Finaly, let's print it ! We execute the json to mustache converter ...
