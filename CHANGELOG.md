@@ -16,6 +16,8 @@ and this project adheres to
   from their reference: whole specification trees, run on one program, that
   each show one approach, from writing data when it is shared to parallel I/O
   and restarting from a checkpoint, with the files they produce.
+* The examples of the User-code plugin move to a page of their own, apart from
+  its reference, with one more, that calls a function on some iterations only.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
@@ -48,7 +50,6 @@ and this project adheres to
 * `find_package(PDI QUIET COMPONENTS Fortran)` no longer prints the deprecation
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
-* The User-code plugin reference gives examples with the access rights they need.
 * The specification tree reference now describes logging as PDI implements it,
   with a working example, fixing [#808](https://github.com/pdidev/pdi/issues/808).
 * The specification tree reference now lists the datatypes PDI has, and only
@@ -64,6 +65,9 @@ and this project adheres to
 * The Decl'NetCDF plugin reference lists its `when` and `deflate` file keys,
   gives group attributes in the form the plugin reads, and documents when it
   compresses and chunks a variable.
+* The User-code plugin reference gives examples that are valid YAML, with the
+  access rights they need, and puts `when` in the function lists, where the
+  plugin reads it.
 
 #### Security
 
