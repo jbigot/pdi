@@ -1,7 +1,7 @@
 # Decl'HDF5 examples {#Decl_HDF5_examples}
 
 These examples show, one approach at a time, how to write and read HDF5 files with the \ref Decl_HDF5_plugin "Decl'HDF5 plugin".
-Each one is a whole specification tree, that you can run as is; the \ref Decl_HDF5_plugin "reference" documents each of their keys.
+Each one is a whole specification tree, that you can run as is; the \ref Decl_HDF5_reference "reference" documents each of their keys.
 They follow the same steps as the Decl'HDF5 part of the \ref Hands_on "tutorial", which lets you write them yourself.
 
 ## The program {#decl_hdf5_ex_program}
