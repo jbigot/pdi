@@ -109,6 +109,10 @@ concept distribution_safe_integral
 	= std::same_as<T, short> || std::same_as<T, unsigned short> || std::same_as<T, int> || std::same_as<T, unsigned int> || std::same_as<T, long>
    || std::same_as<T, unsigned long> || std::same_as<T, long long> || std::same_as<T, unsigned long long>;
 
+/// \name random_init
+/// Initializes a value with the provided generator, in a way that depends on its type
+///@{
+
 /** initialize an integral value with uniformly distributed values from the provided generator
  * \param gen the (pseudo)random generator
  * \param t the value to initialize
@@ -157,6 +161,12 @@ static inline void random_init(G& gen, T& t)
 	t = T(gen);
 }
 
+///@}
+
+/// \name make_random
+/// Makes a new randomly initialized object
+///@{
+
 /** make a new randomly-initialized object that can be constructed from a generator
  * \param gen the (pseudo)random generator
  */
@@ -178,6 +188,8 @@ static inline T make_random(G& gen)
 	random_init(gen, result);
 	return result;
 }
+
+///@}
 
 /** The fixture class for PDI plugins testing.
  * 

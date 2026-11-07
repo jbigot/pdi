@@ -109,19 +109,9 @@ public:
 	static std::optional<Yaml_region> make(PC_tree_t tree);
 };
 
-/** Converts a Yaml region into a string representation for debugging purpose
- * 
- * \param location the location to convert
- * \return the string representation
- */
-std::string PDI_EXPORT to_string(Yaml_region location);
-
-/** Converts an optional Yaml region into a string representation for debugging purpose
- * 
- * \param location the location to convert
- * \return the string representation
- */
-std::string PDI_EXPORT to_string(std::optional<Yaml_region> location);
+/// \name len
+/// Returns the length of a node
+///@{
 
 /** Returns the length of a node.
  *
@@ -150,6 +140,12 @@ int PDI_EXPORT len(PC_tree_t tree);
  */
 int PDI_EXPORT len(PC_tree_t tree, int dflt);
 
+///@}
+
+/// \name to_long
+/// Returns the integer value of a scalar node
+///@{
+
 /** Returns the int value of a scalar node
  *
  * throws an Error if the provided tree is in error
@@ -168,6 +164,12 @@ long PDI_EXPORT to_long(PC_tree_t tree);
  * \return the int value of the scalar node
  */
 long PDI_EXPORT to_long(PC_tree_t tree, long dflt);
+
+///@}
+
+/// \name to_double
+/// Returns the floating point value of a scalar node
+///@{
 
 /** Returns the floating point value of a scalar node
  *
@@ -188,6 +190,12 @@ double PDI_EXPORT to_double(PC_tree_t tree);
  */
 double PDI_EXPORT to_double(PC_tree_t tree, double dflt);
 
+///@}
+
+/// \name to_string
+/// Returns the string content of a scalar node, or a string representation of a Yaml region for debugging purposes
+///@{
+
 /** Returns the string content of a scalar node
  *
  * throws an Error if the provided tree is in error
@@ -206,6 +214,26 @@ std::string PDI_EXPORT to_string(PC_tree_t tree);
  * \return the content of the scalar node
  */
 std::string PDI_EXPORT to_string(PC_tree_t tree, const std::string& dflt);
+
+/** Converts a Yaml region into a string representation for debugging purposes
+ * 
+ * \param location the location to convert
+ * \return the string representation
+ */
+std::string PDI_EXPORT to_string(Yaml_region location);
+
+/** Converts an optional Yaml region into a string representation for debugging purposes
+ * 
+ * \param location the location to convert
+ * \return the string representation
+ */
+std::string PDI_EXPORT to_string(std::optional<Yaml_region> location);
+
+///@}
+
+/// \name to_bool
+/// Returns the boolean value of a scalar node
+///@{
 
 /** Returns the boolean value of a scalar node
  *
@@ -229,6 +257,8 @@ bool PDI_EXPORT to_bool(PC_tree_t tree);
  */
 bool PDI_EXPORT to_bool(PC_tree_t tree, bool dflt);
 
+///@}
+
 
 /** Checks if the tree is a list
  *
@@ -251,12 +281,25 @@ bool PDI_EXPORT is_map(PC_tree_t tree);
  */
 bool PDI_EXPORT is_scalar(PC_tree_t tree);
 
+/// \name each
+/// Iterates over a PC list or mapping, applying the provided function to each of its elements
+///@{
+
 /** Iterates and apply the provided function to all elements of a PC list
  *
  * \param tree the tree containing the list
  * \param operation the operation to apply to each element of the tree
  */
 void PDI_EXPORT each(PC_tree_t tree, std::function<void(PC_tree_t)> operation);
+
+/** Iterates and applies the provided function to all elements of a PC mapping
+ *
+ * \param tree the tree containing the mapping
+ * \param operation the operation to apply to each element of the tree
+ */
+void PDI_EXPORT each(PC_tree_t tree, std::function<void(PC_tree_t, PC_tree_t)> operation);
+
+///@}
 
 /** Iterates and apply the provided function to all elements of a PC list or
  * directly to the provided element if it is not a list
@@ -265,13 +308,6 @@ void PDI_EXPORT each(PC_tree_t tree, std::function<void(PC_tree_t)> operation);
  * \param operation the operation to apply to the elements
  */
 void PDI_EXPORT opt_each(PC_tree_t tree, std::function<void(PC_tree_t)> operation);
-
-/** Iterates and apply the provided function to all elements of a PC mapping
- *
- * \param tree the tree containing the mapping
- * \param operation the operation to apply to each element of the tree
- */
-void PDI_EXPORT each(PC_tree_t tree, std::function<void(PC_tree_t, PC_tree_t)> operation);
 
 /** Iterates and apply the provided function to all elements of a PC ordered
  *  mapping

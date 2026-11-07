@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -45,6 +45,10 @@ protected:
 	Attributes_map m_attributes;
 
 public:
+	/// \name Datatype_template
+	/// Creates a datatype template
+	///@{
+
 	/** Creates datatype template with given attributes
 	 *
 	 * \param attributes attributes of datatype template
@@ -58,6 +62,8 @@ public:
 	 * \param datatype_tree datatype tree
 	 */
 	Datatype_template(PC_tree_t datatype_tree);
+
+	///@}
 
 	/** Destroys the template
 	 */
