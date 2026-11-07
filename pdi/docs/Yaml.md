@@ -124,7 +124,7 @@ PDI_init(PC_parse_path("example.yaml"));
 ```
 
 Fortran source code:
-```Fortran
+```f90
 type(PC_tree_t), target :: yaml_tree
 
 call PC_parse_path("example.yaml", yaml_tree)
@@ -155,7 +155,7 @@ PDI_init(PC_get(PC_parse_path("example.yaml"), ".pdi_subtree"));
 ```
 
 Fortran source code:
-```Fortran
+```f90
 type(PC_tree_t),target :: root
 
 call PC_parse_path("example.yaml", root)
