@@ -55,6 +55,8 @@ and this project adheres to
 * The Decl'NetCDF plugin reference lists its `when` and `deflate` file keys,
   gives group attributes in the form the plugin reads, and documents when it
   compresses and chunks a variable.
+* The Decl'NetCDF plugin reference documents that the data it reads and writes
+  must be dense.
 
 #### Security
 
