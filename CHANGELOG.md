@@ -12,18 +12,14 @@ and this project adheres to
 ### For users
 
 #### Added
-* The Decl'HDF5 and Decl'NetCDF plugins each have a page of examples, apart
-  from their reference: whole specification trees, run on one program, that
-  each show one approach, from writing data when it is shared to parallel I/O
-  and restarting from a checkpoint, with the files they produce.
-* The Set_value plugin has a page of examples, apart from its reference: whole
-  programs and specification trees that give parameters to a program, count
-  events, compute new values from old ones, emit events for other plugins and
-  show the iteration in the log, with their output.
-* The examples of the User-code plugin move to a page of their own, apart from
-  its reference, with one more, that calls a function on some iterations only.
-* The JSON plugin has a page of examples, apart from its reference, which
-  replaces its custom formatting example with one whose output is that of a run.
+* The Decl'HDF5, Decl'NetCDF, Set_value, User-code and JSON plugins each have
+  a short presentation page, with two subpages: their configuration reference,
+  and a page of examples, whole programs and specification trees that each show
+  one approach, with their output. Those of Decl'HDF5 and Decl'NetCDF follow
+  the tutorial, from writing data when it is shared to parallel I/O and
+  restarting from a checkpoint; those of User-code are the former ones, with
+  one more; that of JSON replaces its custom formatting example with one whose
+  output is that of a run.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
