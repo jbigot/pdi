@@ -1,0 +1,17 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  #! [decl_netcdf]
+  decl_netcdf:
+    file: output_${rank}.nc
+    deflate: 6                   # the compression level of all the variables
+    variables:
+      field:
+        chunking: ['$size[0] + 2', 4]  # chunks of 6x4 elements
+    write: [field]
+  #! [decl_netcdf]

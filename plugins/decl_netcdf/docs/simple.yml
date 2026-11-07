@@ -1,0 +1,13 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  #! [decl_netcdf]
+  decl_netcdf:
+    file: simple.nc
+    write: [size, field]
+  #! [decl_netcdf]

@@ -1,0 +1,18 @@
+metadata:
+  int_scalar: int
+  int_array: {type: array, subtype: int, size: 3}
+plugins:
+  #! [set_value]
+  set_value:
+    on_event:
+      init:
+        - expose:
+            - int_scalar: 0
+            - int_array: [0, 0, 0]
+      increment:
+        - expose:
+            - int_array:
+                - $int_array[0] + 1
+                - $int_array[0] + 1  # int_array[0] is still 0
+                - $int_array[1] + 1  # and so is int_array[1]
+  #! [set_value]

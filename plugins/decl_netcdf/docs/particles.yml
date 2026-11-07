@@ -1,0 +1,32 @@
+metadata:
+  time: double
+data:
+  #! [data]
+  particles:
+    type: array
+    size: 2
+    subtype:
+      type: struct
+      +decl_netcdf.type: particle_t  # the name of the compound type
+      members:
+        - id: int
+        - position: {type: array, subtype: double, size: 3}
+  #! [data]
+plugins:
+  #! [decl_netcdf]
+  decl_netcdf:
+    - file: particles.nc
+      on_event: save
+      variables:
+        particles:
+          attributes:
+            time: $time          # written from time
+      write: [particles]
+    - file: particles.nc
+      on_event: load
+      variables:
+        particles:
+          attributes:
+            time: $time          # read into time
+      read: [particles]
+  #! [decl_netcdf]

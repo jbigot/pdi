@@ -1,0 +1,28 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  mpi: ~
+  #! [decl_hdf5]
+  decl_hdf5:
+    file: output.h5                  # one file for all processes
+    communicator: $MPI_COMM_WORLD
+    datasets:
+      field:                         # the blocks of all processes
+        type: array
+        subtype: double
+        size: ['$nprocs * $size[0]', '$size[1]']
+    write:
+      field:
+        when: $iter = 2
+        memory_selection:
+          size: ['$size[0]', '$size[1]']
+          start: [1, 1]
+        dataset_selection:           # the rows of this process
+          start: ['$rank * $size[0]', 0]
+        mpio: INDEPENDENT            # each process writes on its own
+  #! [decl_hdf5]

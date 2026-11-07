@@ -1,0 +1,7 @@
+plugins:
+  #! [user_code]
+  user_code:
+    on_event:
+      print:                     # on the print event
+        hello_world: {}          # call hello_world, with no alias
+  #! [user_code]

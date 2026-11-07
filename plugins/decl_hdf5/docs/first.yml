@@ -1,0 +1,17 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  #! [decl_hdf5]
+  decl_hdf5:
+    file: output_${rank}.h5
+    write:
+      field:
+        - dataset: field_last
+        - dataset: field_first
+          collision_policy: skip # written once, then left as it is
+  #! [decl_hdf5]

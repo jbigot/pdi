@@ -1,0 +1,13 @@
+data:
+  nb_iter: int
+  alpha: double
+plugins:
+  #! [set_value]
+  set_value:
+    on_init:                     # in PDI_init
+      - share:
+          - nb_iter: 10
+          - alpha: 0.125
+    on_finalize:                 # in PDI_finalize
+      - release: [nb_iter, alpha]
+  #! [set_value]

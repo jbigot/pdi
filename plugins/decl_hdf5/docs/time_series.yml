@@ -1,0 +1,23 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  #! [decl_hdf5]
+  decl_hdf5:
+    file: output_${rank}.h5
+    datasets:
+      field:                     # 3 iterations of the interior
+        {type: array, subtype: double, size: [3, '$size[0]', '$size[1]']}
+    write:
+      field:
+        memory_selection:
+          size: ['$size[0]', '$size[1]']
+          start: [1, 1]
+        dataset_selection:       # the slice of the current iteration
+          size: [1, '$size[0]', '$size[1]']
+          start: [$iter, 0, 0]
+  #! [decl_hdf5]

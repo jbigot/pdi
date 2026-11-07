@@ -1,0 +1,14 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  #! [decl_hdf5]
+  decl_hdf5:
+    file: output_${rank}_${iter}.h5
+    collision_policy: error      # never overwrite a file
+    write: [field]
+  #! [decl_hdf5]

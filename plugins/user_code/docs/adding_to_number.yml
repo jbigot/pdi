@@ -1,0 +1,9 @@
+data:
+  number: int
+plugins:
+  #! [user_code]
+  user_code:
+    on_data:
+      number:
+        add_ten: {input: $number}
+  #! [user_code]

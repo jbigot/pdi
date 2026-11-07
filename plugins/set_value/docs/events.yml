@@ -1,0 +1,17 @@
+metadata:
+  iter: int
+data:
+  field: {type: array, subtype: double, size: 3}
+plugins:
+  #! [plugins]
+  set_value:
+    on_data:
+      field:                     # each time field is shared
+        - event: field_ready
+  decl_hdf5:
+    file: output.h5
+    on_event: field_ready
+    write:
+      field:
+        dataset: field_${iter}
+  #! [plugins]

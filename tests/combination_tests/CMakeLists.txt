@@ -75,3 +75,18 @@ add_test(NAME test_05_C COMMAND "$<TARGET_FILE:test_05_C>" "${CMAKE_CURRENT_SOUR
 set_tests_properties(test_05_C PROPERTIES DISABLED TRUE)
 
 endif("${BUILD_DECL_NETCDF_PLUGIN}" AND "${BUILD_SERIALIZE_PLUGIN}")
+
+# The examples of the Set_value documentation that load other plugins
+if("${BUILD_SET_VALUE_PLUGIN}" AND ("${BUILD_DECL_HDF5_PLUGIN}" OR "${BUILD_TRACE_PLUGIN}"))
+	add_executable(set_value_examples set_value_examples.cxx)
+	target_link_libraries(set_value_examples PDI::PDI_C GTest::gtest GTest::gtest_main)
+	target_compile_definitions(set_value_examples PRIVATE "SET_VALUE_EXAMPLES_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../plugins/set_value/docs\"")
+	if("${BUILD_DECL_HDF5_PLUGIN}")
+		target_compile_definitions(set_value_examples PRIVATE EXAMPLES_DECL_HDF5)
+	endif()
+	if("${BUILD_TRACE_PLUGIN}")
+		target_compile_definitions(set_value_examples PRIVATE EXAMPLES_TRACE)
+	endif()
+	target_compile_features(set_value_examples PRIVATE cxx_std_17)
+	gtest_discover_tests(set_value_examples)
+endif()
