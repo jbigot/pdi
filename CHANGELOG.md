@@ -12,6 +12,10 @@ and this project adheres to
 ### For users
 
 #### Added
+* The Decl'HDF5 plugin has a page of examples, apart from its reference: whole
+  specification trees, run on one program, that each show one approach, from
+  writing data when it is shared to parallel I/O and restarting from a
+  checkpoint, with the files they produce.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
