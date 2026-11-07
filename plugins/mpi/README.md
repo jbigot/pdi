@@ -22,7 +22,7 @@ All the metadata above are available from the call to `PDI_init` to the call to 
 At the yaml tree root plugin is a map that contains the following keys:
 |key|value|
 |:--|:----|
-|`"logging"` (*optional*)|a \ref logging_node|
+|`"logging"` (*optional*)|a \ref spectree_logging|
 |`"transtype"` (*optional*)|a \ref transtype_map_node|
 
 ## transtype map {#transtype_map_node}

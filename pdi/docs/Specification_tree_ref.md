@@ -1,1785 +1,372 @@
 # Specification tree Reference {#Specification_tree_ref}
 
 The %PDI specification tree is expressed in \subpage YAML.
+This reference documents each key of the tree in its own section, named after the path leading to it from a block.
+
+The paths follow these conventions:
+* a dot `.` separates a key from the key that contains it, *e.g.* `@pdi.plugins.mpi` is the `mpi` key of the `plugins` mapping of the `@pdi` block,
+* a name between angle brackets is a key whose name you choose, *e.g.* `@pdi.data.<data_name>` is any key of the `data` mapping,
+* `[*]` stands for any element of a sequence, *e.g.* `@struct.members[*]`,
+* a name preceded by `@` is a *block*: a part of the tree documented once, in its own section, to which each key that takes it as value links,
+  *e.g.* `@logging` is the configuration of a logger, the value of both \ref spectree_pdi_logging and \ref spectree_pdi_plugins_plugin_name_logging, and
+  `@logging.level` is its `level` key,
+* names between parentheses and separated by `|` are alternatives, *e.g.* `(@character|@integer|@logical|@real).kind` is the `kind` key of
+  any of these four datatypes.
+
+Datatypes and $-expressions can appear in many places in the tree, including in the configuration of plugins.
+Each is documented once, on its own page: \subpage Spectree_types_ref "Datatypes" and \subpage spectree_expression "$-expressions".
+Each plugin documents its own blocks on its own page.
+
+The root of the specification tree is a \ref spectree_pdi block.
+It is either the root of the YAML document, or a subtree of it selected when initializing %PDI (see
+\ref parse_subtree "Parsing a subtree").
 
 
-## specification tree root {#root_node}
+## `@pdi` {#spectree_pdi}
 
-The *specification tree root* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"include"` (*optional*)     | a \ref include_or_seq_node |
-|`"logging"` (*optional*)     | a \ref logging_node |
-|`"types"` (*optional*)|a \ref types_map_node|
-|`"metadata"` (*optional*)|a \ref data_map_node|
-|`"data"` (*optional*)        | a \ref data_map_node |
-|`"plugin_path"` (*optional*)|a \ref plugin_path_map_node|
-|`"plugins"` (*optional*)     | a \ref plugin_map_node |
-|`".*"` (*optional*)| *anything* |
-
-* the `include` section specify other YAML configuration part of a same
-  Paraconf tree. The configuration it contains should have the same format as
-  the main file (with `include`, `types`,  `metadata`,  `data`,  `plugin_path`,
-  and`plugins` sections. But the keys under these sections should not be
-  repeated. The same file can be included twice (diamond include) but recursive
-  inclusion is an error.
-* the `logging` section specify logger properties
-* the `metadata` and `data` sections specify the type of the data in buffers
-  exposed by the application; for `metadata`, %PDI keeps a copy while it only
-  keeps references for `data`,
-* the `plugin_path` section specifies the path to directories where %PDI should
-  search for plugins
-* the `plugins` section specifies the list of plugins to load and their
-  configuration,
-* the `types` section specifies user-defined datatypes
-* additional sections are ignored.
-
-### Example:
-
-```{.python}
-include: my_other_configuration_file.yml
-logging: trace
-types:
-  metadata_t: int
-metadata:
-  my_metadata: metadata_t
-data:
-  my_data:
-    type: array
-    subtype: double
-    size: $my_metadata
-plugin_path:
-  - /usr/lib/pdi
-plugins:
-  decl_hdf5: #...
-  mpi: #...
-```
-
-
-## array_type {#array_type_node}
-
-A *array_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"array"`|
-|`"size"`|a \ref intexpr_or_seq_node|
-|`"subtype"` (*optional*)|a \ref datatype_node|
-|`"subsize"` (*optional, deprecated*)|a \ref intexpr_or_seq_node|
-|`"start"` (*optional, deprecated*)|a \ref intexpr_or_seq_node|
-|`"\+.*"` (*optional*)|anything|
-
-A *array_type_node* represents a potentially multi-dimensional array where:
-* the value associated to the `size` key represents the size of the array in
-  each dimension (C order),
-* the value associated to the `subtype` key represents the type of the elements
-  in the array,
-* the value associated to the `subsize` key represents the number of elements to
-  actually use in each dimension (slicing), if specified it **must** have the
-  same number of elements as `size`, this defaults to the full array size in
-  each dimension,
-* the value associated to the `start` key represents the index of the first
-  element to actually use in each dimension (slicing), if specified it **must**
-  have the same number of elements as `size`, this defaults to the first (0)
-  element in each dimension,
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: array
-subtype: double
-size: 5
-```
-
-```{.python}
-type: array
-subtype: { type: character, kind: 4 }
-size: [ '$size_1d', '$size_2d' ]
-```
-
-
-## byte_type {#byte_type_node}
-
-A *byte_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"byte"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref byte_type_node represents the C++ `byte` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
+A mapping with the keys below: the configuration of %PDI.
+Keys not listed below are ignored.
 
 **Example:**
 
-```{.python}
-type: byte
-```
-
-
-## char_type {#char_type_node}
-
-A *char_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"char"`|
-|`"\+.*"` (*optional*)|anything|
-
-A *char_type* represents the C `char` datatype; it accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: char
-```
-
-
-## character_type {#character_type_node}
-
-A *character_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"character"`|
-|`"kind"` (*optional*)|a \ref expression_node "integer-valued $-expression"|
-|`"\+.*"` (*optional*)|anything|
-
-A *character_type_node* represents the Fortran `character` datatype, where:
-* the value associated to the `kind` key corresponds to the Fortran *kind*
-  parameter (`character(kind=...)`),
-  if missing, the default kind of the Fortran implementation is used,
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: character
-```
-
-```{.python}
-type: character
-kind: 4
-```
-
-
-## data_map {#data_map_node}
-
-A *data_map* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a \ref datatype_node|
-
-* each key identifies the name of a buffer exposed to %PDI associated to its
-type.
-
-### Example:
-
-```{.python}
-my_data_1: int
-my_data_2: {type: array, subtype: double, size: 5}
-```
-
-
-## datatype {#datatype_node}
-
-A *datatype* can be **any of**:
-* a \ref array_type_node,
-* a \ref byte_type_node,
-* a \ref char_type_node,
-* a \ref character_type_node,
-* a \ref double_type_node,
-* a \ref float_type_node,
-* a \ref int_type_node,
-* a \ref int16_type_node,
-* a \ref int32_type_node,
-* a \ref int64_type_node,
-* a \ref int8_type_node,
-* a \ref integer_type_node,
-* a \ref int_fast16_type_node,
-* a \ref int_fast32_type_node,
-* a \ref int_fast64_type_node,
-* a \ref int_fast8_type_node,
-* a \ref int_least16_type_node,
-* a \ref int_least32_type_node,
-* a \ref int_least64_type_node,
-* a \ref int_least8_type_node,
-* a \ref intmax_type_node,
-* a \ref intptr_type_node,
-* a \ref logical_type_node,
-* a \ref long_type_node,
-* a \ref long_type_node,
-* a \ref pointer_type_node,
-* a \ref ptrdiff_t_type_node,
-* a \ref real_type_node,
-* a \ref record_type_node,
-* a \ref short_type_node,
-* a \ref simple_datatype_node,
-* a \ref size_t_type_node,
-* a \ref struct_type_node,
-* a \ref tuple_type_node,
-* a \ref uint_type_node,
-* a \ref uint16_type_node,
-* a \ref uint32_type_node,
-* a \ref uint64_type_node,
-* a \ref uint8_type_node,
-* a \ref uint_fast16_type_node,
-* a \ref uint_fast32_type_node,
-* a \ref uint_fast64_type_node,
-* a \ref uint_fast8_type_node,
-* a \ref uint_least16_type_node,
-* a \ref uint_least32_type_node,
-* a \ref uint_least64_type_node,
-* a \ref uint_least8_type_node,
-* a \ref uintmax_type_node,
-* a \ref uintptr_type_node,
-* a \ref unsigned_long_type_node,
-* a \ref unsigned_long_long_type_node,
-* a \ref unsigned_short_type_node,
-* any user-defined datatype name.
-
-\ref simple_datatype_node is just a string that identifies the referenced type.
-All others cases are dictionaries whose `type` key identifies the type.
-
-A *datatype* represents the memory layout and interpretation for data
-exposed by the user in the \ref Data_store "data store".
-
-Optional attributes can be added to any *datatype*.
-An attribute is identified by a key that starts with the `+` character.
-The value can be anything (**scalar**, **sequence** or **mapping**).
-
-\warning
-Some additional types that are not listed here might be made available by
-plugins.
-
-### Example:
-
-```{.yaml}
-  data_name:
-    type: int
-    +first_attr: attr_value_1
-    +second_attr: [attr, value]
-    +third_attr: {key_0: 0, key_1: 1}
-```
-
-## datatype_with_disp {#datatype_with_disp_node}
-
-A *datatype_with_disp* is a **mapping** that must be a valid \ref datatype_node
-with an additional `disp` key:
-|key|value|
-|:--|:----|
-|`"disp"`|a \ref expression_node "integer-valued $-expression"|
-|`"type"`|a type identifier|
-|`".*"` (*\ref datatype_node *)|see \ref datatype_node |
-
-* the value associated to the `disp` key specifies the offset in bytes from the
-  base address of the container to this specific member,
-* the other keys and values are interpreted as for a \ref datatype_node .
-
-
-## double_type {#double_type_node}
-
-A *double_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"double"`|
-|`"\+.*"` (*optional*)|anything|
-
-
-A *double_type* represents the C `double` type; it accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: double
-```
-
-
-## $-expression {#expression_node}
-
-A *$-expression* is a **scalar** whose content matches the following
-grammar:
-
-\include docs/expression_grammar.in.txt
-
-The rules for evaluating an expression are close to those of BASH for example.
-
-In addition to raw text, a `STRING_LITERAL` can contain references to the string
-value of some data in the store as well as the result of an operation by
-enclosing it inside a dollar-parenthesis `$()`.
-A backslash `\` escapes the character that follows it, whatever it is: `\$`
-stands for a dollar `$`, `\\` for a backslash `\`, and `\x` for `x`.
-There is nothing to escape after the last character, so a string that ends with
-a lone backslash is an error.
-YAML itself gives a meaning to `\` in a double-quoted scalar, so write `5\$`
-there as `"5\\$"`, or use a plain or single-quoted scalar: `'5\$'`.
-
-An `OPERATION` can include logical and arithmetic operators grouped by
-parenthesis.
-The basic terms manipulated in an operation can be integer literals or
-references to the integer value of some data in the store.
-
-A `REFERENCE` is introduced by a dollar `$` sign and optionally enclosed in
-curly braces `{`, `}`.
-Its value is that of the data or metadata with the associated name.
-It is always a good idea to have referenced values in the metadata section as it
-prevents dangling references.
-Value formatting can be applied using a FMT `format_spec` string by adding a
-column `:` followed by the `format_spec` after a column just before the closing
-bracket `}` (see: https://fmt.dev/latest/syntax.html#grammar-token-format_spec).
-A direct reference is possible as well as sub-references to:
-* array elements using the square brackets `[`, `]` operator,
-* record member using dot `.` operator.
-
-The value-type of an `EXPRESSION` is as follow:
-* if it's a `REFERENCE`, it has the  type of the referenced data in the store,
-* if it's a `OPERATION`, it is integer-valued,
-* if it's a `STRING_LITERAL`, it is string-valued.
-
-In addition, an integer can be interpreted as a string or as a boolean value
-where zero is interpreted as false and any other value as true.
-
-The following strings can also be interpreted as a boolean integer values:
-* true (1): `y`, `Y`, `yes`, `Yes`, `YES`, `true`, `True`, `TRUE`, `on`, `On`,
-  `ON`.
-* false (0): `n`, `N`, `no`, `No`, `NO`, `false`, `False`, `FALSE`, `Off`,
-  `Off`, `OFF`.
-
-### Example:
-
-```{.python}
-'$my_data'
-```
-
-```{.python}
-'($my_data + 3) % 6'
-```
-
-```{.python}
-'${my_data.subarray[0]} * 42'
-```
-
-```{.python}
-'my name is ${my_name}'
-```
-
-```{.python}
-'${my_data:05d}'
-'${my_data:b}'
-'${my_data:1.5f}'
-'${my_data:>15s}'
-```
-
-
-## float_type {#float_type_node}
-
-A *float_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"float"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref float_type_node represents the C `float` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: float
-```
-
-
-## include {#include_node}
-
-An *include* can be **any of**:
-* a **scalar**,
-* a \ref include_with_subtree_node.
-
-In that context, a scalar is interpreted as a shortcut for a
-\ref include_with_subtree_node whose `file` value is set to that scalar and `subtree`
-to an empty string.
-
-### Example:
 ```yaml
-"/my/file.yaml"
+include: common.yml          # more of the tree, from another file
+logging: info                # the logger of PDI
+types:
+  vector3_t: {type: array, subtype: double, size: 3}
+metadata:
+  iter: int
+data:
+  position: vector3_t
+plugin_path: /opt/pdi/plugins
+plugins:
+  trace: ~
 ```
 
-is interpreted as if it was:
+This is a whole specification tree: either the root of a YAML file passed to `PDI_init`, or a subtree of one.
+
+
+### `@pdi.include` {#spectree_pdi_include}
+
+*Optional.*
+Either a single \ref spectree_include or a sequence of them.
+Use `include` to read parts of the specification tree from other YAML files, or from subtrees of files.
+
+An included tree has the same format as the root of the specification tree.
+Its `include`, `types`, `metadata`, `data`, `plugin_path` and `plugins` keys are taken into account, while its \ref spectree_pdi_logging key is
+ignored.
+The keys under these sections must not be repeated: a type, a data, a metadata or a plugin defined in two files is an error.
+
+The same file can be included twice (a diamond include), in which case it is only read once, but a recursive inclusion is an error.
+
+**Example:**
+
 ```yaml
-file: "/my/file.yaml"
+include: common.yml   # <- reads common.yml as if its content were here
+data:
+  field: double
+```
+
+The scalar form is a shortcut for `include: [{file: common.yml, subtree: ""}]`.
+
+
+### `@pdi.logging` {#spectree_pdi_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of %PDI.
+It is only read from the root file, not from included ones.
+Each plugin has its own logger, see \ref spectree_pdi_plugins_plugin_name_logging.
+
+**Example:**
+
+```yaml
+logging: debug        # <- PDI logs what it does in detail
+data:
+  field: double
+```
+
+
+### `@pdi.types.<type_name>` {#spectree_pdi_types_type_name}
+
+A \ref spectree_datatype.
+Use `types.<type_name>` to define a datatype named `<type_name>`.
+`<type_name>` can then be used as the value of \ref spectree_datatype_type anywhere a datatype is expected.
+
+A user-defined datatype cannot reuse the name of an existing datatype.
+
+**Example:**
+
+```yaml
+types:
+  vector3_t: {type: array, subtype: double, size: 3}   # <- defines vector3_t...
+data:
+  position: vector3_t                                 # ... used here
+  velocity: vector3_t
+```
+
+
+### `@pdi.metadata.<data_name>` {#spectree_pdi_metadata_data_name}
+
+A \ref spectree_datatype.
+Use `metadata.<data_name>` to declare a metadata named `<data_name>`, of this type.
+%PDI keeps a copy of the value of a metadata when it is shared, so that it can be referenced in $-expressions afterwards.
+
+A name can only be defined once among all \ref spectree_pdi_metadata_data_name and \ref spectree_pdi_data_data_name keys.
+
+**Example:**
+
+```yaml
+metadata:
+  iter: int               # <- PDI keeps a copy of iter at each share
+data:
+  field: {type: array, subtype: double, size: 64}
+plugins:
+  decl_hdf5:
+    file: field_${iter}.h5   # so that it can use it afterwards
+    write: [field]
+```
+
+
+### `@pdi.data.<data_name>` {#spectree_pdi_data_data_name}
+
+A \ref spectree_datatype.
+Use `data.<data_name>` to declare a data named `<data_name>`, of this type.
+Unlike with a metadata, %PDI only keeps a reference to a data while it is shared.
+
+A name can only be defined once among all \ref spectree_pdi_metadata_data_name and \ref spectree_pdi_data_data_name keys.
+
+**Example:**
+
+```yaml
+data:
+  field: {type: array, subtype: double, size: [64, 64]}   # <- PDI only references field while it is shared
+```
+
+
+### `@pdi.plugin_path` {#spectree_pdi_plugin_path}
+
+*Optional.*
+Either a single scalar or a sequence of them.
+Use `plugin_path` to list directories in which %PDI searches for plugins.
+
+%PDI takes the first match, searching the directories of the `PDI_PLUGIN_PATH` environment variable first, then those of `plugin_path`, then the
+directory where %PDI installs its plugins, and finally the system library path.
+
+**Example:**
+
+```yaml
+plugin_path: [/home/user/pdi_plugins, /opt/pdi/plugins]   # <- searched in this order
+plugins:
+  my_plugin: ~
+```
+
+
+### `@pdi.plugins.<plugin_name>` {#spectree_pdi_plugins_plugin_name}
+
+Use `plugins.<plugin_name>` to load the plugin named `<plugin_name>` and to configure it.
+Its content depends on the plugin: see the \ref Plugins "plugins" documentation for the specification tree each one accepts.
+It can be empty (`~`) for a plugin that needs no configuration.
+
+A plugin can only be loaded once, even across included files.
+
+**Example:**
+
+```yaml
+plugins:
+  trace: ~                # <- a plugin with no configuration
+  decl_hdf5:              # <- a plugin with its configuration
+    file: example.h5
+    write: [field]
+```
+
+
+### `@pdi.plugins.<plugin_name>.logging` {#spectree_pdi_plugins_plugin_name_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin.
+This key is handled by %PDI for every plugin whose configuration is a mapping.
+
+**Example:**
+
+```yaml
+plugins:
+  decl_hdf5:
+    logging: debug        # <- the logger of Decl'HDF5, independent from that of PDI
+    file: example.h5
+    write: [field]
+```
+
+Each plugin documents this key too, in its own reference.
+
+
+## `@logging` {#spectree_logging}
+
+The configuration of a logger, either:
+* a scalar, a shortcut for a mapping whose only key is \ref spectree_logging_level with that value,
+* a mapping with the keys below.
+You can use it in \ref spectree_pdi_logging and \ref spectree_pdi_plugins_plugin_name_logging.
+
+**Example:**
+
+```yaml
+logging: debug            # <- the scalar form, a level only
+plugins:
+  decl_hdf5:
+    logging:                # <- the mapping form
+      level: warn
+      output:
+        file: decl_hdf5.log
+    file: example.h5
+    write: [field]
+```
+
+
+### `@logging.level` {#spectree_logging_level}
+
+*Optional.*
+A scalar.
+Use `level` to set the verbosity of the logger, to one of the following values, from the most to the least verbose:
+
+|`level`  |what is logged                                                                                                              |
+|:--------|:---------------------------------------------------------------------------------------------------------------------------|
+|`trace`  |every step of the execution, to debug the library itself                                                                    |
+|`debug`  |the normal situations of the execution that might help to understand the behavior of the library                            |
+|`info`   |the normal situations of the execution that are likely to help understand the behavior of the library                       |
+|`warn`   |the situations that the library detects as very likely invalid (user input that is technically valid, but very unusual)     |
+|`error`  |the invalid situations that the library detects (invalid user input, invalid hardware behavior, etc.)                       |
+|`off`    |nothing                                                                                                                     |
+
+By default, the level is `info` for %PDI, and that of %PDI for a plugin.
+
+**Example:**
+
+```yaml
+level: warn               # <- only warnings and errors
+```
+
+
+### `@logging.pattern` {#spectree_logging_pattern}
+
+*Optional.*
+A scalar.
+Use `pattern` to set the format of a log line, as an spdlog pattern.
+
+The pattern is parsed by the spdlog library (see https://github.com/gabime/spdlog/wiki/3.-Custom-formatting).
+It specifies the format of the whole line, so it should contain `%v`, the logged message itself.
+
+%PDI adds a special flag, `%{<REF>}`, where `<REF>` is the `REFERENCE` part of a \ref spectree_expression without its leading `$` (with an
+optional format specification).
+It is evaluated just after all plugins have been initialized.
+
+By default, the pattern is (where `%n` is `PDI` or a plugin name):
+```
+[%T][%n] *** %^%l%$: %v
+```
+for a serial execution, and:
+```
+[%T][MPI %{MPI_COMM_WORLD_rank:06d}][%n] *** %^%l%$: %v
+```
+when the \ref mpi_plugin "MPI plugin" is loaded.
+The pattern of a plugin defaults to that of %PDI.
+
+**Example:**
+
+```yaml
+level: debug
+pattern: "[%{MPI_COMM_WORLD_rank:04d}][%n][%l] %v"   # <- prefixes each line with the MPI rank
+```
+
+`MPI_COMM_WORLD_rank` is shared by the \ref mpi_plugin "MPI plugin", which must then be loaded.
+
+
+### `@logging.output.file` {#spectree_logging_output_file}
+
+*Optional.*
+A scalar.
+Use `output.file` to write the logs to the file at this path.
+
+**Example:**
+
+```yaml
+level: info
+output:
+  file: pdi.log           # <- the logs go to pdi.log, and no longer to the console
+```
+
+
+### `@logging.output.console` {#spectree_logging_output_console}
+
+*Optional.*
+A scalar.
+Use `output.console` to choose whether to write the logs to the standard output:
+
+|`console`                         |the logs are                     |
+|:---------------------------------|:--------------------------------|
+|`off`                             |not written to the console       |
+|`on`, or any other value          |written to the standard output   |
+
+By default, it is `off` when \ref spectree_logging_output_file is defined and `on` otherwise.
+
+**Example:**
+
+```yaml
+output:
+  file: pdi.log
+  console: on             # <- the logs go to pdi.log, and to the console too
+```
+
+
+## `@include` {#spectree_include}
+
+An *include directive*, either:
+* a scalar: the path of a file whose root is included, a shortcut for a mapping whose `file` is that scalar and whose `subtree` is empty,
+* a mapping with both an \ref spectree_include_file and an \ref spectree_include_subtree key, and no other key.
+You can use it in \ref spectree_pdi_include.
+
+**Example:**
+
+```yaml
+include:
+  - common.yml            # <- an include directive, in its scalar form...
+  - file: other.yml       # <- ... and in its mapping form
+    subtree: .pdi
+```
+
+
+### `@include.file` {#spectree_include_file}
+
+*Required in a mapping include directive.*
+A scalar.
+Use `file` to give the path of the file to include.
+The path is interpreted relative to the working directory of the execution.
+
+**Example:**
+
+```yaml
+file: config/common.yml   # <- relative to the working directory, not to the including file
 subtree: ""
 ```
 
 
-## include_or_seq {#include_or_seq_node}
-
-An *include_or_seq* can be **any of**:
-* a \ref include_node,
-* an \ref include_seq_node.
-
-In that context, a single \ref include_node is interpreted as a shortcut for a
-sequence containing a single \ref include_node.
-
-For example, the following:
-```
-file: "/my/file.yaml"
-subtree: ".pdi"
-```
-
-is interpreted as if it was:
-```
-- file: "/my/file.yaml"
-  subtree: ".pdi"
-```
-
-
-## include_seq {#include_seq_node}
-
-A *include_seq* is a **sequence** where each element of the sequence is
-a \ref include_node.
-
-
-## include_with_subtree {#include_with_subtree_node}
-
-A *include_with_subtree* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"file"`    | a **scalar** representing the path of the file |
-|`"subtree"` | a **scalar** representing the ypath of a subtree in the file |
-
-The path is interpreted relative to the working directory of the execution.
-The subtree ypath is expanded according to the ypath specification of paraconf:
-* access to a mapping element using the dot syntax: *e.g.* `.map.key`
-* access to a sequence element using square brackets (indices are 0-based):
-  *e.g.* `.seq[1]`
-* access to a mapping element key using braces (indices are 0-based):
-  *e.g.* `.map{1}`
-* access to a mapping element value by index using chevrons: *e.g.* `.map<1>`
-
-### Example:
-```yaml
-file: "/my/file.yaml"
-subtree: ".pdi"
-```
-or
-```yaml
-file: "relative_file.yaml"
-subtree: "[1]"
-```
-
-It references a subtree in another file.
-
-## int_type {#int_type_node}
-
-A *int_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_type_node represents the C `int` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int
-```
-
-
-## int16_type {#int16_type_node}
-
-A *int16_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int16" or "int16_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int16_type_node represents the C `int16_t` type from
-the `<stdtypes.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int16
-```
-
-
-## int32_type {#int32_type_node}
-
-A *int32_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int32"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int32_type_node represents the C `int32_t` type from
-the `<stdtypes.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int32
-```
-
-
-## int64_type {#int64_type_node}
-
-A *int64_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int64"`|
-|`"\+.*"` (*optional*)|anything|
-
-A *int64_type* represents the C `int64_t` type from
-the `<stdtypes.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int64
-```
-
-
-## int8_type {#int8_type_node}
-
-A *int8_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int8"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int8_type_node represents the C `int8_t` type from the
-`<stdtypes.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int8
-```
-
-
-## integer_type {#integer_type_node}
-
-A *integer_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"integer"`|
-|`"kind"` (*optional*)|a \ref expression_node "integer-valued $-expression"|
-|`"\+.*"` (*optional*)|anything|
-
-A *integer_type* represents the Fortran `integer` datatype.
-* The value associated to the `kind` key corresponds to the Fortran *kind*
-  parameter (`integer(kind=...)`).
-  If missing, the default kind of the Fortran implementation is used.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: integer
-```
-
-```{.python}
-type: integer
-kind: 2
-```
-
-
-## intexpr_or_seq {#intexpr_or_seq_node}
-
-A *intexpr_or_seq* can be **any of**:
-* a \ref expression_node "integer-valued $-expression",
-* a \ref intexpr_seq_node.
-
-In that context, a simple \ref expression_node is interpreted as a shortcut for
-a sequence containing a single \ref expression_node.
-
-For example, the following value:
-```
-"$x + 2"
-```
-
-is interpreted as if it was:
-```
-[ "$x + 2" ]
-```
-
-
-## intexpr_seq {#intexpr_seq_node}
-
-A *intexpr_seq* is a **sequence** where each element of the sequence is
-a \ref expression_node "integer-valued $-expression".
-
-### Example:
-
-```{.python}
-[ 1, '2', '$size', '$other_size + 2' ]
-```
-
-
-## int_fast16_type {#int_fast16_type_node}
-
-A *int_fast16_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_fast16" or "int_fast16_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_fast16_type_node represents the C `int_fast16_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_fast16
-```
-
-
-## int_fast32_type {#int_fast32_type_node}
-
-A *int_fast32_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_fast32" or "int_fast32_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_fast32_type_node represents the C `int_fast32_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_fast32
-```
-
-
-## int_fast64_type {#int_fast64_type_node}
-
-A *int_fast64_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_fast64" or "int_fast64_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_fast64_type_node represents the C `int_fast64_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_fast64
-```
-
-
-## int_fast8_type {#int_fast8_type_node}
-
-A *int_fast8_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_fast8" or "int_fast8_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_fast8_type_node represents the C `int_fast8_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_fast8
-```
-
-
-## int_least16_type {#int_least16_type_node}
-
-A *int_least16_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_least16" or "int_least16_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_least16_type_node represents the C `int_least16_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_least16
-```
-
-
-## int_least32_type {#int_least32_type_node}
-
-A *int_least32_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_least32" or "int_least32_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_least32_type_node represents the C `int_least32_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_least32
-```
-
-
-## int_least64_type {#int_least64_type_node}
-
-A *int_least64_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_least64" or "int_least64_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_least64_type_node represents the C `int_least64_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_least64
-```
-
-
-## int_least8_type {#int_least8_type_node}
-
-A *int_least8_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"int_least8" or "int_least8_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref int_least8_type_node represents the C `int_least8_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: int_least8
-```
-
-## intmax_type {#intmax_type_node}
-
-A *intmax_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"intmax" or "intmax_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref intmax_type_node represents the C `intmax_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: intmax
-```
-
-
-## intptr_type {#intptr_type_node}
-
-A *intptr_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"intptr" or "intptr_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref intptr_type_node represents the C `intptr_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: intptr
-```
-
-
-## logging {#logging_node}
-
-A *logging* can be **any of**:
-* a \ref logging_map_node,
-* a \ref logging_level_node,
-
-A *logging* is fully supported in \ref root_node and any \ref plugin_map_node .
-
-
-## logging_level {#logging_level_node}
-
-A *logging_level* is a scalar which determines verbosity level. It can be set to 
-  (from the most to the least verbose): 
-* `"debug"` - shows a log when a normal situation of the execution might be
-  useful to understand the behavior of the library,
-* `"info"` - shows a log when a normal situation of the execution is likely
-  useful to understand the behavior of the library,
-* `"warn"` - shows a log when a very likely invalid situation has been detected
-  by the library (user input that is technically valid, but very unusual for
-  example),
-* `"error"` - shows a log when an invalid situation has been detected by the
-  library (invalid user input, invalid hardware behaviour, etc.),
-* `"off"` - logs are disabled.
-
-Examples:
-
-```yaml
-logging: "debug"
-```
-
-* by default `level` is set to `info`
-
-
-## logging_map {#logging_map_node}
-
-A *logging_map* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"level"`  (*optional*)|a \ref logging_level_node|
-|`"pattern"` (*optional*)|a logger prefix pattern of spdlog|
-|`"output"` (*optional*)|a \ref logging_output_map_node|
-
-* spdlog pattern is a string that is parsed by spdlog library,
-  (see more: https://github.com/gabime/spdlog/wiki/3.-Custom-formatting)
-* %PDI introduces new special flag `%{<EXPR>}`, where `<EXPR>` represents a
-  \ref expression_node "string-valued $-expression"|a $-expression that will be
-  evaluated just after all plugins have been initialized,
-* *pattern* by default is set to (where %n is `PDI` or a plugin name):
-  ```
-  [%T][%n] *** %^%l%$: %v
-  ```
-  for serial execution and:
-  ```
-  [%T][%{MPI_COMM_WORLD.rank:06d}][%n] *** %^%l%$: %v
-  ```
-  when running application with MPI/
-
-Example:
-
-```yaml
-logging:
-  level: "debug"
-  pattern: "[%{MPI_COMM_WORLD.rank:04d}][%n][%l]"
-```
-
-
-## logging_output_map {#logging_output_map_node}
-
-A *logging_output_map* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"file"`  (*optional*)|a path of the file where to write logs|
-|`"console"` (*optional*)|`on` or `off`|
-
-* by default when `file` is defined, `console` is set to `off`.
-
-Example:
-
-```yaml
-logging:
-  level: "debug"
-  output:
-    file: "test.log"
-    console: "on"
-```
-
-### Example:
-
-```{.python}
-type: struct
-members:
-  - my_char: char
-```
-
-```{.python}
-type: struct
-members:
-  - my_long: int64
-  - my_array:
-      type: array
-      subtype: int64
-      size: [10, 10]
-```
-
-See \ref struct_type_node for more examples.
-
-
-## logical_type {#logical_type_node}
-
-A *logical_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"logical"`|
-|`"kind"` (*optional*)|a \ref expression_node "integer-valued $-expression"|
-|`"\+.*"` (*optional*)|anything|
-
-A *logical_type* represents the Fortran `logical` datatype.
-* The value associated to the `kind` key corresponds to the Fortran *kind*
-  parameter (`logical(kind=...)`).
-  If missing, the default kind of the Fortran implementation is used.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: logical
-```
-
-```{.python}
-type: logical
-kind: 1
-```
-
-
-## long_type {#long_type_node}
-
-A *long_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"long"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref long_type_node represents the C `long` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
+### `@include.subtree` {#spectree_include_subtree}
+
+*Required in a mapping include directive.*
+A scalar.
+Use `subtree` to include only part of \ref spectree_include_file, given as a ypath, an empty one standing for the root of the file.
+
+The ypath follows the syntax of paraconf, where:
+* a dot accesses the value of a mapping by its key, *e.g.* `.map.key`,
+* square brackets access an element of a sequence by its 0-based index, *e.g.* `.seq[1]`,
+* braces access a key of a mapping by its 0-based index, *e.g.* `.map{1}`,
+* chevrons access a value of a mapping by its 0-based index, *e.g.* `.map<1>`.
 
 **Example:**
 
-```{.python}
-type: long
-```
-
-
-## long_long_type {#long_long_type_node}
-
-A *long_long_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"long long"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref long_long_type_node represents the C `long long` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-**Example:**
-
-```{.python}
-type: long long
-```
-
-
-## plugin_map {#plugin_map_node}
-
-A *plugin_map* is a **mapping** that contains the following keys:
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)| *anything* |
-
-* each key identifies the name of a plugin to load associated to its
-  configuration; the content of the configuration depends on the plugin.
-
-Have a look at the \ref Plugins "plugins" documentation to see the specification
-tree they accept.
-
-See \ref root_node for an example.
-
-
-## plugin_path {#plugin_path_map_node}
-
-A path to directory where %PDI should search for plugins. It can be single path:
-
 ```yaml
-plugin_path: "/home/user123/plugins"
-```
-
-or array of paths (%PDI will take first match):
-
-```yaml
-plugin_path: ["/home/user123/plugins", "/usr/lib/pdi/plugins"]
+file: simulation.yml
+subtree: .pdi             # <- only the pdi key at the root of simulation.yml
 ```
 
 
-## pointer_type {#pointer_type_node}
-
-A *pointer_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"pointer"`|
-|`"subtype"`|a \ref datatype_node|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref pointer_type_node represents a memory address where data is actually
-stored (a pointer) where:
-* the value associated to the `subtype` key represents the type of the
-  referenced elements,
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: pointer
-subtype: double
-```
-
-```{.python}
-type: pointer
-subtype: { type: pointer, subtype: int }
-```
-
-
-## ptrdiff_t_type {#ptrdiff_t_type_node}
-
-A *ptrdiff_t_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"ptrdiff_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref ptrdiff_t_type_node represents the C `ptrdiff_t` type from the
-`<stddef.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-**Example:**
-
-```{.python}
-type: ptrdiff_t
-```
-
-## real_type {#real_type_node}
-
-A *real_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"real"`|
-|`"kind"` (*optional*)|a \ref expression_node "integer-valued $-expression"|
-|`"\+.*"` (*optional*)|anything|
-
-A *real_type* represents the Fortran `real` datatype.
-* The value associated to the `kind` key corresponds to the Fortran *kind*
-  parameter (`real(kind=...)`).
-  If missing, the default kind of the Fortran implementation is used.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: real
-```
-
-```{.python}
-type: real
-kind: 8
-```
-
-
-## record_members_map {#record_members_map_node}
-
-A *record_members_map* is a **mapping** that contains the following keys:
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a \ref datatype_with_disp_node|
-
-* each key identifies the name of a member of the record and the value
-  associated to it describes the member itself.
-
-See \ref record_type_node for an example.
-
-
-## record_type {#record_type_node}
-
-A *record_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"record"`|
-|`"buffersize"`|a \ref expression_node "integer-valued $-expression"|
-|`"members"` (*optional*)|a \ref record_members_map_node|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref record_type_node represents a "record" where:
-* the value associated to the `buffersize` key represents the overall size of
-  the record, including potential padding,
-* the value associated to the `members` key lists all members of the record with
-  their offset,
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Examples:
-
-```{.python}
-type: record
-buffersize: 8
-members:
-  first_int:
-    disp: 0
-    type: int32
-  second_int:
-    disp: 4
-    type: int32
-```
-
-```{.python}
-type: record
-buffersize: 1
-members:
-  my_char:
-        disp: 0
-        type: char
-```
-
-```{.python}
-type: record
-buffersize: 808 
-members:
-  my_long:
-    disp: 0
-    type: int64
-  my_array:
-    disp: 8
-    type: array
-    subtype: int64
-    size: [10, 10]
-```
-
-
-## short_type {#short_type_node}
-
-A *short_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"short"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref short_type_node represents the C `short` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: short
-```
-
-
-## simple_datatype {#simple_datatype_node}
-
-A *simple_datatype* is a **scalar**.
-
-It is interpreted as a shortcut for a mapping with a
-single key `type` whose value is the provided scalar and therefore another
-\ref datatype_node.
-
-For example, the following value:
-```
-"my_type"
-```
-
-is interpreted as if it was:
-```
-{ type: "my_type" }
-```
-
-
-## size_t_type {#size_t_type_node}
-
-A *size_t_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"size_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref size_t_type_node represents the C `size_t` type from the `<stddef.h>`
-header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-**Example:**
-
-```{.python}
-type: size_t
-```
-
-
-## struct_members_omap {#struct_members_omap_node}
-
-A *struct_members_omap* is an **ordered mapping** that contains the following
-keys:
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a \ref datatype_node|
-
-* each key identifies the name of a member and the associated value specifies
-  its type.
-
-See \ref struct_type_node for an example.
-
-
-## struct_type {#struct_type_node}
-
-A *struct_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"struct"`|
-|`"members"` (*optional*)|a \ref struct_members_omap_node|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref struct_type_node represents a C "struct" or C++ "class" using the default
-C memory layout, where:
-* the value associated to the `members` key lists all members of the `struct` in
-  order,
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-```{.python}
-type: struct
-members:
-  - first_int: int32
-  - second_int: int32
-```
-
-matches:
-```C
-struct {
-  int32_t first_int;
-  int32_t second_int;
-};
-```
-
-
-## tuple_element {#tuple_element_node}
-
-A *tuple_elements_seq* is a **sequence** where each element of the sequence is a
-\ref datatype_with_disp_node where `disp` key is optional.
-
-See \ref tuple_type_node for an example.
-
-
-## tuple_elements_seq {#tuple_elements_seq_node}
-
-A *tuple_elements_seq* is a **sequence** where each element of the sequence is 
-either a \ref datatype_node or a \ref datatype_with_disp_node.
-
-If \ref datatype_node "datatypes" with no explicit offset are used, the minimum
-offset that does not lead to overlaps is used.
-
-See \ref tuple_type_node for an example.
-
-
-## tuple_type {#tuple_type_node}
-
-A *tuple_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"tuple"`|
-|`"buffersize"` (*optional*)|a \ref expression_node "integer-valued $-expression"|
-|`"elements"` (*optional*)|a \ref tuple_elements_seq_node|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref tuple_type_node represents a "tuple", where:
-* the value associated to the `buffersize` key represents the overall size of
-  the tuple including potential padding, if omitted, the minimum size that fits
-  all elements is used,
-* the value associated to the `elements` key lists all elements of the tuple,
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```yaml
-type: tuple
-buffersize: 16
-elements:
-  - integer_value: {disp: 0, type: int32}
-  - double_value: {disp: 8, type: double}
-```
-
-```yaml
-type: tuple
-elements:
-  - integer_value: int32
-  - double_value: double
-```
-
-
-## types_map {#types_map_node}
-
-A *types_map* is a **mapping** that contains the following keys:
-|key|value|
-|:--|:----|
-|`".*"` (*optional*)|a \ref datatype_node|
-
-* each key identifies the name of new user-defined datatype and the value
-  associated to it describes the type
-
-
-## uint_type {#uint_type_node}
-## uint16_type {#uint16_type_node}
-
-A *uint16_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint16" or "uint16_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint16_type_node represents the C `uint16_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint16
-```
-
-
-## uint32_type {#uint32_type_node}
-
-A *uint32_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint32" or "uint32_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint32_type_node represents the C `uint32_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint32
-```
-
-
-## uint64_type {#uint64_type_node}
-
-A *uint64_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint64" or "uint64_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint64_type_node represents the C `uint64_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint64
-```
-
-
-## uint8_type {#uint8_type_node}
-
-A *uint8_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint8" or "uint8_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint8_type_node represents the C `uint8_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint8
-```
-
-
-## uint_fast16_type {#uint_fast16_type_node}
-
-A *uint_fast16_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_fast16" or "uint_fast16_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_fast16_type_node represents the C `uint_fast16_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_fast16
-```
-
-
-## uint_fast32_type {#uint_fast32_type_node}
-
-A *uint_fast32_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_fast32" or "uint_fast32_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_fast32_type_node represents the C `uint_fast32_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_fast32
-```
-
-
-## uint_fast64_type {#uint_fast64_type_node}
-
-A *uint_fast64_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_fast64" or "uint_fast64_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_fast64_type_node represents the C `uint_fast64_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_fast64
-```
-
-
-## uint_fast8_type {#uint_fast8_type_node}
-
-A *uint_fast8_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_fast8" or "uint_fast8_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_fast8_type_node represents the C `uint_fast8_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_fast8
-```
-
-
-## uint_least16_type {#uint_least16_type_node}
-
-A *uint_least16_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_least16" or "uint_least16_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_least16_type_node represents the C `uint_least16_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_least16
-```
-
-
-## uint_least32_type {#uint_least32_type_node}
-
-A *uint_least32_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_least32" or "uint_least32_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_least32_type_node represents the C `uint_least32_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_least32
-```
-
-
-## uint_least64_type {#uint_least64_type_node}
-
-A *uint_least64_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_least64" or "uint_least64_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_least64_type_node represents the C `uint_least64_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_least64
-```
-
-
-## uint_least8_type {#uint_least8_type_node}
-
-A *uint_least8_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uint_least8" or "uint_least8_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uint_least8_type_node represents the C `uint_least8_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uint_least8
-```
-
-
-## uintmax_type {#uintmax_type_node}
-
-A *uintmax_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uintmax" or "uintmax_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uintmax_type_node represents the C `uintmax_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uintmax
-```
-
-
-## uintptr_type {#uintptr_type_node}
-
-A *uintptr_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"uintptr" or "uintptr_t"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref uintptr_type_node represents the C `uintptr_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: uintptr
-```
-
-
-## unsigned_long_type {#unsigned_long_type_node}
-
-A *unsigned_long_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"unsigned long long"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref unsigned_long_type_node represents the C `unsigned long` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: unsigned long
-```
-
-
-## unsigned_long_long_type {#unsigned_long_long_type_node}
-
-A *unsigned_long_long_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"unsigned long long"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref unsigned_long_long_type_node represents the C `unsigned long long` type.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: unsigned long long
-```
-
-
-## unsigned_short_type {#unsigned_short_type_node}
-
-A *unsigned_short_type* is a **mapping** that contains the following keys:
-
-|key|value|
-|:--|:----|
-|`"type"`|`"unsigned short"`|
-|`"\+.*"` (*optional*)|anything|
-
-A \ref unsigned_short_type_node represents the C `unsigned short_t` type from the
-`<stdint.h>` header.
-It accepts no parameter.
-* keys that start with `+` represent attributes, the associated value can be
-  anything (**scalar**, **sequence** or **mapping**).
-
-### Example:
-
-```{.python}
-type: unsigned short
-```
