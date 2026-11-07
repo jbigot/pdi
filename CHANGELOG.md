@@ -56,6 +56,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The Timer plugin reference documents the sequence form of its configuration,
+  the plugins that emit timer events, the format of its output file, and that
+  nothing is written to it when it cannot be locked.
 * The MPI plugin reference uses the name under which the plugin shares the rank
   metadata, and documents `Comm_c2f` and `Comm_f2c` in place of the deprecated
   `transtype`.
@@ -76,6 +79,9 @@ and this project adheres to
 * The Decl'NetCDF plugin reference lists its `when` and `deflate` file keys,
   gives group attributes in the form the plugin reads, and documents when it
   compresses and chunks a variable.
+* The Timer and Serialize plugin references state that their `logging` key
+  only takes a level, and the Decl'HDF5 one that an attribute write cannot be an
+  element of a sequence of writes.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
