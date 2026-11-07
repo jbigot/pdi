@@ -63,6 +63,8 @@ and this project adheres to
   gives group attributes in the form the plugin reads, and documents when it
   compresses and chunks a variable, part of
   [#916](https://github.com/pdidev/pdi/issues/916).
+* The Decl'NetCDF plugin reference documents that the data it reads and writes
+  must be dense, part of [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
