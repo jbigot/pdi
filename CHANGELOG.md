@@ -62,8 +62,11 @@ and this project adheres to
 * The Decl'HDF5 plugin reference documents `mpio` as a plain string. It also
   documents that its compression and checksum filters need a chunked dataset,
   when subfiling applies, and that a dataset has no unlimited dimension, and no
-  longer links its `error` collision policy to the C API's error handling. This
-  fixes [#889](https://github.com/pdidev/pdi/issues/889), part of
+  longer links its `error` collision policy to the C API's error handling. It no
+  longer states that a dataset it creates without a description has the size of
+  the memory selection: it has that of the data. It documents that `size_of`
+  reads into an array of `int64`. This fixes
+  [#889](https://github.com/pdidev/pdi/issues/889), part of
   [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security

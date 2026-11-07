@@ -432,7 +432,7 @@ A \ref spectree_expression.
 Use `dataset` to name the dataset to access in the file.
 It defaults to the name of the data.
 When a written dataset does not exist in the file and its name matches no \ref decl_hdf5_h5file_datasets_dataset_regex, it is created with the
-size of the memory selection.
+size of the data (that of its `subsize`, for an array that has one), whatever the \ref decl_hdf5_h5io_memory_selection.
 
 **Example:**
 
@@ -624,6 +624,7 @@ fletcher: 1               # <- this dataset gets a checksum
 *Optional, reads only.*
 A \ref spectree_expression.
 Use `size_of` to read the size of the dataset at this path into the data, instead of its content.
+The data must be an array of `int64`, with one element per dimension of the dataset: the plugin writes 64-bit integers, whatever its type.
 When it is present, any other key is ignored.
 
 **Example:**
