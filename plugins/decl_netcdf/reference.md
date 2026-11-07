@@ -388,7 +388,7 @@ read:
 A scalar.
 Use each element of `read` to read the descriptor it names from the file.
 `read` can also be a single name instead of a sequence.
-The NetCDF variable must have the name of the descriptor and the same type, and no attributes are read.
+The NetCDF variable has the name of the descriptor; the attributes that \ref decl_netcdf_ncfile_variables_variable_path gives it are read too.
 
 **Example:**
 
