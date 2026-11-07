@@ -59,6 +59,9 @@ and this project adheres to
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies, fixing
   [#915](https://github.com/pdidev/pdi/issues/915).
+* The Set-value plugin reference gives examples that the plugin runs, where they
+  used to fail on a record given as a sequence, or put `set_value` outside
+  `plugins`, part of [#916](https://github.com/pdidev/pdi/issues/916).
 
 #### Security
 
