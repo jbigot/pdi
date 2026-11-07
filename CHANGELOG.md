@@ -12,6 +12,10 @@ and this project adheres to
 ### For users
 
 #### Added
+* The Set_value plugin has a page of examples, apart from its reference: whole
+  programs and specification trees that give parameters to a program, count
+  events, compute new values from old ones, emit events for other plugins and
+  show the iteration in the log, with their output.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree
