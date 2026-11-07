@@ -52,6 +52,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The JSON plugin reference gives a valid configuration example, shows the file
+  the plugin writes, with a mustache template that matches its output, and
+  documents its configuration forms and where its `logging` key can go.
 
 #### Security
 
