@@ -64,7 +64,8 @@ set(DOXYGEN_INPUT
 		"${PDI_SOURCE_DIR}/../plugins/serialize/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/set_value/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/set_value/examples.md"
-		"${PDI_SOURCE_DIR}/../plugins/json/README.md")
+		"${PDI_SOURCE_DIR}/../plugins/json/README.md"
+		"${PDI_SOURCE_DIR}/../plugins/json/examples.md")
 
 set(DOXY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 cmake_path(NORMAL_PATH DOXY_ROOT)
