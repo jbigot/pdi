@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020-2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -100,19 +100,35 @@ public:
 
 	void* data_from_dense_copy(void*, const void*) const override;
 
+	/// \name index
+	/// Access the type, or the type and value, of the element at the provided index
+	///@{
+
 	Datatype_sptr index(size_t index) const override;
 
 	std::pair<void*, Datatype_sptr> index(size_t index, void* data) const override;
 
+	///@}
+
+	/// \name slice
+	/// Access the type, or the type and value, of the slice of elements between the provided indices
+	///@{
+
 	Datatype_sptr slice(size_t start_index, size_t end_index) const override;
 
 	std::pair<void*, Datatype_sptr> slice(size_t start_index, size_t end_index, void* data) const override;
+
+	///@}
 
 	void destroy_data(void*) const override;
 
 	std::string debug_string() const override;
 
 	bool operator== (const Datatype&) const override;
+
+	/// \name make
+	/// Construct a new Array_datatype, partially or completely filled
+	///@{
 
 	/** Construct a new partially filled Array_datatype
 	 *
@@ -132,6 +148,8 @@ public:
 	 * \param attributes attributes of the array
 	 */
 	static std::shared_ptr<Array_datatype> make(Datatype_sptr subtype, size_t size, const Attributes_map& attributes = {});
+
+	///@}
 
 private:
 	/** Construct a new partially filled Array_datatype

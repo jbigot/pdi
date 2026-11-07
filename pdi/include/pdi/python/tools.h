@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2024 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -34,6 +34,10 @@
 
 namespace PDI {
 
+/// \name to_python
+/// Wraps a PDI reference in a Python object, or converts a Scalar_datatype to a pybind11 data type
+///@{
+
 /** Wraps a PDI reference in a python object
  *
  * \param r PDI reference to wrap
@@ -42,19 +46,21 @@ namespace PDI {
  */
 pybind11::object PDI_EXPORT to_python(Ref r, bool force_const = false);
 
-/** Function takes python numpy array and converts it into PDI datatype
- *
- * \param a python numpy array data
- * \return PDI datatype of python object
- */
-Datatype_sptr PDI_EXPORT python_type(const pybind11::array& a);
-
 /** Convert a Scalar_datatype to a pybind11 data type.
  *
  * \param scalar_type to convert to pybind11 data type
  * \return pybind11 data type for the given scalar type
  */
 pybind11::dtype PDI_EXPORT to_python(const std::shared_ptr<const Scalar_datatype>& scalar_type);
+
+///@}
+
+/** Builds the PDI datatype of a Python numpy array
+ *
+ * \param a the Python numpy array
+ * \return the PDI datatype of the array
+ */
+Datatype_sptr PDI_EXPORT python_type(const pybind11::array& a);
 
 } // namespace PDI
 
