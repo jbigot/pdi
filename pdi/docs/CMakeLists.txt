@@ -57,6 +57,7 @@ set(DOXYGEN_INPUT
 		"${PDI_SOURCE_DIR}/../plugins/timer/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/trace/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/user_code/README.md"
+		"${PDI_SOURCE_DIR}/../plugins/user_code/examples.md"
 		"${PDI_SOURCE_DIR}/../plugins/pycall/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/serialize/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/set_value/README.md"
