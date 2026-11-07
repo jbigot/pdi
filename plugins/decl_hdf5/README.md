@@ -20,7 +20,7 @@ It is specified by a key/value map that contains at least the `file`
 key.
 Other keys are optional.
 The possible values for the keys are as follow:
-* `logging`: \ref logging_node
+* `logging`: \ref spectree_logging
 * `file`: a string that can contain $-expressions and specified the
   name of the file this `FILE_DESC` refers to.
 * `write`: a `DATA_SECTION` that defaults to an empty one.
@@ -151,9 +151,9 @@ The possible values for the keys are as follow:
   Each value is a $-expression (evaluated when the dataset is accessed)
   specifying the value to the attribute.
 * `collision_policy`: a string identifying a \ref COLLISION_POLICY.
-* `chunking`: a \ref intexpr_or_seq_node that defines the size of the chunks
+* `chunking`: a \ref spectree_expression "integer-valued $-expression, or sequence of them," that defines the size of the chunks
   used to the dataset in a chunked layout.
-  The \ref intexpr_or_seq_node must have the same dimension as the dataset type.
+  The \ref spectree_expression "integer-valued $-expression, or sequence of them," must have the same dimension as the dataset type.
   This can be overriden by the `decl_hdf5.chunking` attribute in the dataset
   type.
   By default, no chunking is activated.

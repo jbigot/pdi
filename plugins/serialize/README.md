@@ -16,7 +16,7 @@ The serialize configuration is made of only:
 
 |key                    |value                |
 |:----------------------|:--------------------|
-|`logging`              |\ref logging_node|
+|`logging`              |\ref spectree_logging|
 |data name to serialize |serialized data name |
 
 ## Plugin examples {#serialize_plugin_examples}
