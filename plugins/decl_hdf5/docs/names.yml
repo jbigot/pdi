@@ -1,0 +1,17 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  #! [decl_hdf5]
+  decl_hdf5:
+    file: output_${rank}.h5     # one file per process
+    write:
+      size: {}                  # an I/O description with the default values
+      field:
+        dataset: field_${iter}  # one dataset per iteration
+        when: $iter > 0         # but for the first one
+  #! [decl_hdf5]

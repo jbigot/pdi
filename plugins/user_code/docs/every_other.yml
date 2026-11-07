@@ -1,0 +1,10 @@
+metadata:
+  iter: int
+plugins:
+  #! [user_code]
+  user_code:
+    on_data:
+      iter:
+        when: $iter % 2 = 0      # only at the even iterations
+        report: {step: $iter}
+  #! [user_code]

@@ -1,0 +1,9 @@
+data:
+  number: int
+plugins:
+  #! [user_code]
+  user_code:
+    on_event:
+      print:
+        print_number: {input: $number}  # number, as input
+  #! [user_code]

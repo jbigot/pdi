@@ -1,0 +1,19 @@
+data:
+  params:
+    type: struct
+    members:
+      - nb_iter: int
+      - alpha: double
+      - size: {type: array, subtype: int, size: 2}
+plugins:
+  #! [set_value]
+  set_value:
+    on_init:
+      - share:
+          - params:              # a record, member by member
+              nb_iter: 10
+              alpha: 0.125
+              size: [60, 12]
+    on_finalize:
+      - release: [params]
+  #! [set_value]

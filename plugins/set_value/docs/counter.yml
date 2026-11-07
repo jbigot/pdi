@@ -1,0 +1,15 @@
+data:
+  counter: int
+plugins:
+  #! [set_value]
+  set_value:
+    on_init:
+      - share:
+          - counter: 0
+    on_event:
+      step:                      # at each step event
+        - set:
+            - counter: $counter + 1
+    on_finalize:
+      - release: [counter]
+  #! [set_value]

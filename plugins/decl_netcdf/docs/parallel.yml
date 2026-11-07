@@ -1,0 +1,26 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  mpi: ~
+  #! [decl_netcdf]
+  decl_netcdf:
+    file: output.nc                  # one file for all processes
+    communicator: $MPI_COMM_WORLD
+    variables:
+      field:                         # the blocks of all processes
+        type: array
+        subtype: double
+        size: ['$nprocs * ($size[0] + 2)', '$size[1] + 2']
+        dimensions: [height, width]
+    write:
+      field:
+        when: $iter = 2
+        variable_selection:          # the rows of this process
+          start: ['$rank * ($size[0] + 2)', 0]
+          subsize: ['$size[0] + 2', '$size[1] + 2']
+  #! [decl_netcdf]

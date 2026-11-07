@@ -1,0 +1,16 @@
+logging: {pattern: '[%n] %l: %v'}
+metadata:
+  iter: int
+data:
+  field: {type: array, subtype: double, size: 3}
+plugins:
+  #! [set_value]
+  set_value:
+    on_data:
+      iter:
+        - logger:
+            level: trace         # from iter's share
+      field:
+        - logger:
+            level: info          # to field's
+  #! [set_value]

@@ -14,10 +14,10 @@ and this project adheres to
 #### Added
 * The Decl'HDF5, Decl'NetCDF, Set_value, User-code and JSON plugins each have
   a short presentation page, with two subpages: their configuration reference,
-  and a page of examples, whole programs and specification trees that each
-  demonstrate one of their features, with their output. Those of User-code are
-  the former ones, with one more; that of JSON replaces its custom formatting
-  example with one whose output is that of a run.
+  and a page of examples, each the part of a specification tree that
+  demonstrates one of their features, with what it does. PDI's tests run every
+  one of them and check what they do. Those of User-code are the former ones,
+  with one more.
 
 #### Changed
 * The specification tree reference, and that of each plugin, documents the tree

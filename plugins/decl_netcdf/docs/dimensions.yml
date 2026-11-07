@@ -1,0 +1,27 @@
+metadata:
+  rank: int
+  nprocs: int
+  size: {type: array, subtype: int, size: 2}
+  iter: int
+data:
+  field: {type: array, subtype: double, size: ['$size[0] + 2', '$size[1] + 2']}
+plugins:
+  #! [decl_netcdf]
+  decl_netcdf:
+    file: output_${rank}.nc
+    groups:
+      results:
+        attributes:              # the attributes of the results group
+          nprocs: $nprocs
+          rank: $rank
+    variables:
+      results/field:
+        dimensions: [height, width]
+        attributes:              # the attributes of the field variable
+          units: kelvin
+          iteration: $iter
+    write:
+      field:
+        variable: results/field
+        when: $iter = 2
+  #! [decl_netcdf]

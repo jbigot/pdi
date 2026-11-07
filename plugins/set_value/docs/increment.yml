@@ -1,0 +1,21 @@
+data:
+  int_scalar: int
+  int_array: {type: array, subtype: int, size: 3}
+plugins:
+  #! [set_value]
+  set_value:
+    on_event:
+      init:
+        - share:
+            - int_scalar: 0
+            - int_array: [1, 2, 3]
+      increment:
+        - set:
+            - int_scalar: $int_scalar + 1
+            - int_array:
+                - $int_array[0] + 1
+                - $int_array[1] + 1
+                - $int_array[2] + 1
+    on_finalize:
+      - release: [int_scalar, int_array]
+  #! [set_value]
