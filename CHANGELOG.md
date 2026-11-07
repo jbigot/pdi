@@ -34,6 +34,7 @@ and this project adheres to
   per [#789](https://github.com/pdidev/pdi/issues/789).
 
 #### Fixed
+* The User-code plugin reference gives examples with the access rights they need.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
