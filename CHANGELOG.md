@@ -135,6 +135,9 @@ and this project adheres to
   metadata, and documents `Comm_c2f` and `Comm_f2c` in place of the deprecated
   `transtype`, part of [#916](https://github.com/pdidev/pdi/issues/916).
 * The examples of the MPI plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the specification tree reference are run by PDI, and its
+  default log patterns checked against what PDI logs, where one of them loaded a
+  plugin that does not exist, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

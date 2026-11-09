@@ -36,6 +36,7 @@ include(GoogleTest)
 set(RUNTEST_DIR "${CMAKE_CURRENT_LIST_DIR}/../cmake/runtest-dir")
 
 option(BUILD_DECL_HDF5_PLUGIN "Build Decl'HDF5 plug-in" ON)
+option(BUILD_MPI_PLUGIN       "Build MPI plug-in"       ON)
 option(BUILD_SERIALIZE_PLUGIN "Build Serialize plug-in" ON)
 option(BUILD_TRACE_PLUGIN     "Build Trace plugin"      ON)
 
@@ -121,3 +122,12 @@ foreach(FIRST_STEPS_EXAMPLE IN ITEMS hello_data hello_event hello_expose hello_m
 endforeach()
 
 endif("${BUILD_TRACE_PLUGIN}")
+
+# The examples of the specification tree reference: they load the Trace, Decl'HDF5 and MPI plugins.
+if("${BUILD_TRACE_PLUGIN}" AND "${BUILD_DECL_HDF5_PLUGIN}" AND "${BUILD_MPI_PLUGIN}")
+	find_package(MPI REQUIRED COMPONENTS C)
+	add_executable(doc_spectree doc_spectree.cxx)
+	target_link_libraries(doc_spectree MPI::MPI_C paraconf::paraconf PDI::PDI_C GTest::gtest GTest::gmock)
+	target_compile_definitions(doc_spectree PRIVATE "SPECIFICATION_TREE_REF_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../pdi/docs/Specification_tree_ref\"")
+	gtest_discover_tests(doc_spectree)
+endif()
