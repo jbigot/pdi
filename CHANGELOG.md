@@ -88,7 +88,8 @@ and this project adheres to
   documents its configuration forms and where its `logging` key can go, part of
   [#916](https://github.com/pdidev/pdi/issues/916).
 * The Decl'NetCDF plugin reference documents that the data it reads and writes
-  must be dense, part of [#916](https://github.com/pdidev/pdi/issues/916).
+  must be dense, and that the attributes of a variable are read whatever the
+  form of `read`, part of [#916](https://github.com/pdidev/pdi/issues/916).
 * The Trace plugin reference shows where the plugin writes its trace, and in
   which format, and documents its `logging` key, part of
   [#916](https://github.com/pdidev/pdi/issues/916).
