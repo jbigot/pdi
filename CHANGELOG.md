@@ -78,7 +78,8 @@ and this project adheres to
   the plugin writes, with a mustache template that matches its output, and
   documents its configuration forms and where its `logging` key can go.
 * The Decl'NetCDF plugin reference documents that the data it reads and writes
-  must be dense.
+  must be dense, and that the attributes of a variable are read whatever the
+  form of `read`.
 * The Trace plugin reference shows where the plugin writes its trace, and in
   which format, and documents its `logging` key.
 * The examples of the first steps build and run, and show the output PDI
