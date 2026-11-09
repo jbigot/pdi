@@ -18,11 +18,11 @@ ensemble run, etc.
 3. \subpage Concepts "Core concepts"
 4. \subpage First_steps "First steps"
 5. \subpage Hands_on "Tutorial"
-6. \subpage PDI_example "PDI example"
-7. [C API reference](topics.html)
-8. \subpage Specification_tree_ref "Specification tree reference"
-9. \subpage Plugins "List of PDI plugins"
-10. \subpage FAQ "F.A.Q."
+   1. \subpage PDI_example "PDI example"
+6. [C API reference](topics.html)
+7. \subpage Specification_tree_ref "Specification tree reference"
+8. \subpage Plugins "List of PDI plugins"
+9. \subpage FAQ "F.A.Q."
 
 ## Developer documentation
 
