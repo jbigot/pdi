@@ -130,6 +130,7 @@ and this project adheres to
   an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Trace plugin page are run by PDI, and its trace compared
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Serialize plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Pycall plugin page are run by PDI, and the output of its
   full example compared to that of a real run, where it showed log lines that
   depend on the installation, as part of [#331](https://github.com/pdidev/pdi/issues/331).
