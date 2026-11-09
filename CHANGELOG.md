@@ -108,6 +108,8 @@ and this project adheres to
 * The examples of the datatypes and $-expressions references are checked
   against what PDI makes of them, where the float and string formats applied to
   an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the YAML page are parsed by the tests, and those of a
+  specification tree loaded by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
