@@ -5,55 +5,19 @@ The Pycall plugin calls Python code written in the YAML file, when some data is 
 ## Configuration {#pycall_configuration}
 
 The structure of its configuration:
-```yaml
-plugins:
-  pycall:           # name of the plugin
-    on_event:       # run code when an event is emitted
-      testing:      # name of the event
-        with:       # values exposed to the code, and their Python names
-        exec:       # Python code to execute when the event is emitted
-    on_data:        # run code when a data is shared
-      data_name:    # Python code to execute when data_name is shared
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_configuration
 
 ## Examples {#pycall_ex}
 
 A full example of the Pycall plugin, with its specification tree and the C code that uses it.
 
 Specification tree:
-```yaml
-logging: trace
-data: {a: {type: array, subtype: int, size: 3}}
-plugins:
-  pycall:
-    on_event:
-      testing:
-        with: { a_python: $a }
-        exec: "print(' * [P] I received    $a =',a_python); a_python[1]=7; print(' * [P] changed it to $a =',a_python);"
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_ex
 
 C code:
-```c
-	int a[3] = {1, 2, 3};
-	
-	printf(" * [C] starting with $a = [%d %d %d]\n", a[0], a[1], a[2]);
-	
-	PDI_share("a", a, PDI_INOUT);
-	PDI_event("testing");
-	PDI_reclaim("a");
-	
-	printf(" * [C] now I see     $a = [%d %d %d]\n", a[0], a[1], a[2]);
-```
+\snippet pycall/docs/pycall_example.c pycall_ex
 Output of the program:
-```
- * [C] starting with $a = [1 2 3]
-[13:51:26][PDI] *** trace: Sharing `a' Ref with rights: R = true, W = true
-[13:51:26][PDI] *** trace: Calling `a' share. Callbacks to call: 0
-[13:51:26][PDI] *** trace: Calling `testing' event. Callbacks to call: 1
- * [P] I received    $a = [1 2 3]
- * [P] changed it to $a = [1 7 3]
- * [C] now I see     $a = [1 7 3]
-```
+\snippet pycall/docs/pycall_example.output output
 
 ## `@pycall` {#pycall_config}
 
@@ -66,15 +30,7 @@ An exception raised by the Python code is logged as an error; it does not interr
 
 **Example:**
 
-```yaml
-plugins:
-  pycall:
-    on_event:
-      my_event:           # <- code run when my_event is emitted...
-        exec: "print('my_event was emitted')"
-    on_data:
-      my_data: "print(my_data)"   # <- ... and when my_data is shared
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_config
 
 
 ### `@pycall.on_event.<event_name>` {#pycall_on_event_event_name}
@@ -84,26 +40,14 @@ Use `on_event.<event_name>` to execute the code, in order, each time the event n
 
 **Example:**
 
-```yaml
-on_event:
-  testing:                # <- a single piece of code...
-    exec: "print(a_python); a_python[1] = 7"
-    with: {a_python: $a}
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_on_event_event_name
 
 The code sees the value of `a` as `a_python`, and can change it if `a` is shared with write access.
 
 
 **Example:**
 
-```yaml
-on_event:
-  testing:                # <- ... or a sequence of them, run in order
-    - exec: "print(x)"
-      with: {x: $a}
-    - exec: "print(y)"
-      with: {y: $b}
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_on_event_event_name_sequence
 
 
 ### `@pycall.on_data.<data_name>` {#pycall_on_data_data_name}
@@ -114,10 +58,7 @@ The data is exposed to the code as the variable named `<data_name>`.
 
 **Example:**
 
-```yaml
-on_data:
-  a: "print(' * [P] I received $a =', a)"   # <- run each time a is shared, which it sees as a
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_on_data_data_name
 
 
 ### `@pycall.logging` {#pycall_logging}
@@ -128,11 +69,7 @@ Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugi
 
 **Example:**
 
-```yaml
-logging: debug            # <- the logger of the Pycall plugin
-on_data:
-  a: "print(a)"
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_logging
 
 
 ## `@pycode` {#pycall_pycode}
@@ -142,12 +79,7 @@ You can use it in \ref pycall_on_event_event_name.
 
 **Example:**
 
-```yaml
-on_event:
-  my_event:
-    exec: "print(x * 2)"  # <- this mapping is a piece of code, and the values it sees
-    with: {x: $my_data}
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_pycode
 
 
 ### `@pycode.exec` {#pycall_pycode_exec}
@@ -158,10 +90,7 @@ Use `exec` to give the Python code to execute.
 
 **Example:**
 
-```yaml
-exec: "import numpy; print(numpy.sum(a))"   # <- the Python code
-with: {a: $my_array}
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_pycode_exec
 
 
 ### `@pycode.with.<python_name>` {#pycall_pycode_with_python_name}
@@ -173,11 +102,6 @@ Use `with.<python_name>` to expose its value to the Python code as the variable 
 
 **Example:**
 
-```yaml
-exec: "print(x, n)"
-with:
-  x: $my_data             # <- the value of my_data, seen as x
-  n: $size
-```
+\snippet{trimleft} pycall/docs/reference.yml pycall_pycode_with_python_name
 
 
