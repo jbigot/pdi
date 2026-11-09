@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2024 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
  * All rights reserved.
@@ -65,12 +65,22 @@ public:
 	typedef std::function<Datatype_template_sptr(Context&, PC_tree_t)> Datatype_template_parser;
 
 protected:
+	/// \name get_iterator
+	/// Wraps an iterator of the descriptor store in an Iterator
+	///@{
+
 	Iterator get_iterator(const std::unordered_map<std::string, std::unique_ptr<Data_descriptor>>::iterator& data);
 
 	Iterator get_iterator(std::unordered_map<std::string, std::unique_ptr<Data_descriptor>>::iterator&& data);
 
+	///@}
+
 public:
 	virtual ~Context();
+
+	/// \name desc
+	/// Accesses the descriptor with a given name, which might be uninitialized
+	///@{
 
 	/** Accesses the descriptor for a specific name. Might be uninitialized
 	 */
@@ -80,6 +90,12 @@ public:
 	 */
 	virtual Data_descriptor& desc(const char* name) = 0;
 
+	///@}
+
+	/// \name operator[]
+	/// Accesses the descriptor with a given name, which might be uninitialized
+	///@{
+
 	/** Accesses the descriptor for a specific name. Might be uninitialized
 	 */
 	virtual Data_descriptor& operator[] (const std::string& name) = 0;
@@ -87,6 +103,8 @@ public:
 	/** Accesses the descriptor for a specific name. Might be uninitialized
 	 */
 	virtual Data_descriptor& operator[] (const char* name) = 0;
+
+	///@}
 
 	/** Returns an iterator on the first descriptor
 	 */
