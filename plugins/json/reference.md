@@ -16,22 +16,12 @@ A variable is written each time it is shared with read permission.
 
 **Example:**
 
-```yaml
-plugins:
-  json:                   # <- a single file description...
-    my_data: my_data.json
-```
+\snippet{trimleft} json/docs/reference.yml json_config
 
 
 **Example:**
 
-```yaml
-plugins:
-  json:                   # <- ... or a sequence of them
-    - my_data: my_data.json
-    - file: all.json
-      write: [data1, data2]
-```
+\snippet{trimleft} json/docs/reference.yml json_config_sequence
 
 
 ### `@json.logging` {#json_logging}
@@ -46,10 +36,7 @@ It can therefore only follow the data name of a single file description of the `
 
 **Example:**
 
-```yaml
-my_data: my_data.json
-logging: debug          # <- after the data name
-```
+\snippet{trimleft} json/docs/reference.yml json_logging
 
 ## `@jsonfile` {#json_jsonfile}
 
@@ -61,13 +48,7 @@ You can use it in \ref json_config.
 
 **Example:**
 
-```yaml
-plugins:
-  json:
-    - my_data: my_data.json   # <- a file description of the <data_name> form
-    - file: all.json          # <- a file description of the file form
-      write: [data1, data2]
-```
+\snippet{trimleft} json/docs/reference.yml json_jsonfile
 
 
 ### `@jsonfile.<data_name>` {#json_jsonfile_data_name}
@@ -77,9 +58,7 @@ Use `<data_name>` to write the variable named `<data_name>` to the file at this 
 
 **Example:**
 
-```yaml
-step: step_${rank}.json   # <- writes step to a file per process
-```
+\snippet{trimleft} json/docs/reference.yml json_jsonfile_data_name
 
 
 ### `@jsonfile.file` {#json_jsonfile_file}
@@ -90,10 +69,7 @@ Use `file` to give the path of the file where to write the variables listed in \
 
 **Example:**
 
-```yaml
-file: output_${rank}.json # <- first key: this file description is of the file form
-write: [temp, step]
-```
+\snippet{trimleft} json/docs/reference.yml json_jsonfile_file
 
 
 ### `@jsonfile.write` {#json_jsonfile_write}
@@ -104,10 +80,7 @@ Use `write` to name the variables to write to \ref json_jsonfile_file.
 
 **Example:**
 
-```yaml
-file: output.json
-write: [temp, step]       # <- each written when it is shared
-```
+\snippet{trimleft} json/docs/reference.yml json_jsonfile_write
 
 
 ### `@jsonfile.when` {#json_jsonfile_when}
@@ -120,8 +93,4 @@ By default, the variables are written each time they are shared with read permis
 
 **Example:**
 
-```yaml
-file: output.json
-when: $step % 10 = 0      # <- one share out of ten
-write: [temp]
-```
+\snippet{trimleft} json/docs/reference.yml json_jsonfile_when
