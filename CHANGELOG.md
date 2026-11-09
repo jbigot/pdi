@@ -148,6 +148,8 @@ and this project adheres to
   example itself, where it gave `PDI_init` a stray bracket, and no longer names
   a C source for Fortran, as part of [#331](https://github.com/pdidev/pdi/issues/331) and
   [#802](https://github.com/pdidev/pdi/issues/802).
+* The page of PDI's example shows the code and configuration of the example
+  itself, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
