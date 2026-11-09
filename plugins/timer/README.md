@@ -1,6 +1,6 @@
 # Timer plugin {#timer_plugin}
 
-The timer plugin allows measuring time spent by PDI and its plugins.
+The Timer plugin measures the time spent by PDI, its plugins, or the application itself.
 
 Each timer records the time spent between a `start` and a `stop` event, accumulated over all the times it is started and stopped.
 When the plugin is unloaded, it outputs the time accumulated by each timer that was started at least once.
