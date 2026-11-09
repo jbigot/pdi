@@ -11,15 +11,7 @@ Use it, as the value of `plugins.set_value` (see \ref spectree_pdi_plugins_plugi
 
 **Example:**
 
-```yaml
-plugins:
-  set_value:              # <- operations to execute in PDI_init and in PDI_finalize
-    on_init:
-      - share:
-          - counter: 0
-    on_finalize:
-      - release: [counter]
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_config
 
 
 ### `@set_value.on_init` {#set_value_on_init}
@@ -30,13 +22,7 @@ Use `on_init` to execute the operations in \ref PDI_init, once all data and meta
 
 **Example:**
 
-```yaml
-on_init:                  # <- run in PDI_init
-  - share:
-      - counter: 0
-on_finalize:
-  - release: [counter]
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_on_init
 
 
 ### `@set_value.on_event.<event_name>` {#set_value_on_event_event_name}
@@ -46,12 +32,7 @@ Use `on_event.<event_name>` to execute the operations each time the event named 
 
 **Example:**
 
-```yaml
-on_event:
-  increment:              # <- run each time the increment event is emitted
-    - set:
-        - counter: $counter + 1
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_on_event_event_name
 
 
 ### `@set_value.on_data.<data_name>` {#set_value_on_data_data_name}
@@ -61,12 +42,7 @@ Use `on_data.<data_name>` to execute the operations each time the data or metada
 
 **Example:**
 
-```yaml
-on_data:
-  field:                  # <- run each time field is shared
-    - expose:
-        - field_shared: 1
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_on_data_data_name
 
 
 ### `@set_value.on_finalize` {#set_value_on_finalize}
@@ -77,10 +53,7 @@ Use `on_finalize` to execute the operations in \ref PDI_finalize.
 
 **Example:**
 
-```yaml
-on_finalize:              # <- run in PDI_finalize
-  - event: finalizing
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_on_finalize
 
 
 ### `@set_value.logging` {#set_value_logging}
@@ -91,11 +64,7 @@ Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugi
 
 **Example:**
 
-```yaml
-logging: debug            # <- the logger of the Set-value plugin
-on_init:
-  - event: initialized
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_logging
 
 
 ## `@operations` {#set_value_operations}
@@ -107,13 +76,7 @@ You can use it in \ref set_value_on_init, \ref set_value_on_event_event_name,
 
 **Example:**
 
-```yaml
-on_event:
-  step:                   # <- this sequence is an operation list, run in order
-    - set:
-        - counter: $counter + 1
-    - event: counter_incremented
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations
 
 
 ### `@operations[*].set` {#set_value_operations_item_set}
@@ -123,10 +86,7 @@ Use `set` to set the values of data that are already shared, with write access.
 
 **Example:**
 
-```yaml
-- set:                    # <- counter is already shared, with write access
-    - counter: $counter + 1
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_set
 
 
 ### `@operations[*].share` {#set_value_operations_item_share}
@@ -140,10 +100,7 @@ If you reclaim the data instead, %PDI no longer manages that memory.
 
 **Example:**
 
-```yaml
-- share:                  # <- allocates buffer and shares it, until it is released
-    - buffer: [0, 0, 0]
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_share
 
 
 ### `@operations[*].expose` {#set_value_operations_item_expose}
@@ -153,10 +110,7 @@ Use `expose` to expose the values: each data is shared, then released immediatel
 
 **Example:**
 
-```yaml
-- expose:                 # <- shares step, then releases it
-    - step: 1
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_expose
 
 
 ### `@operations[*].release` {#set_value_operations_item_release}
@@ -166,9 +120,7 @@ Use `release` to release the data it names.
 
 **Example:**
 
-```yaml
-- release: [buffer]       # <- releases buffer, shared by an earlier share operation
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_release
 
 
 ### `@operations[*].event` {#set_value_operations_item_event}
@@ -178,9 +130,7 @@ Use `event` to emit the event it names.
 
 **Example:**
 
-```yaml
-- event: checkpoint       # <- emits checkpoint, for the other plugins
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_event
 
 
 ### `@operations[*].logger.level` {#set_value_operations_item_logger_level}
@@ -191,10 +141,7 @@ Use `logger.level` to change the level of the logger of %PDI to one of those of 
 
 **Example:**
 
-```yaml
-- logger:
-    level: debug          # <- PDI logs in detail from now on
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_logger_level
 
 
 ### `@operations[*].logger.pattern` {#set_value_operations_item_logger_pattern}
@@ -205,10 +152,7 @@ Use `logger.pattern` to change the pattern of the logger of %PDI and of those of
 
 **Example:**
 
-```yaml
-- logger:
-    pattern: "[%n] %v"    # <- a shorter pattern from now on
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_logger_pattern
 
 
 ### `@operations[*].logger.evaluate` {#set_value_operations_item_logger_evaluate}
@@ -220,11 +164,7 @@ current values of the data it references.
 
 **Example:**
 
-```yaml
-- logger:
-    pattern: "[iteration %{iter}][%n] %v"
-    evaluate: 1           # <- the iteration in the pattern is updated each time this operation runs
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_operations_item_logger_evaluate
 
 
 ## `@value_list` {#set_value_value_list}
@@ -234,11 +174,7 @@ You can use it in \ref set_value_operations_item_set, \ref set_value_operations_
 
 **Example:**
 
-```yaml
-- share:
-    - step: 0             # <- this sequence is a value list, handled in order
-    - position: [0.0, 0.0, 0.0]
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_value_list
 
 
 ### `@value_list[*].<data_name>` {#set_value_value_list_item_data_name}
@@ -251,22 +187,14 @@ Use `<data_name>` to give the value of the data named `<data_name>`, either:
 
 **Example:**
 
-```yaml
-- step: 42                # <- a scalar
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_value_list_item_data_name_scalar
 
 
 **Example:**
 
-```yaml
-- position: [1.0, 2.0, 3.0]   # <- an array
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_value_list_item_data_name_array
 
 
 **Example:**
 
-```yaml
-- particle:               # <- a record, member by member
-    id: 3
-    position: [1.0, 2.0, 3.0]
-```
+\snippet{trimleft} set_value/docs/reference.yml set_value_value_list_item_data_name_record

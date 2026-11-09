@@ -1,0 +1,248 @@
+# The examples of the Set_value configuration reference (reference.md), one whole specification tree per key, that the page shows the marked
+# part of; the operations outside the marked part share what the example needs, and release it.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx, which emits the events they react to, the plugin sharing the data.
+
+set_value_config:
+  metadata:
+    counter: int
+  #! [set_value_config]
+  plugins:
+    set_value:              # <- operations to execute in PDI_init and in PDI_finalize
+      on_init:
+        - share:
+            - counter: 0
+      on_finalize:
+        - release: [counter]
+  #! [set_value_config]
+
+set_value_on_init:
+  metadata:
+    counter: int
+  plugins:
+    set_value:
+      #! [set_value_on_init]
+      on_init:                  # <- run in PDI_init
+        - share:
+            - counter: 0
+      on_finalize:
+        - release: [counter]
+      #! [set_value_on_init]
+
+set_value_on_event_event_name:
+  metadata:
+    counter: int
+  plugins:
+    set_value:
+      on_init:
+        - share:
+            - counter: 0
+      #! [set_value_on_event_event_name]
+      on_event:
+        increment:              # <- run each time the increment event is emitted
+          - set:
+              - counter: $counter + 1
+      #! [set_value_on_event_event_name]
+      on_finalize:
+        - release: [counter]
+
+set_value_on_data_data_name:
+  metadata:
+    field_shared: int
+  data:
+    field: {type: array, subtype: double, size: 4}
+  plugins:
+    set_value:
+      on_init:
+        - expose:
+            - field: [0.0, 0.0, 0.0, 0.0]
+      #! [set_value_on_data_data_name]
+      on_data:
+        field:                  # <- run each time field is shared
+          - expose:
+              - field_shared: 1
+      #! [set_value_on_data_data_name]
+
+set_value_on_finalize:
+  plugins:
+    set_value:
+      #! [set_value_on_finalize]
+      on_finalize:              # <- run in PDI_finalize
+        - event: finalizing
+      #! [set_value_on_finalize]
+
+set_value_logging:
+  plugins:
+    set_value:
+      #! [set_value_logging]
+      logging: debug            # <- the logger of the Set-value plugin
+      on_init:
+        - event: initialized
+      #! [set_value_logging]
+
+set_value_operations:
+  metadata:
+    counter: int
+  plugins:
+    set_value:
+      on_init:
+        - share:
+            - counter: 0
+      #! [set_value_operations]
+      on_event:
+        step:                   # <- this sequence is an operation list, run in order
+          - set:
+              - counter: $counter + 1
+          - event: counter_incremented
+      #! [set_value_operations]
+      on_finalize:
+        - release: [counter]
+
+set_value_operations_item_set:
+  metadata:
+    counter: int
+  plugins:
+    set_value:
+      on_init:
+        - share:
+            - counter: 0
+      on_event:
+        increment:
+          #! [set_value_operations_item_set]
+          - set:                    # <- counter is already shared, with write access
+              - counter: $counter + 1
+          #! [set_value_operations_item_set]
+      on_finalize:
+        - release: [counter]
+
+set_value_operations_item_share:
+  data:
+    buffer: {type: array, subtype: int, size: 3}
+  plugins:
+    set_value:
+      on_init:
+        #! [set_value_operations_item_share]
+        - share:                  # <- allocates buffer and shares it, until it is released
+            - buffer: [0, 0, 0]
+        #! [set_value_operations_item_share]
+      on_finalize:
+        - release: [buffer]
+
+set_value_operations_item_expose:
+  metadata:
+    step: int
+  plugins:
+    set_value:
+      on_init:
+        #! [set_value_operations_item_expose]
+        - expose:                 # <- shares step, then releases it
+            - step: 1
+        #! [set_value_operations_item_expose]
+
+set_value_operations_item_release:
+  data:
+    buffer: {type: array, subtype: int, size: 3}
+  plugins:
+    set_value:
+      on_init:
+        - share:
+            - buffer: [0, 0, 0]
+      on_finalize:
+        #! [set_value_operations_item_release]
+        - release: [buffer]       # <- releases buffer, shared by an earlier share operation
+        #! [set_value_operations_item_release]
+
+set_value_operations_item_event:
+  plugins:
+    set_value:
+      on_init:
+        #! [set_value_operations_item_event]
+        - event: checkpoint       # <- emits checkpoint, for the other plugins
+        #! [set_value_operations_item_event]
+
+set_value_operations_item_logger_level:
+  plugins:
+    set_value:
+      on_init:
+        #! [set_value_operations_item_logger_level]
+        - logger:
+            level: debug          # <- PDI logs in detail from now on
+        #! [set_value_operations_item_logger_level]
+
+set_value_operations_item_logger_pattern:
+  plugins:
+    set_value:
+      on_init:
+        #! [set_value_operations_item_logger_pattern]
+        - logger:
+            pattern: "[%n] %v"    # <- a shorter pattern from now on
+        #! [set_value_operations_item_logger_pattern]
+
+set_value_operations_item_logger_evaluate:
+  metadata:
+    iter: int
+  plugins:
+    set_value:
+      on_init:
+        - expose:
+            - iter: 0
+      on_event:
+        step:
+          #! [set_value_operations_item_logger_evaluate]
+          - logger:
+              pattern: "[iteration %{iter}][%n] %v"
+              evaluate: 1           # <- the iteration in the pattern is updated each time this operation runs
+          #! [set_value_operations_item_logger_evaluate]
+
+set_value_value_list:
+  metadata:
+    step: int
+    position: {type: array, subtype: double, size: 3}
+  plugins:
+    set_value:
+      on_init:
+        #! [set_value_value_list]
+        - share:
+            - step: 0             # <- this sequence is a value list, handled in order
+            - position: [0.0, 0.0, 0.0]
+        #! [set_value_value_list]
+      on_finalize:
+        - release: [step, position]
+
+set_value_value_list_item_data_name_scalar:
+  metadata:
+    step: int
+  plugins:
+    set_value:
+      on_init:
+        - expose:
+            #! [set_value_value_list_item_data_name_scalar]
+            - step: 42                # <- a scalar
+            #! [set_value_value_list_item_data_name_scalar]
+
+set_value_value_list_item_data_name_array:
+  metadata:
+    position: {type: array, subtype: double, size: 3}
+  plugins:
+    set_value:
+      on_init:
+        - expose:
+            #! [set_value_value_list_item_data_name_array]
+            - position: [1.0, 2.0, 3.0]   # <- an array
+            #! [set_value_value_list_item_data_name_array]
+
+set_value_value_list_item_data_name_record:
+  metadata:
+    particle:
+      type: struct
+      members:
+        - id: int
+        - position: {type: array, subtype: double, size: 3}
+  plugins:
+    set_value:
+      on_init:
+        - expose:
+            #! [set_value_value_list_item_data_name_record]
+            - particle:               # <- a record, member by member
+                id: 3
+                position: [1.0, 2.0, 3.0]
+            #! [set_value_value_list_item_data_name_record]
