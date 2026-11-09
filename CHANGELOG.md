@@ -122,6 +122,8 @@ and this project adheres to
   [#846](https://github.com/pdidev/pdi/issues/846)
 * The examples of the first steps build and run, and show the output PDI
   really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the YAML page are parsed by the tests, and those of a
+  specification tree loaded by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the datatypes and $-expressions references are checked
   against what PDI makes of them, where the float and string formats applied to
   an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
