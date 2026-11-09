@@ -7,18 +7,7 @@ When the plugin is unloaded, it outputs the time accumulated by each timer that 
 
 ## Example of a Timer configuration {#timer_configuration}
 
-```yaml
-plugins:
-  timer:
-    timer_A: {start: "decl_hdf5_start_timer", stop: "decl_hdf5_stop_timer"}
-    timer_B: "decl_hdf5"
-    timer_C: ["toto", "titi"]
-    timer_D:
-      start: "begin_timing"
-      stop: "end_timing"
-    timer_E: ["pdi"]
-    output_to: cout
-```
+\snippet{trimleft} timer/docs/reference.yml timer_configuration
 
 In this example, `timer_B` is equivalent to `timer_A`; `timer_C` records the time spent between `toto_start_timer` and `toto_stop_timer`, and
 between `titi_start_timer` and `titi_stop_timer`; and `timer_E` records the time spent between `PDI_init` and `PDI_finalize`, including the time
@@ -32,24 +21,12 @@ It can also be a sequence of single-key mappings, which has the same meaning.
 
 **Example:**
 
-```yaml
-plugins:
-  timer:                  # <- two timers, and where their results go
-    io_time: decl_hdf5
-    total: pdi
-    output_to: timers.csv
-```
+\snippet{trimleft} timer/docs/reference.yml timer_config
 
 
 **Example:**
 
-```yaml
-plugins:
-  timer:                  # <- the same, as a sequence of single-key mappings
-    - io_time: decl_hdf5
-    - total: pdi
-    - output_to: timers.csv
-```
+\snippet{trimleft} timer/docs/reference.yml timer_config_sequence
 
 
 ### `@timer.<timer_name>` {#timer_timer_name}
@@ -67,12 +44,7 @@ A timer started while already running, or stopped while not running, logs an err
 
 **Example:**
 
-```yaml
-io_time: [decl_hdf5, decl_netcdf]   # <- the time spent in both plugins, in one timer
-compute:                            # <- the time between two events of the application
-  start: compute_begin
-  stop: compute_end
-```
+\snippet{trimleft} timer/docs/reference.yml timer_timer_name
 
 
 ### `@timer.<timer_name>.start` {#timer_timer_name_start}
@@ -83,11 +55,7 @@ Use `start` to name the event that starts the timer.
 
 **Example:**
 
-```yaml
-compute:
-  start: compute_begin    # <- the event that starts the timer
-  stop: compute_end
-```
+\snippet{trimleft} timer/docs/reference.yml timer_timer_name_start
 
 
 ### `@timer.<timer_name>.stop` {#timer_timer_name_stop}
@@ -98,11 +66,7 @@ Use `stop` to name the event that stops the timer.
 
 **Example:**
 
-```yaml
-compute:
-  start: compute_begin
-  stop: compute_end       # <- the event that stops it
-```
+\snippet{trimleft} timer/docs/reference.yml timer_timer_name_stop
 
 
 ### `@timer.output_to` {#timer_output_to}
@@ -118,10 +82,7 @@ If the underlying filesystem does not support `flock`, the results are not writt
 
 **Example:**
 
-```yaml
-total: pdi
-output_to: timers.csv     # <- appends `total,<seconds>` to timers.csv
-```
+\snippet{trimleft} timer/docs/reference.yml timer_output_to
 
 
 ### `@timer.logging` {#timer_logging}
@@ -134,9 +95,6 @@ Like any other key, it then also defines a timer, named `logging`, that uses the
 
 **Example:**
 
-```yaml
-logging: debug            # <- also defines a timer named logging, on debug_start_timer and debug_stop_timer
-total: pdi
-```
+\snippet{trimleft} timer/docs/reference.yml timer_logging
 
 

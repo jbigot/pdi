@@ -1,0 +1,78 @@
+# The examples of the Timer plugin documentation (README.md), one whole specification tree per key, that the page shows the marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+timer_configuration:
+  #! [timer_configuration]
+  plugins:
+    timer:
+      timer_A: {start: "decl_hdf5_start_timer", stop: "decl_hdf5_stop_timer"}
+      timer_B: "decl_hdf5"
+      timer_C: ["toto", "titi"]
+      timer_D:
+        start: "begin_timing"
+        stop: "end_timing"
+      timer_E: ["pdi"]
+      output_to: cout
+  #! [timer_configuration]
+
+timer_config:
+  #! [timer_config]
+  plugins:
+    timer:                  # <- two timers, and where their results go
+      io_time: decl_hdf5
+      total: pdi
+      output_to: timers.csv
+  #! [timer_config]
+
+timer_config_sequence:
+  #! [timer_config_sequence]
+  plugins:
+    timer:                  # <- the same, as a sequence of single-key mappings
+      - io_time: decl_hdf5
+      - total: pdi
+      - output_to: timers.csv
+  #! [timer_config_sequence]
+
+timer_timer_name:
+  plugins:
+    timer:
+      #! [timer_timer_name]
+      io_time: [decl_hdf5, decl_netcdf]   # <- the time spent in both plugins, in one timer
+      compute:                            # <- the time between two events of the application
+        start: compute_begin
+        stop: compute_end
+      #! [timer_timer_name]
+
+timer_timer_name_start:
+  plugins:
+    timer:
+      #! [timer_timer_name_start]
+      compute:
+        start: compute_begin    # <- the event that starts the timer
+        stop: compute_end
+      #! [timer_timer_name_start]
+
+timer_timer_name_stop:
+  plugins:
+    timer:
+      #! [timer_timer_name_stop]
+      compute:
+        start: compute_begin
+        stop: compute_end       # <- the event that stops it
+      #! [timer_timer_name_stop]
+
+timer_output_to:
+  plugins:
+    timer:
+      #! [timer_output_to]
+      total: pdi
+      output_to: timers.csv     # <- appends `total,<seconds>` to timers.csv
+      #! [timer_output_to]
+
+timer_logging:
+  plugins:
+    timer:
+      #! [timer_logging]
+      logging: debug            # <- also defines a timer named logging, on debug_start_timer and debug_stop_timer
+      total: pdi
+      #! [timer_logging]
