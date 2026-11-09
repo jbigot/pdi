@@ -1,0 +1,56 @@
+# The examples of the $-expressions reference (Spectree_expressions.md), that the page shows the marked part of.
+# pdi/tests/PDI_doc_expression.cxx initializes PDI with the pdi subtree, shares the values below, and checks that each expression evaluates to
+# the given value.
+
+pdi:
+  metadata:
+    my_data: int          # 42
+    my_real: double       # 3.5
+    my_name: {type: array, subtype: char, size: 3}   # PDI
+    my_record:            # its subarray is [2, 0, 0, 0]
+      type: record
+      buffersize: 16
+      members:
+        subarray: {disp: 0, type: array, subtype: int, size: 4}
+
+examples:
+  - value: "42"
+    expression:
+      #! [reference]
+      '$my_data'
+      #! [reference]
+  - value: "3"
+    expression:
+      #! [operation]
+      '($my_data + 3) % 6'
+      #! [operation]
+  - value: "84"
+    expression:
+      #! [subscript]
+      '${my_record.subarray[0]} * 42'
+      #! [subscript]
+  - value: "my name is PDI"
+    expression:
+      #! [string]
+      'my name is ${my_name}'
+      #! [string]
+  - value: "00042"
+    expression:
+      #! [format_int]
+      '${my_data:05d}'
+      #! [format_int]
+  - value: "101010"
+    expression:
+      #! [format_binary]
+      '${my_data:b}'
+      #! [format_binary]
+  - value: "3.50000"
+    expression:
+      #! [format_float]
+      '${my_real:1.5f}'
+      #! [format_float]
+  - value: "            PDI"
+    expression:
+      #! [format_string]
+      '${my_name:>15s}'
+      #! [format_string]

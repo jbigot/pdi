@@ -122,6 +122,9 @@ and this project adheres to
   [#846](https://github.com/pdidev/pdi/issues/846)
 * The examples of the first steps build and run, and show the output PDI
   really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the datatypes and $-expressions references are checked
+  against what PDI makes of them, where the float and string formats applied to
+  an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Trace plugin page are run by PDI, and its trace compared
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Pycall plugin page are run by PDI, and the output of its
@@ -201,6 +204,9 @@ and this project adheres to
 * A plugin that does not export its pretty name, now loads under its own name
   instead of crashing PDI, fixing
   [#836](https://github.com/pdidev/pdi/issues/836)
+* A test program made of several files that include `pdi/testing.h` now links,
+  where `PDI::PdiTest`'s constructor was defined in each of them, fixing
+  [#926](https://github.com/pdidev/pdi/issues/926).
 
 #### Security
 

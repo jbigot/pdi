@@ -63,6 +63,8 @@ add_executable(PDI_unit_tests
 		PDI_context.cxx
 		PDI_data_descriptor.cxx
 		PDI_datatype_attributes.cxx
+		PDI_doc_datatype.cxx
+		PDI_doc_expression.cxx
 		PDI_error.cxx
 		PDI_expression.cxx
 # 		PDI_initialize_plugins.cxx
@@ -105,6 +107,12 @@ foreach(OPERAND1_TYPE IN LISTS MODULABLE_OPERAND_TYPES)
 endforeach()
 
 target_compile_features(PDI_unit_tests PRIVATE cxx_std_20)
+# the examples of the documentation that PDI_doc_datatype.cxx and PDI_doc_expression.cxx check
+target_compile_definitions(PDI_unit_tests PRIVATE "PDI_DOCS_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../docs\"")
+target_include_directories(PDI_unit_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../docs")
+if("${BUILD_FORTRAN}")
+	target_compile_definitions(PDI_unit_tests PRIVATE PDI_DOC_FORTRAN)
+endif()
 # export the symbols of the test plugins, that PDI looks up in the executable before searching for a plugin library
 set_target_properties(PDI_unit_tests PROPERTIES ENABLE_EXPORTS TRUE)
 target_link_libraries(PDI_unit_tests PDI::PDI_plugins Threads::Threads GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
