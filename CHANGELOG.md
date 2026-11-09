@@ -62,6 +62,8 @@ and this project adheres to
 * The Trace plugin reference shows where the plugin writes its trace, and in
   which format, and documents its `logging` key, part of
   [#916](https://github.com/pdidev/pdi/issues/916).
+* The examples of the first steps build and run, and show the output PDI
+  really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
