@@ -96,6 +96,8 @@ end module
 endif()
 
 
+add_subdirectory(docs)
+
 add_executable(PDI_example_C example.c)
 target_link_libraries(PDI_example_C PRIVATE PDI::PDI_C paraconf::paraconf MPI::MPI_C m)
 

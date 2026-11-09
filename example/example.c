@@ -170,10 +170,14 @@ int main(int argc, char* argv[])
 
 	MPI_Comm main_comm = MPI_COMM_WORLD;
 #ifndef WITHOUT_PARACONF
+	//! [pdi_init]
 	PDI_init(PC_get(conf, ".pdi"));
+	//! [pdi_init]
 #endif
 
+	//! [mpi_comm]
 	PDI_expose("mpi_comm", &main_comm, PDI_INOUT);
+	//! [mpi_comm]
 
 	int psize_1d;
 	MPI_Comm_size(main_comm, &psize_1d);
@@ -240,9 +244,11 @@ int main(int argc, char* argv[])
 
 	int ii = 0;
 	PDI_expose("iter", &ii, PDI_OUT);
+	//! [expose_sizes]
 	PDI_expose("dsize", dsize, PDI_OUT);
 	PDI_expose("psize", psize, PDI_OUT);
 	PDI_expose("pcoord", pcoord, PDI_OUT);
+	//! [expose_sizes]
 
 	double(*cur)[dsize[1]] = malloc(sizeof(double) * dsize[1] * dsize[0]);
 	double(*next)[dsize[1]] = malloc(sizeof(double) * dsize[1] * dsize[0]);
@@ -253,7 +259,9 @@ int main(int argc, char* argv[])
 	double start = MPI_Wtime();
 	int next_reduce = 0;
 	for (ii = 0;; ++ii) {
+		//! [multi_expose]
 		PDI_multi_expose("newiter", "iter", &ii, PDI_INOUT, "main_field", cur, PDI_INOUT, NULL);
+		//! [multi_expose]
 
 		iter(dsize, cur, next);
 		exchange(cart_com, dsize, next);
