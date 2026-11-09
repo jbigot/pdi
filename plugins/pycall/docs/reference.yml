@@ -1,0 +1,116 @@
+# The examples of the Pycall plugin documentation (README.md), one whole specification tree per key, that the page shows the marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx; pycall_example.c runs pycall_ex and checks its output.
+
+pycall_configuration:
+  #! [pycall_configuration]
+  plugins:
+    pycall:           # name of the plugin
+      on_event:       # run code when an event is emitted
+        testing:      # name of the event
+          with:       # values exposed to the code, and their Python names
+          exec:       # Python code to execute when the event is emitted
+      on_data:        # run code when a data is shared
+        data_name:    # Python code to execute when data_name is shared
+  #! [pycall_configuration]
+
+pycall_ex:
+  #! [pycall_ex]
+  data: {a: {type: array, subtype: int, size: 3}}
+  plugins:
+    pycall:
+      on_event:
+        testing:
+          with: { a_python: $a }
+          exec: "print(' * [P] I received    $a =',a_python); a_python[1]=7; print(' * [P] changed it to $a =',a_python);"
+  #! [pycall_ex]
+
+pycall_config:
+  data:
+    my_data: int
+  #! [pycall_config]
+  plugins:
+    pycall:
+      on_event:
+        my_event:           # <- code run when my_event is emitted...
+          exec: "print('my_event was emitted')"
+      on_data:
+        my_data: "print(my_data)"   # <- ... and when my_data is shared
+  #! [pycall_config]
+
+pycall_on_event_event_name:
+  data: {a: {type: array, subtype: int, size: 3}}
+  plugins:
+    pycall:
+      #! [pycall_on_event_event_name]
+      on_event:
+        testing:                # <- a single piece of code...
+          exec: "print(a_python); a_python[1] = 7"
+          with: {a_python: $a}
+      #! [pycall_on_event_event_name]
+
+pycall_on_event_event_name_sequence:
+  data: {a: int, b: int}
+  plugins:
+    pycall:
+      #! [pycall_on_event_event_name_sequence]
+      on_event:
+        testing:                # <- ... or a sequence of them, run in order
+          - exec: "print(x)"
+            with: {x: $a}
+          - exec: "print(y)"
+            with: {y: $b}
+      #! [pycall_on_event_event_name_sequence]
+
+pycall_on_data_data_name:
+  data: {a: {type: array, subtype: int, size: 3}}
+  plugins:
+    pycall:
+      #! [pycall_on_data_data_name]
+      on_data:
+        a: "print(' * [P] I received $a =', a)"   # <- run each time a is shared, which it sees as a
+      #! [pycall_on_data_data_name]
+
+pycall_logging:
+  data: {a: {type: array, subtype: int, size: 3}}
+  plugins:
+    pycall:
+      #! [pycall_logging]
+      logging: debug            # <- the logger of the Pycall plugin
+      on_data:
+        a: "print(a)"
+      #! [pycall_logging]
+
+pycall_pycode:
+  data: {my_data: int}
+  plugins:
+    pycall:
+      #! [pycall_pycode]
+      on_event:
+        my_event:
+          exec: "print(x * 2)"  # <- this mapping is a piece of code, and the values it sees
+          with: {x: $my_data}
+      #! [pycall_pycode]
+
+pycall_pycode_exec:
+  data: {my_array: {type: array, subtype: double, size: 4}}
+  plugins:
+    pycall:
+      on_event:
+        my_event:
+          #! [pycall_pycode_exec]
+          exec: "import numpy; print(numpy.sum(a))"   # <- the Python code
+          with: {a: $my_array}
+          #! [pycall_pycode_exec]
+
+pycall_pycode_with_python_name:
+  data: {my_data: int, size: int}
+  plugins:
+    pycall:
+      on_event:
+        my_event:
+          #! [pycall_pycode_with_python_name]
+          exec: "print(x, n)"
+          with:
+            x: $my_data             # <- the value of my_data, seen as x
+            n: $size
+          #! [pycall_pycode_with_python_name]

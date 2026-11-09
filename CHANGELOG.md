@@ -64,6 +64,8 @@ and this project adheres to
   the type spellings, literals and redefinition rules PDI applies.
 * The Trace plugin reference shows where the plugin writes its trace, and in
   which format, and documents its `logging` key.
+* The Pycall plugin reference gives examples with working Python code, and
+  documents how the plugin exposes values and handles errors.
 * The JSON plugin reference gives a valid configuration example, shows the file
   the plugin writes, with a mustache template that matches its output, and
   documents its configuration forms and where its `logging` key can go.
@@ -122,6 +124,9 @@ and this project adheres to
   really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Trace plugin page are run by PDI, and its trace compared
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Pycall plugin page are run by PDI, and the output of its
+  full example compared to that of a real run, where it showed log lines that
+  depend on the installation, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Decl'HDF5 plugin reference are run by PDI, where one was
   not valid YAML and others lacked the description of the dataset that a smaller
   memory selection needs, as part of [#331](https://github.com/pdidev/pdi/issues/331).
