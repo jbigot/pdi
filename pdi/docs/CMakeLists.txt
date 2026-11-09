@@ -39,8 +39,8 @@ set(DOXYGEN_INPUT
 		"${CMAKE_CURRENT_SOURCE_DIR}/How_to_create_plugin.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Installation.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Plugins.md"
+		"${CMAKE_CURRENT_BINARY_DIR}/Source_installation.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Specification_tree_ref.md"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Source_installation.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Using_PDI.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Yaml.md"
 		"${PDI_BINARY_DIR}/pdi/export.h"
@@ -59,6 +59,11 @@ set(DOXYGEN_INPUT
 		"${PDI_SOURCE_DIR}/../plugins/serialize/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/set_value/README.md"
 		"${PDI_SOURCE_DIR}/../plugins/json/README.md")
+
+file(READ "../../RELEASED_VERSION" PDI_RELEASED_VERSION)
+string(STRIP "${PDI_RELEASED_VERSION}" PDI_RELEASED_VERSION)
+configure_file("Source_installation.md" "Source_installation.md" @ONLY)
+configure_file("../../tests/installation_tests/download_release.sh.in" "doc_snippets/download_release.sh" @ONLY)
 
 set(DOXY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 cmake_path(NORMAL_PATH DOXY_ROOT)
