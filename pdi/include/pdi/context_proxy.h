@@ -44,6 +44,10 @@ class PDI_EXPORT Context_proxy: public Context
 	Logger m_plugin_logger;
 
 public:
+	/// \name Context_proxy
+	/// Creates a Context proxy, with or without a plugin logger
+	///@{
+
 	/** Creates Context proxy without plugin logger
 	 * \param[in] ctx context to make a proxy
 	 */
@@ -56,19 +60,33 @@ public:
 	 */
 	Context_proxy(Context& ctx, const std::string& logger_name, PC_tree_t logging_tree);
 
+	///@}
+
 	/** Sets up logger
 	 * \param[in] logger_name name of the logger (will be used in logger pattern)
 	 * \param[in] logging_tree logging yaml tree of the plugin
 	 */
 	void setup_logger(const std::string& logger_name, PC_tree_t logging_tree);
 
+	/// \name desc
+	/// Accesses the descriptor with a given name, which might be uninitialized
+	///@{
+
 	Data_descriptor& desc(const std::string& name) override;
 
 	Data_descriptor& desc(const char* name) override;
 
+	///@}
+
+	/// \name operator[]
+	/// Accesses the descriptor with a given name, which might be uninitialized
+	///@{
+
 	Data_descriptor& operator[] (const std::string& name) override;
 
 	Data_descriptor& operator[] (const char* name) override;
+
+	///@}
 
 	Iterator begin() override;
 

@@ -65,18 +65,14 @@ public:
 	 */
 	virtual PDI_status_t status() const noexcept = 0;
 
+	/// \name rethrow_with_context
+	/// Rethrow the error with some context prepended to its description
+	///@{
+
 	/** Rethrow the error with some context prepended to its description
 	 * \param context the context to prepend to the error message
 	 */
 	[[noreturn]] virtual void rethrow_with_context(std::string context) const = 0;
-
-	/** Gives access to a full error message 
-	 * 
-	 * The message includes all available context as well as the info about error type
-	 * 
-	 * \returns the full message
-	 */
-	virtual std::string full_msg() const = 0;
 
 	/** Rethrow the error with some context prepended to its description
 	 * \param[in] format_str the context to prepend to the error message as a python-style {fmt} format
@@ -88,6 +84,16 @@ public:
 		rethrow_with_context(fmt::format(format_str, std::forward<Args>(args)...));
 		std::abort(); // rethrow_with_context should never return, this is just to silence compiler warnings
 	}
+
+	///@}
+
+	/** Gives access to a full error message 
+	 * 
+	 * The message includes all available context as well as the info about error type
+	 * 
+	 * \returns the full message
+	 */
+	virtual std::string full_msg() const = 0;
 };
 
 namespace impl {
@@ -202,6 +208,10 @@ private:
 	Spectree_error(std::optional<Yaml_region> location, std::string what);
 
 public:
+	/// \name Spectree_error
+	/// Creates a new Spectree_error
+	///@{
+
 	/** Creates a new Spectree_error
 	 * \param[in] tree the subtree that's in error
 	 * \param[in] what an error message
@@ -217,6 +227,8 @@ public:
 	inline Spectree_error(PC_tree_t tree, fmt::format_string<Args...> format_str, Args&&... args)
 		: Spectree_error(tree, fmt::format(format_str, std::forward<Args>(args)...))
 	{}
+
+	///@}
 
 	using What_impl::what;
 
@@ -238,6 +250,10 @@ private:
 	std::vector<std::exception_ptr> m_nested_ptrs;
 
 public:
+	/// \name Multiple_errors
+	/// Creates a new Multiple_errors
+	///@{
+
 	/** Creates a new Multiple_errors
 	 * \param[in] causes the list or original errors
 	 * \param[in] what an error message
@@ -254,6 +270,8 @@ public:
 		: Multiple_errors(std::vector<std::exception_ptr>(causes.begin(), causes.end()), fmt::format(format_str, std::forward<Args>(args)...))
 	{}
 
+	///@}
+
 	/** Gives access to the list or original errors
 	 * \return the list or original errors
 	 */
@@ -268,12 +286,33 @@ public:
 	[[noreturn]] void rethrow_with_context(std::string msg) const override;
 };
 
+/// \name rethrow_with_simple_context
+/// Throws a new exception by adding context to an existing exception or set of exceptions
+///@{
+
 /** Throws a new exception by adding context to an existing exception
  * 
  * \param[in] err original error
  * \param[in] msg some context to prepend to the error
  */
 [[noreturn]] void PDI_EXPORT rethrow_with_simple_context(std::exception_ptr err, std::string msg);
+
+/** Throws a new exception by adding context to an existing set of exceptions
+ * 
+ * - if the set of exception (errors) is empty, do nothing,
+ * - if it contains a single exception, throw it with additional context
+ * - if it contains multiple exceptions, throw a `Multiple_errors`
+ * 
+ * \param[in] errors a list of original errors
+ * \param[in] msg some context to prepend to the error
+ */
+void PDI_EXPORT rethrow_with_simple_context(std::vector<std::exception_ptr> errors, std::string msg);
+
+///@}
+
+/// \name rethrow_with_context
+/// Throws a new exception by adding context to an existing exception or set of exceptions
+///@{
 
 /** Throws a new exception by adding context to an existing exception
  * 
@@ -294,17 +333,6 @@ template <typename... Args>
  * - if it contains multiple exceptions, throw a `Multiple_errors`
  * 
  * \param[in] errors a list of original errors
- * \param[in] msg some context to prepend to the error
- */
-void PDI_EXPORT rethrow_with_simple_context(std::vector<std::exception_ptr> errors, std::string msg);
-
-/** Throws a new exception by adding context to an existing set of exceptions
- * 
- * - if the set of exception (errors) is empty, do nothing,
- * - if it contains a single exception, throw it with additional context
- * - if it contains multiple exceptions, throw a `Multiple_errors`
- * 
- * \param[in] errors a list of original errors
  * \param[in] format_str some context to prepend to the error as a python-style {fmt} format
  * \param[in] args the fmt parameters for the message
  */
@@ -313,6 +341,8 @@ static inline void rethrow_with_context(range_of_exception_ptrs auto&& errors, f
 {
 	rethrow_with_simple_context(std::vector<std::exception_ptr>(errors.begin(), errors.end()), fmt::format(format_str, std::forward<Args>(args)...));
 }
+
+///@}
 
 } // namespace PDI
 

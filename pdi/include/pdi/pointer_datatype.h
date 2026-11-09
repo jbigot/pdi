@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2021-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2020-2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * All rights reserved.
  *
@@ -73,21 +73,45 @@ public:
 
 	void* data_from_dense_copy(void* to, const void* from) const override;
 
+	/// \name index
+	/// Access the type, or the type and value, of the element at the provided index
+	///@{
+
 	Datatype_sptr index(size_t index) const override;
 
 	std::pair<void*, Datatype_sptr> index(size_t index, void* data) const override;
+
+	///@}
+
+	/// \name slice
+	/// Access the type, or the type and value, of the slice of elements between the provided indices
+	///@{
 
 	Datatype_sptr slice(size_t start_index, size_t end_index) const override;
 
 	std::pair<void*, Datatype_sptr> slice(size_t start_index, size_t end_index, void* data) const override;
 
+	///@}
+
+	/// \name member
+	/// Access the type, or the type and value, of the member with the provided name
+	///@{
+
 	Datatype_sptr member(const char* name) const override;
 
 	std::pair<void*, Datatype_sptr> member(const char* name, void* data) const override;
 
+	///@}
+
+	/// \name dereference
+	/// Access the type, or the type and value, of the content referenced by this datatype
+	///@{
+
 	Datatype_sptr dereference() const override;
 
 	std::pair<void*, Datatype_sptr> dereference(void* data) const override;
+
+	///@}
 
 	void destroy_data(void* ptr) const override;
 
@@ -118,6 +142,10 @@ private:
 	);
 
 public:
+	/// \name make
+	/// Creates a new pointer datatype
+	///@{
+
 	/** Creates new pointer datatype
 	 *
 	 * \param[in] subtype subtype of the pointer datatype
@@ -138,6 +166,8 @@ public:
 		std::function<void(void*)> destroy,
 		const Attributes_map& attributes = {}
 	);
+
+	///@}
 };
 
 } // namespace PDI

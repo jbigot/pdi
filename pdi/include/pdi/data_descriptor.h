@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2024 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,10 @@ class PDI_EXPORT Data_descriptor
 public:
 	virtual ~Data_descriptor();
 
+	/// \name default_type
+	/// Set or access the datatype template used to type raw pointers shared through this descriptor
+	///@{
+
 	/** Set the datatype template used to type raw pointers shared
 	 *  through this descriptor
 	 *
@@ -54,6 +58,12 @@ public:
 	 */
 	virtual Datatype_template_sptr default_type() = 0;
 
+	///@}
+
+	/// \name metadata
+	/// Return or set whether the descriptor describes a metadata
+	///@{
+
 	/** Return true if the data is a metadata
 	 */
 	virtual bool metadata() const = 0;
@@ -63,6 +73,8 @@ public:
 	 *        behave as a metadata
 	 */
 	virtual void metadata(bool metadata) = 0;
+
+	///@}
 
 	/** Access the name of the descriptor
 	 */
@@ -78,6 +90,10 @@ public:
 	 */
 	virtual bool empty() = 0;
 
+	/// \name share
+	/// Shares some data with PDI
+	///@{
+
 	/** Shares some data with PDI
 	 * \param[in,out] data the shared data
 	 * \param read whether read access is granted to other references
@@ -92,6 +108,8 @@ public:
 	 * \return the just shared buffer
 	 */
 	virtual void* share(Ref ref, bool read, bool write) = 0;
+
+	///@}
 
 	/** Releases ownership of a data shared with PDI. PDI is then responsible to
 	 * free the associated memory whenever necessary.

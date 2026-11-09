@@ -64,6 +64,10 @@ class PDI_EXPORT Logger
 	Logger* m_parent_logger = nullptr;
 
 public:
+	/// \name Logger
+	/// Creates a new logger
+	///@{
+
 	/// Creates new empty logger
 	Logger();
 
@@ -87,6 +91,12 @@ public:
 	 */
 	Logger(Logger& parent_logger, const std::string& logger_name, PC_tree_t config);
 
+	///@}
+
+	/// \name setup
+	/// Sets up the logger
+	///@{
+
 	/** Sets up the logger
 	 * \param[in] logger_name logger name that will be displayed
 	 * \param[in] config configuration tree from config file
@@ -101,11 +111,24 @@ public:
 	 */
 	void setup(Logger& parent_logger, const std::string& logger_name, PC_tree_t config);
 
+	///@}
+
+	/// \name pattern
+	/// Changes or returns the pattern of the logger
+	///@{
+
 	/** Changes pattern of the logger
 	 *
 	 * \param[in] pattern pattern to set
 	 */
 	void pattern(const std::string& pattern);
+
+	/** Returns pattern of the logger
+	 * \return pattern of the logger
+	 */
+	const std::string& pattern() const;
+
+	///@}
 
 	/** Changes pattern of the global logger
 	 *
@@ -137,10 +160,9 @@ public:
 	*/
 	void add_pattern_global_block(const std::string& block);
 
-	/** Returns pattern of the logger
-	 * \return pattern of the logger
-	 */
-	const std::string& pattern() const;
+	/// \name level
+	/// Sets or returns the level of the logger
+	///@{
 
 	/** Sets logger level
 	 * \param[in] log_level level to set
@@ -151,6 +173,8 @@ public:
 	 * \return level of the logger
 	 */
 	spdlog::level::level_enum level() const;
+
+	///@}
 
 	/** Evaluate pattern
 	 *
