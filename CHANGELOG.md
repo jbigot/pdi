@@ -105,6 +105,9 @@ and this project adheres to
 * The examples of the Pycall plugin page are run by PDI, and the output of its
   full example compared to that of a real run, where it showed log lines that
   depend on the installation, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the datatypes and $-expressions references are checked
+  against what PDI makes of them, where the float and string formats applied to
+  an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
