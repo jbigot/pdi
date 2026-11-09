@@ -1,9 +1,9 @@
 # Trace plugin {#trace_plugin}
 
-The trace plugin is intended to generate a trace of what happens in 
+The Trace plugin generates a trace of what happens in the
 \ref Data_store "PDI data store".
 
-The plugin is very simple; just list its name in the 
+The plugin is very simple: just list its name in the
 \ref Specification_tree "specification tree" and you're done.
 
 \snippet{trimleft} trace/docs/reference.yml trace_plugin
@@ -14,13 +14,13 @@ standard output by default.
 For example:
 \snippet trace/docs/trace_output.output output
 
-Each line starting by `=>>   data becoming available in the store` means a new
+Each line starting with `=>>   data becoming available in the store` means a new
 piece of data has been shared.
 
-Each line starting by `<<= data stop being available in the store` means a piece
+Each line starting with `<<= data stop being available in the store` means a piece
 of data is being removed from the store.
 
-Each line starting by `!!!                            named event` means a named
+Each line starting with `!!!                            named event` means a named
 event has been emitted.
 
 ## `@trace` {#trace_config}
