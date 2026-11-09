@@ -64,4 +64,5 @@ install(TARGETS pdi_mpi_plugin
 # Tests
 if("${BUILD_TESTING}")
 	add_subdirectory(tests/)
+	add_subdirectory(docs/)
 endif()
