@@ -58,6 +58,12 @@ and this project adheres to
   really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Trace plugin page are run by PDI, and its trace compared
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The Timer plugin reference documents the sequence form of its configuration,
+  the plugins that emit timer events, the format of its output file, and that
+  nothing is written to it when it cannot be locked.
+* The Timer and Serialize plugin references state that their `logging` key
+  only takes a level, and the Decl'HDF5 one that an attribute write cannot be an
+  element of a sequence of writes.
 
 #### Security
 
