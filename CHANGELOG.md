@@ -150,6 +150,9 @@ and this project adheres to
   [#802](https://github.com/pdidev/pdi/issues/802).
 * The page of PDI's example shows the code and configuration of the example
   itself, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The source installation page gives commands that work, for the latest
+  release, where it unpacked the archive as bzipped and into the wrong
+  directory, fixing [#960](https://github.com/pdidev/pdi/issues/960).
 
 #### Security
 
