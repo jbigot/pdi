@@ -42,6 +42,8 @@ and this project adheres to
 * The `DISABLE_PDI` CMake option of the example project, which builds it against
   the mock PDI, is renamed `PDI_EXAMPLE_USE_MOCK_PDI`, as per
   [#785](https://github.com/pdidev/pdi/issues/785).
+* Renamed the "How to create a plugin" documentation page from
+  `How_to_create_plugin` to `How_to_create_a_plugin`.
 
 #### Deprecated
 * The `INSTALL_CMAKEDIR` CMake variable, which sets where the PDI CMake package
@@ -228,6 +230,10 @@ and this project adheres to
 * A plugin that does not export its pretty name, now loads under its own name
   instead of crashing PDI, fixing
   [#836](https://github.com/pdidev/pdi/issues/836)
+* Fixed the plugin creation tutorial, whose examples did not compile against
+  the current plugin API. It is now built by the test suite that the CI
+  executes, so that it can no longer go stale. This fixes
+  [#331](https://github.com/pdidev/pdi/issues/331).
 * A test program made of several files that include `pdi/testing.h` now links,
   where `PDI::PdiTest`'s constructor was defined in each of them, fixing
   [#926](https://github.com/pdidev/pdi/issues/926).
