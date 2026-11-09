@@ -212,7 +212,7 @@ Four rules follow from that:
   branch, for instance, nothing outside that branch ever observed it, so it gets no entry.
   Judge every change against the latest release, not against the branch.
 * **Pick the section by who is affected, not by which code you touched.** *For users* is the application or library consumer:
-  someone writing YAML configuration or calling `pdi.h` / `pdi.F90`.
+  someone writing YAML configuration or calling `pdi.h` / the Fortran module.
   *For plugin developers* is whoever writes a `PDI::Plugin` subclass or otherwise codes against the public plugin API.
   A change confined to the library-wide or file-local levels of the [API levels](#api-levels) table is invisible to both and gets no entry, **unless
   it makes something observably better:
@@ -240,6 +240,43 @@ The link closes the list item and is worded as part of the sentence:
 * Any change to `pdi/include/pdi.h` **must** be mirrored in `mock_pdi/pdi.h`.
 * New CMake options, changes to the YAML configuration and changes to the API must be documented in `pdi/docs/`.
 * Document any new or changed function or class with doxygen.
+
+#### Make the examples testable
+
+The user documentation in `pdi/docs/` and in the pages of each plugin is built by doxygen.
+An example written inline in a fenced ```` ``` ```` block is a copy that nothing checks: it silently goes stale as the code, the specification tree
+grammar or the log format change around it.
+**Write examples in files that are built and run, and pull them into the documentation with the doxygen `\snippet` command.**
+The files of the examples of a page live in a directory named after it, in `pdi/docs/` or in `plugins/<plugin>/docs/`, and the test suite that CI
+executes builds and runs them, so that an example that stops working breaks the tests rather than misleading a reader.
+Delimit the region to show with a `//! [label]` comment on either side in code, `#! [label]` in YAML, and refer to it as `\snippet <path> label`.
+The markers themselves never appear in the rendered page.
+A region that holds a marker must not sit inside another region the documentation shows: the inner markers would appear in that listing.
+
+Doxygen, and the site generated from its output, highlight a listing in the language of the file it comes from: a C snippet comes from a `.c`
+file, a YAML one from a `.yml` file.
+How to make each kind of block testable:
+
+* **Code** is the simple case: put it in a file the documentation `\snippet`s and that a `CMakeLists.txt` beside it builds.
+  Compiling is enough for an example that only illustrates the syntax of an API.
+* **A specification tree** goes in a `.yml` file, whole, even when the page only shows part of it: `\snippet{trimleft}` removes the indentation
+  of a region taken from deep in the tree.
+  The examples of a reference page share a file, whose root keys each name a whole specification tree, as in
+  `plugins/decl_hdf5/docs/reference.yml`; the part that the page does not show completes the example, declaring its data or sharing what it uses.
+  `pdi_doc_run_trees()`, in `pdi/docs/RunTrees.cmake`, adds a test per tree, that initializes %PDI with it, shares its data and emits the events
+  its plugins react to; its options cover the trees that need MPI, values, functions or plugins of their own.
+  An example that a program loads reads its tree from the file, as in `plugins/pycall/docs/pycall_example.c`.
+* **Feed a specification tree to `PDI_init`, not to paraconf alone.**
+  Paraconf only tells that a tree is valid YAML; %PDI tells that it is a valid specification tree, which is what catches a misspelled type or a key
+  in the wrong place, and sharing its data is what makes the plugins act on it.
+  Plain YAML that only illustrates the format is parsed, as `pdi/docs/Yaml/format.yaml` is.
+* **What the documentation says of an example** is checked by a test of its own: the value of an expression in
+  `pdi/docs/Spectree_expressions/expressions.yml`, the layout of a datatype in `pdi/tests/PDI_doc_datatype.cxx`, the files written in the tests of
+  the examples pages.
+* **An expected output** goes in a `.output` file that the documentation `\snippet`s and that the test compares the run against, so that the same text
+  is shown and asserted.
+  `pdi/docs/run_and_compare.cmake` runs an example and does that comparison; see `plugins/pycall/docs/pycall_example.output` for the shape of such a
+  file.
 
 ### Copyright and authorship
 
