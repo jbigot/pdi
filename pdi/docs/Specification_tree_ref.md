@@ -29,19 +29,7 @@ Keys not listed below are ignored.
 
 **Example:**
 
-```yaml
-include: common.yml          # more of the tree, from another file
-logging: info                # the logger of PDI
-types:
-  vector3_t: {type: array, subtype: double, size: 3}
-metadata:
-  iter: int
-data:
-  position: vector3_t
-plugin_path: /opt/pdi/plugins
-plugins:
-  trace: ~
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi
 
 This is a whole specification tree: either the root of a YAML file passed to `PDI_init`, or a subtree of one.
 
@@ -61,11 +49,7 @@ The same file can be included twice (a diamond include), in which case it is onl
 
 **Example:**
 
-```yaml
-include: common.yml   # <- reads common.yml as if its content were here
-data:
-  field: double
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_include
 
 The scalar form is a shortcut for `include: [{file: common.yml, subtree: ""}]`.
 
@@ -80,11 +64,7 @@ Each plugin has its own logger, see \ref spectree_pdi_plugins_plugin_name_loggin
 
 **Example:**
 
-```yaml
-logging: debug        # <- PDI logs what it does in detail
-data:
-  field: double
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_logging
 
 
 ### `@pdi.types.<type_name>` {#spectree_pdi_types_type_name}
@@ -97,13 +77,7 @@ A user-defined datatype cannot reuse the name of an existing datatype.
 
 **Example:**
 
-```yaml
-types:
-  vector3_t: {type: array, subtype: double, size: 3}   # <- defines vector3_t...
-data:
-  position: vector3_t                                 # ... used here
-  velocity: vector3_t
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_types_type_name
 
 
 ### `@pdi.metadata.<data_name>` {#spectree_pdi_metadata_data_name}
@@ -116,16 +90,7 @@ A name can only be defined once among all \ref spectree_pdi_metadata_data_name a
 
 **Example:**
 
-```yaml
-metadata:
-  iter: int               # <- PDI keeps a copy of iter at each share
-data:
-  field: {type: array, subtype: double, size: 64}
-plugins:
-  decl_hdf5:
-    file: field_${iter}.h5   # so that it can use it afterwards
-    write: [field]
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_metadata_data_name
 
 
 ### `@pdi.data.<data_name>` {#spectree_pdi_data_data_name}
@@ -138,10 +103,7 @@ A name can only be defined once among all \ref spectree_pdi_metadata_data_name a
 
 **Example:**
 
-```yaml
-data:
-  field: {type: array, subtype: double, size: [64, 64]}   # <- PDI only references field while it is shared
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_data_data_name
 
 
 ### `@pdi.plugin_path` {#spectree_pdi_plugin_path}
@@ -155,11 +117,7 @@ directory where %PDI installs its plugins, and finally the system library path.
 
 **Example:**
 
-```yaml
-plugin_path: [/home/user/pdi_plugins, /opt/pdi/plugins]   # <- searched in this order
-plugins:
-  my_plugin: ~
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_plugin_path
 
 
 ### `@pdi.plugins.<plugin_name>` {#spectree_pdi_plugins_plugin_name}
@@ -172,13 +130,7 @@ A plugin can only be loaded once, even across included files.
 
 **Example:**
 
-```yaml
-plugins:
-  trace: ~                # <- a plugin with no configuration
-  decl_hdf5:              # <- a plugin with its configuration
-    file: example.h5
-    write: [field]
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_plugins_plugin_name
 
 
 ### `@pdi.plugins.<plugin_name>.logging` {#spectree_pdi_plugins_plugin_name_logging}
@@ -190,13 +142,7 @@ This key is handled by %PDI for every plugin whose configuration is a mapping.
 
 **Example:**
 
-```yaml
-plugins:
-  decl_hdf5:
-    logging: debug        # <- the logger of Decl'HDF5, independent from that of PDI
-    file: example.h5
-    write: [field]
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_pdi_plugins_plugin_name_logging
 
 Each plugin documents this key too, in its own reference.
 
@@ -210,17 +156,7 @@ You can use it in \ref spectree_pdi_logging and \ref spectree_pdi_plugins_plugin
 
 **Example:**
 
-```yaml
-logging: debug            # <- the scalar form, a level only
-plugins:
-  decl_hdf5:
-    logging:                # <- the mapping form
-      level: warn
-      output:
-        file: decl_hdf5.log
-    file: example.h5
-    write: [field]
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_logging
 
 
 ### `@logging.level` {#spectree_logging_level}
@@ -242,9 +178,7 @@ By default, the level is `info` for %PDI, and that of %PDI for a plugin.
 
 **Example:**
 
-```yaml
-level: warn               # <- only warnings and errors
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_logging_level
 
 
 ### `@logging.pattern` {#spectree_logging_pattern}
@@ -261,22 +195,15 @@ optional format specification).
 It is evaluated just after all plugins have been initialized.
 
 By default, the pattern is (where `%n` is `PDI` or a plugin name):
-```
-[%T][%n] *** %^%l%$: %v
-```
+\snippet Specification_tree_ref/default_patterns.txt serial
 for a serial execution, and:
-```
-[%T][MPI %{MPI_COMM_WORLD_rank:06d}][%n] *** %^%l%$: %v
-```
+\snippet Specification_tree_ref/default_patterns.txt mpi
 when the \ref mpi_plugin "MPI plugin" is loaded.
 The pattern of a plugin defaults to that of %PDI.
 
 **Example:**
 
-```yaml
-level: debug
-pattern: "[%{MPI_COMM_WORLD_rank:04d}][%n][%l] %v"   # <- prefixes each line with the MPI rank
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_logging_pattern
 
 `MPI_COMM_WORLD_rank` is shared by the \ref mpi_plugin "MPI plugin", which must then be loaded.
 
@@ -289,11 +216,7 @@ Use `output.file` to write the logs to the file at this path.
 
 **Example:**
 
-```yaml
-level: info
-output:
-  file: pdi.log           # <- the logs go to pdi.log, and no longer to the console
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_logging_output_file
 
 
 ### `@logging.output.console` {#spectree_logging_output_console}
@@ -311,11 +234,7 @@ By default, it is `off` when \ref spectree_logging_output_file is defined and `o
 
 **Example:**
 
-```yaml
-output:
-  file: pdi.log
-  console: on             # <- the logs go to pdi.log, and to the console too
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_logging_output_console
 
 
 ## `@include` {#spectree_include}
@@ -327,12 +246,7 @@ You can use it in \ref spectree_pdi_include.
 
 **Example:**
 
-```yaml
-include:
-  - common.yml            # <- an include directive, in its scalar form...
-  - file: other.yml       # <- ... and in its mapping form
-    subtree: .pdi
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_include
 
 
 ### `@include.file` {#spectree_include_file}
@@ -344,10 +258,7 @@ The path is interpreted relative to the working directory of the execution.
 
 **Example:**
 
-```yaml
-file: config/common.yml   # <- relative to the working directory, not to the including file
-subtree: ""
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_include_file
 
 
 ### `@include.subtree` {#spectree_include_subtree}
@@ -364,9 +275,6 @@ The ypath follows the syntax of paraconf, where:
 
 **Example:**
 
-```yaml
-file: simulation.yml
-subtree: .pdi             # <- only the pdi key at the root of simulation.yml
-```
+\snippet{trimleft} Specification_tree_ref/spectree.yml spectree_include_subtree
 
 

@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
+#include <filesystem>
 #include <fstream>
 
 #include <pdi/testing.h>
@@ -318,4 +319,50 @@ metadata:
 
 	int constexpr array_size = 7;
 	PDI_expose("array_size", &array_size, PDI_OUT);
+}
+
+// The forms of the `include' keyword that the specification tree reference
+// documents, a subtree that selects an element of a sequence included.
+TEST_F(IncludeTest, DocumentedForms)
+{
+	{
+		std::filesystem::create_directories("my");
+		std::ofstream("my/file.yaml") << R"==(
+metadata:
+  my_int: int
+pdi:
+  metadata:
+    my_other_int: int
+)==";
+		std::ofstream("relative_file.yaml") << R"==(
+- metadata: {first_int: int}
+- metadata: {second_int: int}
+)==";
+	}
+
+	InitPdi(PC_parse_string(R"==(
+include:
+  file: "my/file.yaml"
+  subtree: ""
+)=="));
+
+	InitPdi(PC_parse_string(R"==(
+include:
+  file: "my/file.yaml"
+  subtree: ".pdi"
+)=="));
+
+	// a single include is a shortcut for a sequence holding it
+	InitPdi(PC_parse_string(R"==(
+include:
+  - file: "my/file.yaml"
+    subtree: ".pdi"
+)=="));
+
+	// a subtree can also select an element of a sequence
+	InitPdi(PC_parse_string(R"==(
+include:
+  file: "relative_file.yaml"
+  subtree: "[1]"
+)=="));
 }

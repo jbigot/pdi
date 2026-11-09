@@ -88,6 +88,9 @@ and this project adheres to
   whatever it is, and an expression that ends with a lone `\` is now reported
   as an error instead of crashing, fixing
   [#846](https://github.com/pdidev/pdi/issues/846)
+* The examples of the specification tree reference are run by PDI, and its
+  default log patterns checked against what PDI logs, where one of them loaded a
+  plugin that does not exist, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

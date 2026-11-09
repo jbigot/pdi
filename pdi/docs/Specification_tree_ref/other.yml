@@ -1,0 +1,4 @@
+# Included by the examples of spectree.yml, from its pdi subtree
+pdi:
+  metadata:
+    step: int
