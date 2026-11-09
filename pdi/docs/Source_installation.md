@@ -42,15 +42,20 @@ external dependencies are:
 This list of dependencies can be further reduced or extended by changing the
 set of features compiled.
 
-For example, release 1.13.0 can be installed by following these instructions (but
-look for the latest release at
+For example, release 1.13.0 can be installed by following these
+instructions (but look for the latest release at
 https://github.com/pdidev/pdi/releases ):
 
 ```bash
-wget https://github.com/pdidev/pdi/archive/refs/tags/1.13.0.tar.gz
-tar -xjf 1.13.0.tar.gz
-mkdir 1.13.0/build
-cd 1.13.0/build
+curl -LO https://github.com/pdidev/pdi/archive/refs/tags/1.13.0.tar.gz
+tar -xzf 1.13.0.tar.gz
+```
+
+then, to build and install it:
+
+```bash
+mkdir pdi-1.13.0/build
+cd pdi-1.13.0/build
 cmake -DCMAKE_INSTALL_PREFIX="${HOME}/.local/" ..   # configuration
 make install   # compilation and installation
 ```

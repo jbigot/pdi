@@ -36,6 +36,9 @@ and this project adheres to
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
 * The User-code plugin reference gives examples with the access rights they need.
+* The source installation page gives commands that work, for the latest
+  release, where it unpacked the archive as bzipped and into the wrong
+  directory, fixing [#960](https://github.com/pdidev/pdi/issues/960).
 
 #### Security
 
