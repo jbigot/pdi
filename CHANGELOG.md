@@ -138,6 +138,8 @@ and this project adheres to
 * The examples of the Decl'NetCDF plugin reference are run by PDI, where its
   I/O example lacked the description of the variable it writes to, as part of
   [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the JSON plugin page and reference are run by PDI, as part of
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
