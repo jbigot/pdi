@@ -1,0 +1,112 @@
+# The examples of the JSON plugin documentation (README.md and reference.md), one whole specification tree per key, that the pages show the
+# marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+json_configuration_grammar:
+  metadata:
+    iteration: int
+  data:
+    data1: int
+    data2: double
+    data3: {type: array, subtype: int, size: 4}
+  #! [json_configuration_grammar]
+  plugins:
+    json:
+      - data1: file_path.json
+      - file: file_path_${iteration}.json
+        when: $iteration % 10 = 0
+        write: [data2, data3]
+  #! [json_configuration_grammar]
+
+json_config:
+  data:
+    my_data: int
+  #! [json_config]
+  plugins:
+    json:                   # <- a single file description...
+      my_data: my_data.json
+  #! [json_config]
+
+json_config_sequence:
+  data:
+    my_data: int
+    data1: int
+    data2: double
+  #! [json_config_sequence]
+  plugins:
+    json:                   # <- ... or a sequence of them
+      - my_data: my_data.json
+      - file: all.json
+        write: [data1, data2]
+  #! [json_config_sequence]
+
+json_logging:
+  data:
+    my_data: int
+  plugins:
+    json:
+      #! [json_logging]
+      my_data: my_data.json
+      logging: debug          # <- after the data name
+      #! [json_logging]
+
+json_jsonfile:
+  data:
+    my_data: int
+    data1: int
+    data2: double
+  #! [json_jsonfile]
+  plugins:
+    json:
+      - my_data: my_data.json   # <- a file description of the <data_name> form
+      - file: all.json          # <- a file description of the file form
+        write: [data1, data2]
+  #! [json_jsonfile]
+
+json_jsonfile_data_name:
+  metadata:
+    rank: int
+  data:
+    step: int
+  plugins:
+    json:
+      #! [json_jsonfile_data_name]
+      step: step_${rank}.json   # <- writes step to a file per process
+      #! [json_jsonfile_data_name]
+
+json_jsonfile_file:
+  metadata:
+    rank: int
+  data:
+    temp: double
+    step: int
+  plugins:
+    json:
+      #! [json_jsonfile_file]
+      file: output_${rank}.json # <- first key: this file description is of the file form
+      write: [temp, step]
+      #! [json_jsonfile_file]
+
+json_jsonfile_write:
+  data:
+    temp: double
+    step: int
+  plugins:
+    json:
+      #! [json_jsonfile_write]
+      file: output.json
+      write: [temp, step]       # <- each written when it is shared
+      #! [json_jsonfile_write]
+
+json_jsonfile_when:
+  metadata:
+    step: int
+  data:
+    temp: double
+  plugins:
+    json:
+      #! [json_jsonfile_when]
+      file: output.json
+      when: $step % 10 = 0      # <- one share out of ten
+      write: [temp]
+      #! [json_jsonfile_when]
