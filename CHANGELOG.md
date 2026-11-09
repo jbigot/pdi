@@ -29,6 +29,8 @@ and this project adheres to
 * The specification tree reference, and that of each plugin, gives an example
   for each key: a minimal configuration of its block, its line commented. The
   values of a key that takes one of a fixed set of them are listed in a table.
+* Renamed the "How to create a plugin" documentation page from
+  `How_to_create_plugin` to `How_to_create_a_plugin`.
 
 #### Deprecated
 
@@ -73,6 +75,10 @@ and this project adheres to
 #### Removed
 
 #### Fixed
+* Fixed the plugin creation tutorial, whose examples did not compile against
+  the current plugin API. It is now built by the test suite that the CI
+  executes, so that it can no longer go stale. This fixes
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

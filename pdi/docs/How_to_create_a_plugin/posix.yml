@@ -1,0 +1,15 @@
+# The specification tree of the POSIX plugin of the plugin creation tutorial (How_to_create_a_plugin.md), that posix.cxx reads.
+# Its test initializes PDI with it, which loads that plugin.
+
+posix:
+  #! [yaml]
+  data:
+    some_data: {type: array, subtype: int, size: 64}
+    can_recover_data: int
+
+  plugins:
+    posix:
+      data:
+        some_data: /file_path/
+      can_recover_all: can_recover_data
+  #! [yaml]
