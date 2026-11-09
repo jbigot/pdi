@@ -145,6 +145,9 @@ and this project adheres to
   part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The page of PDI's example shows the code and configuration of the example
   itself, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The source installation page gives commands that work, for the latest
+  release, where it unpacked the archive as bzipped and into the wrong
+  directory; CI runs them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the specification tree reference are run by PDI, and its
   default log patterns checked against what PDI logs, where one of them loaded a
   plugin that does not exist, as part of [#331](https://github.com/pdidev/pdi/issues/331).
