@@ -69,6 +69,9 @@ and this project adheres to
 * The Pycall plugin reference gives examples with working Python code, and
   documents how the plugin exposes values and handles errors, part of
   [#916](https://github.com/pdidev/pdi/issues/916).
+* The examples of the Pycall plugin page are run by PDI, and the output of its
+  full example compared to that of a real run, where it showed log lines that
+  depend on the installation, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
