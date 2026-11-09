@@ -131,6 +131,9 @@ and this project adheres to
   that works, by its test.
 * The API reference names the deprecated statuses `PDI_UNAVAILABLE`,
   `PDI_ERR_CONFIG` and `PDI_ERR_RIGHT`, instead of their deprecation macro.
+* The page on using PDI shows CMake and code that the tests build and run,
+  where it named a C source for Fortran and gave `PDI_init` a stray bracket, as
+  part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
