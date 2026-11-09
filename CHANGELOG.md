@@ -89,6 +89,13 @@ and this project adheres to
   [#916](https://github.com/pdidev/pdi/issues/916).
 * The Decl'NetCDF plugin reference documents that the data it reads and writes
   must be dense, part of [#916](https://github.com/pdidev/pdi/issues/916).
+* The Trace plugin reference shows where the plugin writes its trace, and in
+  which format, and documents its `logging` key, part of
+  [#916](https://github.com/pdidev/pdi/issues/916).
+* The examples of the first steps build and run, and show the output PDI
+  really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Trace plugin page are run by PDI, and its trace compared
+  to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

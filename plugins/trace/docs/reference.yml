@@ -1,0 +1,27 @@
+# The examples of the Trace plugin documentation (README.md), one whole specification tree per key, that the page shows the marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+trace_plugin:
+  #! [trace_plugin]
+  data: #...
+  metadata: #...
+  plugins:
+    trace:
+    #...
+  #! [trace_plugin]
+
+trace_config:
+  #! [trace_config]
+  plugins:
+    trace: ~                # <- no configuration: the trace goes to the standard output
+  #! [trace_config]
+
+trace_logging:
+  plugins:
+    trace:
+      #! [trace_logging]
+      logging:
+        level: info
+        output:
+          file: trace.log   # <- the trace goes to trace.log instead of the standard output
+      #! [trace_logging]
