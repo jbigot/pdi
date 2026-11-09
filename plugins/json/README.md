@@ -63,10 +63,8 @@ Next, users can activate the json_plugin by adding `BUILD_JSON_PLUGIN=ON` option
 
 Once the plugin is installed, the easiest way to test it is the example of `example/`, a full, somewhat realistic C simulation code that uses PDI with the JSON plugin.
 
-To use it, first build PDI with CMake, with `BUILD_TESTING` set to `ON`, then run:
-```bash
-build/PDI_EXAMPLE/PDI_example_C example/json.yml
-```
+To use it, first build PDI with CMake, with `BUILD_TESTING` set to `ON`, then run its `PDI_example_json_C` test, that runs it on 4 MPI processes
+with `example/json.yml`, from the build directory: `ctest -R PDI_example_json_C`.
 
 <!-- ### Example output -->
 
