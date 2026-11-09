@@ -109,6 +109,13 @@ and this project adheres to
 * The examples of the User-code plugin reference are run by PDI, with the
   functions they call, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Serialize plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The Timer plugin reference documents the sequence form of its configuration,
+  the plugins that emit timer events, the format of its output file, and that
+  nothing is written to it when it cannot be locked.
+* The Timer and Serialize plugin references state that their `logging` key
+  only takes a level, and the Decl'HDF5 one that an attribute write cannot be an
+  element of a sequence of writes.
+* The examples of the Timer plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
