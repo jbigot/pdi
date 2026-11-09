@@ -1,0 +1,60 @@
+# The examples of the MPI plugin documentation (README.md), one whole specification tree per key, that the page shows the marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+mpi_configuration:
+  #! [mpi_configuration]
+  data:
+    mpi_comm: MPI_Comm
+    mpi_comm_f: MPI_Comm_f
+  plugins:
+    mpi:
+      Comm_c2f:
+        mpi_comm: m_mpi_comm_f
+      Comm_f2c:
+        mpi_comm_f: m_mpi_comm
+  #! [mpi_configuration]
+
+mpi_config:
+  #! [mpi_config]
+  plugins:
+    mpi: ~                  # <- no configuration: only the MPI metadata and types
+  #! [mpi_config]
+
+mpi_config_mapping:
+  #! [mpi_config_mapping]
+  plugins:
+    mpi:                    # <- with communicators to transtype
+      Comm_c2f:
+        my_comm: my_comm_f
+  #! [mpi_config_mapping]
+
+mpi_Comm_c2f_data_name:
+  plugins:
+    mpi:
+      #! [mpi_Comm_c2f_data_name]
+      Comm_c2f:
+        my_comm: my_comm_f      # <- each time my_comm (an MPI_Comm) is shared, its Fortran handle is shared as my_comm_f
+      #! [mpi_Comm_c2f_data_name]
+
+mpi_Comm_f2c_data_name:
+  plugins:
+    mpi:
+      #! [mpi_Comm_f2c_data_name]
+      Comm_f2c:
+        my_comm_f: my_comm      # <- each time my_comm_f (an MPI_Comm_f) is shared, its C handle is shared as my_comm
+      #! [mpi_Comm_f2c_data_name]
+
+mpi_transtype_data_name:
+  plugins:
+    mpi:
+      #! [mpi_transtype_data_name]
+      transtype:
+        my_comm: my_comm_f      # <- deprecated: Comm_c2f: {my_comm: my_comm_f}
+      #! [mpi_transtype_data_name]
+
+mpi_logging:
+  plugins:
+    mpi:
+      #! [mpi_logging]
+      logging: debug            # <- the logger of the MPI plugin
+      #! [mpi_logging]
