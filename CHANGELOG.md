@@ -58,6 +58,12 @@ and this project adheres to
   the type spellings, literals and redefinition rules PDI applies.
 * The Trace plugin reference shows where the plugin writes its trace, and in
   which format, and documents its `logging` key.
+* The Timer plugin reference documents the sequence form of its configuration,
+  the plugins that emit timer events, the format of its output file, and that
+  nothing is written to it when it cannot be locked.
+* The Timer and Serialize plugin references state that their `logging` key
+  only takes a level, and the Decl'HDF5 one that an attribute write cannot be an
+  element of a sequence of writes.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
