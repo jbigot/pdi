@@ -185,7 +185,7 @@ A plugin defines a `class <name>_plugin:
 public PDI::Plugin` with a constructor taking `(PDI::Logger&, PDI::Context&, PC_tree_t)` and invokes the `PDI_PLUGIN(<name>)` macro, which emits the
 loader together with the optional `dependencies()` and `pretty_name()` hooks.
 Plugins do their work by registering callbacks on the context from their constructor.
-`pdi/docs/How_to_create_plugin.md` is the reference for writing one.
+`pdi/docs/How_to_create_a_plugin.md` is the reference for writing one.
 
 ### Tests
 

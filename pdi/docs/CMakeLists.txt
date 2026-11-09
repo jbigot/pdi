@@ -36,7 +36,7 @@ set(DOXYGEN_INPUT
 		"${CMAKE_CURRENT_SOURCE_DIR}/Concepts.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/FAQ.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/First_steps.md"
-		"${CMAKE_CURRENT_SOURCE_DIR}/How_to_create_plugin.md"
+		"${CMAKE_CURRENT_SOURCE_DIR}/How_to_create_a_plugin.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Installation.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Plugins.md"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Source_installation.md"
@@ -82,3 +82,4 @@ add_custom_target(doc ALL
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/" DESTINATION "${CMAKE_INSTALL_DOCDIR}/html")
 
 add_subdirectory(First_steps)
+add_subdirectory(How_to_create_a_plugin)

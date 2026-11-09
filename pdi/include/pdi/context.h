@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2024 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * Copyright (C) 2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
  * Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
  * All rights reserved.
@@ -142,7 +142,9 @@ public:
 	 *
 	 * \return function that removes callback
 	 */
+	// [on_data]
 	virtual std::function<void()> on_data(const std::function<void(const std::string&, Ref)>& callback, const std::string& name = {}) = 0;
+	// [on_data]
 
 	/** Adds new data remove callback to context
 	 *
