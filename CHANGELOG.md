@@ -137,6 +137,9 @@ and this project adheres to
 * A plugin that does not export its pretty name, now loads under its own name
   instead of crashing PDI, fixing
   [#836](https://github.com/pdidev/pdi/issues/836)
+* A test program made of several files that include `pdi/testing.h` now links,
+  where `PDI::PdiTest`'s constructor was defined in each of them, fixing
+  [#926](https://github.com/pdidev/pdi/issues/926).
 
 #### Security
 
