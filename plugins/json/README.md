@@ -22,14 +22,7 @@ The JSON plugin cannot yet wait for several variables to be readable before writ
 
 ## Example of a JSON configuration {#json_configuration_grammar}
 
-```yaml
-plugins:
-  json:
-    - data1: file_path.json
-    - file: file_path_${iteration}.json
-      when: $iteration % 10 = 0
-      write: [data2, data3]
-```
+\snippet{trimleft} json/docs/reference.yml json_configuration_grammar
 
 More examples are given in `example/json.yml`.
 

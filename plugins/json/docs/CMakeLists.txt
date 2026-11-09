@@ -55,3 +55,7 @@ target_link_libraries(json_examples PDI::PDI_C nlohmann_json::nlohmann_json GTes
 target_compile_definitions(json_examples PRIVATE "EXAMPLES_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 target_compile_features(json_examples PRIVATE cxx_std_17)
 gtest_discover_tests(json_examples)
+
+# The specification trees of the configuration reference (reference.yml), and of the README, run by PDI.
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../../pdi/docs/RunTrees.cmake")
+pdi_doc_run_trees(json_reference "${CMAKE_CURRENT_SOURCE_DIR}/reference.yml")
