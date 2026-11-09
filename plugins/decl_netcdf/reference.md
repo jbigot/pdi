@@ -11,24 +11,12 @@ Use it, as the value of `plugins.decl_netcdf` (see \ref spectree_pdi_plugins_plu
 
 **Example:**
 
-```yaml
-plugins:
-  decl_netcdf:            # <- a single file description...
-    file: result.nc
-    write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_config
 
 
 **Example:**
 
-```yaml
-plugins:
-  decl_netcdf:            # <- ... or a sequence of them, one per file and direction
-    - file: result.nc
-      write: [field]
-    - file: restart.nc
-      read: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_config_sequence
 
 
 ### `@decl_netcdf.logging` {#decl_netcdf_logging}
@@ -40,11 +28,7 @@ It is only taken into account when the value of `@decl_netcdf` is a single \ref 
 
 **Example:**
 
-```yaml
-logging: debug            # <- only in the single file description form
-file: result.nc
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_logging
 
 
 ## `@ncfile` {#decl_netcdf_ncfile}
@@ -55,13 +39,7 @@ You can use it in \ref decl_netcdf_config.
 
 **Example:**
 
-```yaml
-plugins:
-  decl_netcdf:
-    file: checkpoint_${iter}.nc   # <- this mapping is a file description:
-    on_event: checkpoint          #    which file, when it is accessed,
-    write: [field, iter]          #    and what is written to it
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile
 
 
 ### `@ncfile.file` {#decl_netcdf_ncfile_file}
@@ -72,10 +50,7 @@ Use `file` to give the path of the file to read or write.
 
 **Example:**
 
-```yaml
-file: output_${iter}.nc   # <- evaluated at each access
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_file
 
 
 ### `@ncfile.communicator` {#decl_netcdf_ncfile_communicator}
@@ -89,11 +64,7 @@ All processes must use the same communicator and file name.
 
 **Example:**
 
-```yaml
-file: output.nc
-communicator: $MPI_COMM_WORLD   # <- all processes access output.nc, the MPI plugin defines $MPI_COMM_WORLD
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference_parallel.yml decl_netcdf_ncfile_communicator
 
 
 ### `@ncfile.on_event` {#decl_netcdf_ncfile_on_event}
@@ -105,11 +76,7 @@ If it is not specified, each data is read or written when it is shared.
 
 **Example:**
 
-```yaml
-file: checkpoint.nc
-on_event: [checkpoint, finalization]   # <- the file is written on either event
-write: [field, iter]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_on_event
 
 
 ### `@ncfile.when` {#decl_netcdf_ncfile_when}
@@ -120,11 +87,7 @@ Use `when` to set the condition under which the plugin accesses the file.
 
 **Example:**
 
-```yaml
-file: output.nc
-when: $iter % 10 = 0      # <- one access out of ten
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_when
 
 
 ### `@ncfile.deflate` {#decl_netcdf_ncfile_deflate}
@@ -136,11 +99,7 @@ It can be overridden for each variable, see \ref decl_netcdf_ncfile_variables_va
 
 **Example:**
 
-```yaml
-file: output.nc
-deflate: 6                # <- every variable of output.nc is compressed, but those that set their own level
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_deflate
 
 
 ### `@ncfile.groups.<group_path>` {#decl_netcdf_ncfile_groups_group_path}
@@ -151,15 +110,7 @@ A group without attributes can be omitted: Decl'NetCDF creates the groups of eve
 
 **Example:**
 
-```yaml
-file: output.nc
-groups:
-  results/fields:         # <- the fields group, in the results group
-    attributes:
-      step: $iter
-write:
-  field: {variable: results/fields/field}
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_groups_group_path
 
 
 ### `@ncfile.groups.<group_path>.attributes` {#decl_netcdf_ncfile_groups_group_path_attributes}
@@ -170,15 +121,7 @@ Use `attributes` to read or write the attributes of the group.
 
 **Example:**
 
-```yaml
-file: output.nc
-groups:
-  results:
-    attributes:           # <- the attributes of the results group
-      step: $iter
-write:
-  field: {variable: results/field}
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_groups_group_path_attributes
 
 
 ### `@ncfile.variables.<variable_path>` {#decl_netcdf_ncfile_variables_variable_path}
@@ -192,16 +135,7 @@ arbitrarily.
 
 **Example:**
 
-```yaml
-file: output.nc
-variables:
-  results/field:          # <- the field variable, in the results group
-    dimensions: [height, width]
-    attributes:
-      units: kelvin
-write:
-  field: {variable: results/field}
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_variables_variable_path
 
 
 ### `@ncfile.variables.<variable_path>.type` {#decl_netcdf_ncfile_variables_variable_path_type}
@@ -214,17 +148,7 @@ It also makes it possible to define an `UNLIMITED` dimension, by setting its siz
 
 **Example:**
 
-```yaml
-file: history.nc
-variables:
-  field:
-    type: array           # <- the variable has one more dimension than the data,
-    subtype: double
-    size: [0, 64, 64]     #    an UNLIMITED one, with one entry per iteration
-write:
-  field:
-    variable_selection: {start: [$iter, 0, 0], subsize: [1, 64, 64]}
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_variables_variable_path_type
 
 
 ### `@ncfile.variables.<variable_path>.dimensions` {#decl_netcdf_ncfile_variables_variable_path_dimensions}
@@ -236,13 +160,7 @@ A value that is not a sequence is ignored.
 
 **Example:**
 
-```yaml
-file: output.nc
-variables:
-  field:
-    dimensions: [height, width]   # <- instead of names chosen by the plugin
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_variables_variable_path_dimensions
 
 
 ### `@ncfile.variables.<variable_path>.attributes` {#decl_netcdf_ncfile_variables_variable_path_attributes}
@@ -253,15 +171,7 @@ Use `attributes` to read or write the attributes of the variable.
 
 **Example:**
 
-```yaml
-file: output.nc
-variables:
-  field:
-    attributes:           # <- the attributes of the field variable
-      units: kelvin
-      step: $iter
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_variables_variable_path_attributes
 
 
 ### `@ncfile.variables.<variable_path>.deflate` {#decl_netcdf_ncfile_variables_variable_path_deflate}
@@ -274,13 +184,7 @@ It defaults to \ref decl_netcdf_ncfile_deflate, and `0` means no compression.
 
 **Example:**
 
-```yaml
-file: output.nc
-variables:
-  field:
-    deflate: 9            # <- overrides the level of the file
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_variables_variable_path_deflate
 
 
 ### `@ncfile.variables.<variable_path>.chunking` {#decl_netcdf_ncfile_variables_variable_path_chunking}
@@ -293,14 +197,7 @@ If it is not specified, NetCDF chooses the chunking automatically.
 
 **Example:**
 
-```yaml
-file: output.nc
-variables:
-  field:
-    deflate: 6
-    chunking: [16, 64]    # <- chunks of 16x64 elements instead of those NetCDF would choose
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_variables_variable_path_chunking
 
 
 ### `@ncfile.write.<data_name>` {#decl_netcdf_ncfile_write_data_name}
@@ -313,38 +210,12 @@ Its datatype must be dense, without `subsize` or `start`: Decl'NetCDF writes its
 
 **Example:**
 
-```yaml
-file: matrix.nc
-variables:
-  integer_matrix:
-    type: array
-    subtype: int
-    size: [8, 8]
-write:
-  int_submatrix:          # <- a 4x4 data written to the bottom-right corner of an 8x8 variable
-    variable: integer_matrix
-    variable_selection:
-      start: [4, 4]
-      subsize: [4, 4]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_write_data_name
 
 
 To write a record, its type needs the `+decl_netcdf.type` attribute:
 
-```yaml
-data:
-  particle:
-    type: struct
-    +decl_netcdf.type: particle_xyz   # the name of the NetCDF compound type
-    members:
-      - x: double
-      - y: double
-      - z: double
-plugins:
-  decl_netcdf:
-    file: particles.nc
-    write: [particle]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_write_data_name_compound
 
 
 ### `@ncfile.write[*]` {#decl_netcdf_ncfile_write_item}
@@ -356,10 +227,7 @@ The NetCDF variable has the name of the descriptor, unless it is described in \r
 
 **Example:**
 
-```yaml
-file: output.nc
-write: [field, iter]      # <- field and iter, each to the variable of the same name
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_write_item
 
 
 ### `@ncfile.read.<data_name>` {#decl_netcdf_ncfile_read_data_name}
@@ -370,17 +238,7 @@ Its datatype must be dense, as for \ref decl_netcdf_ncfile_write_data_name.
 
 **Example:**
 
-```yaml
-file: matrix.nc
-read:
-  matrix_size:
-    size_of: integer_matrix   # <- reads the size of the variable, [8, 8]
-  int_submatrix:              # <- reads its bottom-right 4x4 corner
-    variable: integer_matrix
-    variable_selection:
-      start: [4, 4]
-      subsize: [4, 4]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_read_data_name
 
 
 ### `@ncfile.read[*]` {#decl_netcdf_ncfile_read_item}
@@ -392,10 +250,7 @@ The NetCDF variable must have the name of the descriptor and the same type, and 
 
 **Example:**
 
-```yaml
-file: restart.nc
-read: [field, iter]       # <- field and iter, each from the variable of the same name
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncfile_read_item
 
 
 ## `@ncio` {#decl_netcdf_ncio}
@@ -406,14 +261,7 @@ You can use it in \ref decl_netcdf_ncfile_write_data_name and \ref decl_netcdf_n
 
 **Example:**
 
-```yaml
-file: history.nc
-write:
-  field:                  # <- this mapping is an I/O description
-    variable: field_history
-    when: $iter > 0
-    variable_selection: {start: [$iter, 0], subsize: [1, 64]}
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncio
 
 
 ### `@ncio.variable` {#decl_netcdf_ncio_variable}
@@ -424,9 +272,7 @@ Use `variable` to give the path of the variable to access, which may be describe
 
 **Example:**
 
-```yaml
-variable: results/field   # <- the variable field, in the results group
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncio_variable
 
 
 ### `@ncio.when` {#decl_netcdf_ncio_when}
@@ -437,10 +283,7 @@ Use `when` to set the condition under which the plugin accesses this descriptor.
 
 **Example:**
 
-```yaml
-variable: field
-when: $iter > 0           # <- not at the first iteration
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncio_when
 
 
 ### `@ncio.variable_selection` {#decl_netcdf_ncio_variable_selection}
@@ -451,12 +294,7 @@ Use `variable_selection` to access only a part (hyperslab) of the NetCDF variabl
 
 **Example:**
 
-```yaml
-variable: field_history
-variable_selection:       # <- the row of this iteration
-  start: [$iter, 0]
-  subsize: [1, 64]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncio_variable_selection
 
 
 ### `@ncio.variable_selection.start` {#decl_netcdf_ncio_variable_selection_start}
@@ -467,12 +305,7 @@ Use `start` to set the start index of the selection in each dimension.
 
 **Example:**
 
-```yaml
-variable: field_history
-variable_selection:
-  start: [$iter, 0]       # <- from the row of this iteration
-  subsize: [1, 64]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncio_variable_selection_start
 
 
 ### `@ncio.variable_selection.subsize` {#decl_netcdf_ncio_variable_selection_subsize}
@@ -483,12 +316,7 @@ Use `subsize` to set the number of elements (count) of the selection in each dim
 
 **Example:**
 
-```yaml
-variable: field_history
-variable_selection:
-  start: [$iter, 0]
-  subsize: [1, 64]        # <- a single row of 64 elements
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncio_variable_selection_subsize
 
 
 ### `@ncio.size_of` {#decl_netcdf_ncio_size_of}
@@ -501,9 +329,7 @@ If \ref decl_netcdf_ncio_variable is given too, the size of that variable is rea
 
 **Example:**
 
-```yaml
-size_of: field            # <- reads the dimensions of the field variable, into an array of integers
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncio_size_of
 
 
 ## `@ncattributes` {#decl_netcdf_ncattributes}
@@ -514,15 +340,7 @@ You can use it in \ref decl_netcdf_ncfile_groups_group_path_attributes and \ref 
 
 **Example:**
 
-```yaml
-file: output.nc
-variables:
-  field:
-    attributes:           # <- this mapping is a set of attributes
-      units: kelvin
-      scale: 0.5
-write: [field]
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncattributes
 
 
 ### `@ncattributes.<attribute_name>` {#decl_netcdf_ncattributes_attribute_name}
@@ -532,7 +350,4 @@ Use `<attribute_name>` to write the attribute named `<attribute_name>` with this
 
 **Example:**
 
-```yaml
-units: kelvin             # <- written as is
-step: $iter               # <- written from, or read into, the iter data
-```
+\snippet{trimleft} decl_netcdf/docs/reference.yml decl_netcdf_ncattributes_attribute_name

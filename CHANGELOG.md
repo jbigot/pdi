@@ -135,6 +135,9 @@ and this project adheres to
 * The examples of the Decl'HDF5 plugin reference are run by PDI, where one was
   not valid YAML and others lacked the description of the dataset that a smaller
   memory selection needs, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Decl'NetCDF plugin reference are run by PDI, where its
+  I/O example lacked the description of the variable it writes to, as part of
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

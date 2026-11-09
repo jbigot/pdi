@@ -1,0 +1,471 @@
+# The examples of the Decl'NetCDF configuration reference (reference.md) that a sequential NetCDF runs, one whole specification tree per key, that the page shows the
+# marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+decl_netcdf_config:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  #! [decl_netcdf_config]
+  plugins:
+    decl_netcdf:            # <- a single file description...
+      file: result.nc
+      write: [field]
+  #! [decl_netcdf_config]
+
+decl_netcdf_config_sequence:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  #! [decl_netcdf_config_sequence]
+  plugins:
+    decl_netcdf:            # <- ... or a sequence of them, one per file and direction
+      - file: result.nc
+        write: [field]
+      - file: restart.nc
+        read: [field]
+  #! [decl_netcdf_config_sequence]
+
+decl_netcdf_logging:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_logging]
+      logging: debug            # <- only in the single file description form
+      file: result.nc
+      write: [field]
+      #! [decl_netcdf_logging]
+
+decl_netcdf_ncfile:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  #! [decl_netcdf_ncfile]
+  plugins:
+    decl_netcdf:
+      file: checkpoint_${iter}.nc   # <- this mapping is a file description:
+      on_event: checkpoint          #    which file, when it is accessed,
+      write: [field, iter]          #    and what is written to it
+  #! [decl_netcdf_ncfile]
+
+decl_netcdf_ncfile_file:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_file]
+      file: output_${iter}.nc   # <- evaluated at each access
+      write: [field]
+      #! [decl_netcdf_ncfile_file]
+
+decl_netcdf_ncfile_on_event:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_on_event]
+      file: checkpoint.nc
+      on_event: [checkpoint, finalization]   # <- the file is written on either event
+      write: [field, iter]
+      #! [decl_netcdf_ncfile_on_event]
+
+decl_netcdf_ncfile_when:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_when]
+      file: output.nc
+      when: $iter % 10 = 0      # <- one access out of ten
+      write: [field]
+      #! [decl_netcdf_ncfile_when]
+
+decl_netcdf_ncfile_deflate:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_deflate]
+      file: output.nc
+      deflate: 6                # <- every variable of output.nc is compressed, but those that set their own level
+      write: [field]
+      #! [decl_netcdf_ncfile_deflate]
+
+decl_netcdf_ncfile_groups_group_path:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_groups_group_path]
+      file: output.nc
+      groups:
+        results/fields:         # <- the fields group, in the results group
+          attributes:
+            step: $iter
+      write:
+        field: {variable: results/fields/field}
+      #! [decl_netcdf_ncfile_groups_group_path]
+
+decl_netcdf_ncfile_groups_group_path_attributes:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_groups_group_path_attributes]
+      file: output.nc
+      groups:
+        results:
+          attributes:           # <- the attributes of the results group
+            step: $iter
+      write:
+        field: {variable: results/field}
+      #! [decl_netcdf_ncfile_groups_group_path_attributes]
+
+decl_netcdf_ncfile_variables_variable_path:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_variables_variable_path]
+      file: output.nc
+      variables:
+        results/field:          # <- the field variable, in the results group
+          dimensions: [height, width]
+          attributes:
+            units: kelvin
+      write:
+        field: {variable: results/field}
+      #! [decl_netcdf_ncfile_variables_variable_path]
+
+decl_netcdf_ncfile_variables_variable_path_type:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_variables_variable_path_type]
+      file: history.nc
+      variables:
+        field:
+          type: array           # <- the variable has one more dimension than the data,
+          subtype: double
+          size: [0, 64, 64]     #    an UNLIMITED one, with one entry per iteration
+      write:
+        field:
+          variable_selection: {start: [$iter, 0, 0], subsize: [1, 64, 64]}
+      #! [decl_netcdf_ncfile_variables_variable_path_type]
+
+decl_netcdf_ncfile_variables_variable_path_dimensions:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_variables_variable_path_dimensions]
+      file: output.nc
+      variables:
+        field:
+          dimensions: [height, width]   # <- instead of names chosen by the plugin
+      write: [field]
+      #! [decl_netcdf_ncfile_variables_variable_path_dimensions]
+
+decl_netcdf_ncfile_variables_variable_path_attributes:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_variables_variable_path_attributes]
+      file: output.nc
+      variables:
+        field:
+          attributes:           # <- the attributes of the field variable
+            units: kelvin
+            step: $iter
+      write: [field]
+      #! [decl_netcdf_ncfile_variables_variable_path_attributes]
+
+decl_netcdf_ncfile_variables_variable_path_deflate:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_variables_variable_path_deflate]
+      file: output.nc
+      variables:
+        field:
+          deflate: 9            # <- overrides the level of the file
+      write: [field]
+      #! [decl_netcdf_ncfile_variables_variable_path_deflate]
+
+decl_netcdf_ncfile_variables_variable_path_chunking:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_variables_variable_path_chunking]
+      file: output.nc
+      variables:
+        field:
+          deflate: 6
+          chunking: [16, 64]    # <- chunks of 16x64 elements instead of those NetCDF would choose
+      write: [field]
+      #! [decl_netcdf_ncfile_variables_variable_path_chunking]
+
+decl_netcdf_ncfile_write_data_name:
+  data:
+    int_submatrix: {type: array, subtype: int, size: [4, 4]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_write_data_name]
+      file: matrix.nc
+      variables:
+        integer_matrix:
+          type: array
+          subtype: int
+          size: [8, 8]
+      write:
+        int_submatrix:          # <- a 4x4 data written to the bottom-right corner of an 8x8 variable
+          variable: integer_matrix
+          variable_selection:
+            start: [4, 4]
+            subsize: [4, 4]
+      #! [decl_netcdf_ncfile_write_data_name]
+
+decl_netcdf_ncfile_write_data_name_compound:
+  #! [decl_netcdf_ncfile_write_data_name_compound]
+  data:
+    particle:
+      type: struct
+      +decl_netcdf.type: particle_xyz   # the name of the NetCDF compound type
+      members:
+        - x: double
+        - y: double
+        - z: double
+  plugins:
+    decl_netcdf:
+      file: particles.nc
+      write: [particle]
+  #! [decl_netcdf_ncfile_write_data_name_compound]
+
+decl_netcdf_ncfile_write_item:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_write_item]
+      file: output.nc
+      write: [field, iter]      # <- field and iter, each to the variable of the same name
+      #! [decl_netcdf_ncfile_write_item]
+
+decl_netcdf_ncfile_read_data_name:
+  data:
+    matrix_size: {type: array, subtype: int64, size: 2}
+    int_submatrix: {type: array, subtype: int, size: [4, 4]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_read_data_name]
+      file: matrix.nc
+      read:
+        matrix_size:
+          size_of: integer_matrix   # <- reads the size of the variable, [8, 8]
+        int_submatrix:              # <- reads its bottom-right 4x4 corner
+          variable: integer_matrix
+          variable_selection:
+            start: [4, 4]
+            subsize: [4, 4]
+      #! [decl_netcdf_ncfile_read_data_name]
+
+decl_netcdf_ncfile_read_item:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_read_item]
+      file: restart.nc
+      read: [field, iter]       # <- field and iter, each from the variable of the same name
+      #! [decl_netcdf_ncfile_read_item]
+
+decl_netcdf_ncio:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: 64}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncio]
+      file: history.nc
+      variables:
+        field_history: {type: array, subtype: double, size: [0, 64]}   # one row per iteration
+      write:
+        field:                  # <- this mapping is an I/O description
+          variable: field_history
+          when: $iter > 0
+          variable_selection: {start: [$iter, 0], subsize: [1, 64]}
+      #! [decl_netcdf_ncio]
+
+decl_netcdf_ncio_variable:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      file: output.nc
+      write:
+        field:
+          #! [decl_netcdf_ncio_variable]
+          variable: results/field   # <- the variable field, in the results group
+          #! [decl_netcdf_ncio_variable]
+
+decl_netcdf_ncio_when:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      file: output.nc
+      write:
+        field:
+          #! [decl_netcdf_ncio_when]
+          variable: field
+          when: $iter > 0           # <- not at the first iteration
+          #! [decl_netcdf_ncio_when]
+
+decl_netcdf_ncio_variable_selection:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: 64}
+  plugins:
+    decl_netcdf:
+      file: history.nc
+      variables:
+        field_history: {type: array, subtype: double, size: [0, 64]}
+      write:
+        field:
+          #! [decl_netcdf_ncio_variable_selection]
+          variable: field_history
+          variable_selection:       # <- the row of this iteration
+            start: [$iter, 0]
+            subsize: [1, 64]
+          #! [decl_netcdf_ncio_variable_selection]
+
+decl_netcdf_ncio_variable_selection_start:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: 64}
+  plugins:
+    decl_netcdf:
+      file: history.nc
+      variables:
+        field_history: {type: array, subtype: double, size: [0, 64]}
+      write:
+        field:
+          #! [decl_netcdf_ncio_variable_selection_start]
+          variable: field_history
+          variable_selection:
+            start: [$iter, 0]       # <- from the row of this iteration
+            subsize: [1, 64]
+          #! [decl_netcdf_ncio_variable_selection_start]
+
+decl_netcdf_ncio_variable_selection_subsize:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: 64}
+  plugins:
+    decl_netcdf:
+      file: history.nc
+      variables:
+        field_history: {type: array, subtype: double, size: [0, 64]}
+      write:
+        field:
+          #! [decl_netcdf_ncio_variable_selection_subsize]
+          variable: field_history
+          variable_selection:
+            start: [$iter, 0]
+            subsize: [1, 64]        # <- a single row of 64 elements
+          #! [decl_netcdf_ncio_variable_selection_subsize]
+
+decl_netcdf_ncio_size_of:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+    field_size: {type: array, subtype: int64, size: 2}
+  plugins:
+    decl_netcdf:
+      file: restart.nc
+      read:
+        field_size:
+          #! [decl_netcdf_ncio_size_of]
+          size_of: field            # <- reads the dimensions of the field variable, into an array of integers
+          #! [decl_netcdf_ncio_size_of]
+
+decl_netcdf_ncattributes:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      #! [decl_netcdf_ncattributes]
+      file: output.nc
+      variables:
+        field:
+          attributes:           # <- this mapping is a set of attributes
+            units: kelvin
+            scale: 0.5
+      write: [field]
+      #! [decl_netcdf_ncattributes]
+
+decl_netcdf_ncattributes_attribute_name:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    decl_netcdf:
+      file: output.nc
+      write: [field]
+      variables:
+        field:
+          attributes:
+            #! [decl_netcdf_ncattributes_attribute_name]
+            units: kelvin             # <- written as is
+            step: $iter               # <- written from, or read into, the iter data
+            #! [decl_netcdf_ncattributes_attribute_name]
