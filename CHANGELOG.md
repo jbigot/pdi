@@ -59,6 +59,9 @@ and this project adheres to
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies, fixing
   [#915](https://github.com/pdidev/pdi/issues/915).
+* The examples of the specification tree reference are run by PDI, and its
+  default log patterns checked against what PDI logs, where one of them loaded a
+  plugin that does not exist, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

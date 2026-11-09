@@ -1,0 +1,8 @@
+# The default patterns of the loggers that the specification tree reference (Specification_tree_ref.md) shows.
+# tests/combination_tests/doc_spectree.cxx checks that the lines PDI logs match them.
+#! [serial]
+[%T][%n] *** %^%l%$: %v
+#! [serial]
+#! [mpi]
+[%T][MPI %{MPI_COMM_WORLD_rank:06d}][%n] *** %^%l%$: %v
+#! [mpi]
