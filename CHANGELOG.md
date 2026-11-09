@@ -30,6 +30,8 @@ and this project adheres to
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
 * The User-code plugin reference gives examples with the access rights they need.
+* The page of PDI's example shows the code and configuration of the example
+  itself, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
