@@ -61,3 +61,14 @@ if("${HDF5_IS_PARALLEL}")
 	set_property(TEST decl_hdf5_examples_mpi PROPERTY TIMEOUT 30)
 	set_property(TEST decl_hdf5_examples_mpi PROPERTY PROCESSORS 2)
 endif()
+
+# The specification trees of the configuration reference (reference.yml, and reference_parallel.yml for a parallel HDF5), run by PDI.
+# Those that read restart.h5, which no example writes, are only initialized.
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../../pdi/docs/RunTrees.cmake")
+pdi_doc_run_trees(decl_hdf5_reference "${CMAKE_CURRENT_SOURCE_DIR}/reference.yml"
+	VALUES nb_iter=1
+	EVENTS checkpoint finalization output
+	INIT_ONLY decl_hdf5_config_sequence decl_hdf5_h5file_read_data_name decl_hdf5_h5file_read_item decl_hdf5_h5io_size_of)
+if("${HDF5_IS_PARALLEL}")
+	pdi_doc_run_trees(decl_hdf5_reference_parallel "${CMAKE_CURRENT_SOURCE_DIR}/reference_parallel.yml" MPI VALUES nprocs=1)
+endif()
