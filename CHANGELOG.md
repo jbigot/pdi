@@ -88,6 +88,9 @@ and this project adheres to
   whatever it is, and an expression that ends with a lone `\` is now reported
   as an error instead of crashing, fixing
   [#846](https://github.com/pdidev/pdi/issues/846)
+* The examples of the datatypes and $-expressions references are checked
+  against what PDI makes of them, where the float and string formats applied to
+  an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

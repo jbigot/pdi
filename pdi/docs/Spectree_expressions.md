@@ -44,25 +44,18 @@ The following strings can also be interpreted as boolean values:
 
 **Example:**
 
-```yaml
-'$my_data'
-```
+\snippet{trimleft} Spectree_expressions/expressions.yml reference
 
-```yaml
-'($my_data + 3) % 6'
-```
+\snippet{trimleft} Spectree_expressions/expressions.yml operation
 
-```yaml
-'${my_data.subarray[0]} * 42'
-```
+\snippet{trimleft} Spectree_expressions/expressions.yml subscript
 
-```yaml
-'my name is ${my_name}'
-```
+\snippet{trimleft} Spectree_expressions/expressions.yml string
 
-```yaml
-'${my_data:05d}'
-'${my_data:b}'
-'${my_data:1.5f}'
-'${my_data:>15s}'
-```
+\snippet{trimleft} Spectree_expressions/expressions.yml format_int
+
+\snippet{trimleft} Spectree_expressions/expressions.yml format_binary
+
+\snippet{trimleft} Spectree_expressions/expressions.yml format_float
+
+\snippet{trimleft} Spectree_expressions/expressions.yml format_string

@@ -21,14 +21,7 @@ You can use it in \ref spectree_pdi_types_type_name, \ref spectree_pdi_metadata_
 
 **Example:**
 
-```yaml
-data:
-  iter: int                       # <- a datatype in its scalar form...
-  field:                          # <- ... and in its mapping form
-    type: array
-    subtype: double
-    size: [64, 64]
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_datatype
 
 `iter: int` is a shortcut for `iter: {type: int}`.
 
@@ -81,9 +74,7 @@ The Fortran types are only available when %PDI is built with Fortran support.
 
 **Example:**
 
-```yaml
-type: int64               # <- a 64-bit signed integer
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_datatype_type
 
 
 ### `@datatype.+<attribute_name>` {#spectree_datatype_attribute_name}
@@ -97,12 +88,7 @@ They are not interpreted by %PDI, but plugins can read them.
 
 **Example:**
 
-```yaml
-type: array
-subtype: double
-size: [64, 64]
-+decl_hdf5.chunking: [16, 64]   # <- an attribute, read by the Decl'HDF5 plugin
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_datatype_attribute_name
 
 
 ## `@fortran` {#spectree_fortran}
@@ -112,14 +98,7 @@ The Fortran types are only available when %PDI is built with Fortran support.
 
 **Example:**
 
-```yaml
-data:
-  temperature: {type: real, kind: 8}            # <- a real(kind=8)
-  flags:
-    type: array
-    subtype: {type: logical, kind: 1}           # <- a logical(kind=1)
-    size: 10
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_fortran
 
 
 ### `@fortran.kind` {#spectree_fortran_kind}
@@ -132,10 +111,7 @@ If it is missing, 0, or anything other than an integer, the default kind of the 
 
 **Example:**
 
-```yaml
-type: integer
-kind: 8                   # <- an integer(kind=8)
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_fortran_kind
 
 
 ## `@array` {#spectree_array}
@@ -144,13 +120,7 @@ A \ref spectree_datatype whose \ref spectree_datatype_type is `array`, a potenti
 
 **Example:**
 
-```yaml
-data:
-  field:                  # <- an array
-    type: array
-    subtype: double
-    size: [$height, $width]
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_array
 
 
 ### `@array.size` {#spectree_array_size}
@@ -161,11 +131,7 @@ Use `size` to set the size of the array in each dimension (C order).
 
 **Example:**
 
-```yaml
-type: array
-subtype: double
-size: [$height, $width]   # <- two dimensions, from metadata
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_array_size
 
 A single value, `size: 10`, makes a one-dimensional array.
 
@@ -178,14 +144,7 @@ Use `subtype` to set the type of the elements of the array.
 
 **Example:**
 
-```yaml
-type: array
-size: 10
-subtype:                  # <- an array of 10 vectors of 3 doubles
-  type: array
-  size: 3
-  subtype: double
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_array_subtype
 
 
 ### `@array.subsize` {#spectree_array_subsize}
@@ -198,13 +157,7 @@ It defaults to the full array size in each dimension.
 
 **Example:**
 
-```yaml
-type: array
-subtype: double
-size: [12, 12]
-subsize: [10, 10]         # <- only the 10x10 interior...
-start: [1, 1]             #    ... after the first row and column
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_array_subsize
 
 
 ### `@array.start` {#spectree_array_start}
@@ -217,13 +170,7 @@ It defaults to 0, the first element, in each dimension.
 
 **Example:**
 
-```yaml
-type: array
-subtype: double
-size: [12, 12]
-subsize: [10, 10]
-start: [1, 1]             # <- the interior starts at the second row and column
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_array_start
 
 
 ### `@array.order` {#spectree_array_order}
@@ -239,12 +186,7 @@ Only the C order is supported, and specifying it is deprecated.
 
 **Example:**
 
-```yaml
-type: array
-subtype: double
-size: [12, 12]
-order: C                  # <- the only value, and the default
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_array_order
 
 
 ## `@pointer` {#spectree_pointer}
@@ -253,12 +195,7 @@ A \ref spectree_datatype whose \ref spectree_datatype_type is `pointer`, a memor
 
 **Example:**
 
-```yaml
-data:
-  buffer:                 # <- a pointer to a double
-    type: pointer
-    subtype: double
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_pointer
 
 
 ### `@pointer.subtype` {#spectree_pointer_subtype}
@@ -269,10 +206,7 @@ Use `subtype` to set the type of the referenced elements.
 
 **Example:**
 
-```yaml
-type: pointer
-subtype: {type: array, subtype: char, size: 256}   # <- a pointer to a string of 256 characters
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_pointer_subtype
 
 
 ## `@record` {#spectree_record}
@@ -282,15 +216,7 @@ It may have no members.
 
 **Example:**
 
-```yaml
-data:
-  particle:               # <- a record of two members, with explicit offsets
-    type: record
-    buffersize: 16
-    members:
-      position: {disp: 0, type: double}
-      id: {disp: 8, type: int64}
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_record
 
 
 ### `@record.buffersize` {#spectree_record_buffersize}
@@ -301,13 +227,7 @@ Use `buffersize` to set the overall size of the record in bytes, including poten
 
 **Example:**
 
-```yaml
-type: record
-buffersize: 16            # <- 16 bytes, padding included
-members:
-  value: {disp: 0, type: double}
-  count: {disp: 8, type: int32}
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_record_buffersize
 
 
 ### `@record.members.<member_name>` {#spectree_record_members_member_name}
@@ -317,13 +237,7 @@ Use `members.<member_name>` to define a member named `<member_name>`, of this ty
 
 **Example:**
 
-```yaml
-type: record
-buffersize: 16
-members:
-  value: {disp: 0, type: double}   # <- a member named value
-  count: {disp: 8, type: int64}
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_record_members_member_name
 
 
 ### `@record.members.<member_name>.disp` {#spectree_record_members_member_name_disp}
@@ -334,13 +248,7 @@ Use `disp` to place the member at this offset in bytes from the base address of 
 
 **Example:**
 
-```yaml
-type: record
-buffersize: 16
-members:
-  value: {disp: 0, type: double}
-  count: {disp: 8, type: int64}    # <- 8 bytes after the start of the record
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_record_members_member_name_disp
 
 
 ## `@struct` {#spectree_struct}
@@ -349,23 +257,11 @@ A \ref spectree_datatype whose \ref spectree_datatype_type is `struct`, a C `str
 
 **Example:**
 
-```yaml
-data:
-  particle:               # <- a struct, laid out as C does
-    type: struct
-    members:
-      - position: double
-      - id: int64
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_struct
 
 It matches:
 
-```c
-struct {
-  double position;
-  int64_t id;
-};
-```
+\snippet Spectree_types/particle.h struct
 
 
 ### `@struct.members` {#spectree_struct_members}
@@ -376,12 +272,7 @@ Use `members` to define the members of the struct, in order.
 
 **Example:**
 
-```yaml
-type: struct
-members:                  # <- the members, in order
-  - x: double
-  - y: double
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_struct_members
 
 
 ### `@struct.members[*].<member_name>` {#spectree_struct_members_item_member_name}
@@ -391,12 +282,7 @@ Use `<member_name>` to define a member named `<member_name>`, of this type.
 
 **Example:**
 
-```yaml
-type: struct
-members:
-  - x: double
-  - neighbors: {type: array, subtype: int, size: 4}   # <- a member named neighbors, of an array type
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_struct_members_item_member_name
 
 
 ## `@tuple` {#spectree_tuple}
@@ -405,12 +291,7 @@ A \ref spectree_datatype whose \ref spectree_datatype_type is `tuple`, a sequenc
 
 **Example:**
 
-```yaml
-data:
-  pair:                   # <- a tuple of an int32 and a double
-    type: tuple
-    elements: [int32, double]
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_tuple
 
 
 ### `@tuple.buffersize` {#spectree_tuple_buffersize}
@@ -423,13 +304,7 @@ If omitted, the size is that of the equivalent C `struct`, including the padding
 
 **Example:**
 
-```yaml
-type: tuple
-buffersize: 16            # <- required with explicit displacements
-elements:
-  - {disp: 0, type: int32}
-  - {disp: 8, type: double}
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_tuple_buffersize
 
 
 ### `@tuple.elements` {#spectree_tuple_elements}
@@ -440,10 +315,7 @@ Use `elements` to define the elements of the tuple, in order.
 
 **Example:**
 
-```yaml
-type: tuple
-elements: [int32, double] # <- the elements, in order
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_tuple_elements
 
 
 ### `@tuple.elements[*]` {#spectree_tuple_elements_item}
@@ -453,12 +325,7 @@ Use each element of `elements` to define an element of the tuple, of this type.
 
 **Example:**
 
-```yaml
-type: tuple
-elements:
-  - int32
-  - {type: array, subtype: double, size: 3}   # <- an element of an array type
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_tuple_elements_item
 
 
 ### `@tuple.elements[*].disp` {#spectree_tuple_elements_item_disp}
@@ -472,12 +339,6 @@ alignment.
 
 **Example:**
 
-```yaml
-type: tuple
-buffersize: 16
-elements:
-  - {disp: 0, type: int32}
-  - {disp: 8, type: double}   # <- 8 bytes after the start of the tuple
-```
+\snippet{trimleft} Spectree_types/types.yml spectree_tuple_elements_item_disp
 
 
