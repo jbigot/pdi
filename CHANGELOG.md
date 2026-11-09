@@ -64,6 +64,9 @@ and this project adheres to
   the type spellings, literals and redefinition rules PDI applies.
 * The Trace plugin reference shows where the plugin writes its trace, and in
   which format, and documents its `logging` key.
+* The Timer plugin reference documents the sequence form of its configuration,
+  the plugins that emit timer events, the format of its output file, and that
+  nothing is written to it when it cannot be locked.
 * The Pycall plugin reference gives examples with working Python code, and
   documents how the plugin exposes values and handles errors.
 * The JSON plugin reference gives a valid configuration example, shows the file
@@ -89,6 +92,9 @@ and this project adheres to
 * The Decl'NetCDF plugin reference lists its `when` and `deflate` file keys,
   gives group attributes in the form the plugin reads, and documents when it
   compresses and chunks a variable.
+* The Timer and Serialize plugin references state that their `logging` key
+  only takes a level, and the Decl'HDF5 one that an attribute write cannot be an
+  element of a sequence of writes.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
@@ -130,6 +136,7 @@ and this project adheres to
   an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Trace plugin page are run by PDI, and its trace compared
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Timer plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Serialize plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Pycall plugin page are run by PDI, and the output of its
   full example compared to that of a real run, where it showed log lines that

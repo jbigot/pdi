@@ -2,32 +2,99 @@
 
 The timer plugin allows measuring time spent by PDI and its plugins.
 
-## Configuration {#timer_configuration}
+Each timer records the time spent between a `start` and a `stop` event, accumulated over all the times it is started and stopped.
+When the plugin is unloaded, it outputs the time accumulated by each timer that was started at least once.
 
-Simple plugin build:
-```yaml
-plugins:
-  timer: 
-    timer_A: {start: "decl_hdf5_start_timer", stop: "decl_hdf5_stop_timer"}
-    timer_B: "decl_hdf5"
-    timer_C: ["toto", "titi"]
-    timer_D: 
-      start: "begin_timing"
-      stop: "end_timing"
-    timer_E: ["pdi"]
-    output_to: cout
-```
+## Example of a Timer configuration {#timer_configuration}
 
-The timer plugin configuration contains a list of timer names (e.g. `timer_A`, `timer_B`, etc.). Each timer will record the time spent between the `start` and `stop` events.
+\snippet{trimleft} timer/docs/reference.yml timer_configuration
 
-`timer_A` uses a map-styled definition where both keys `start` and `stop` are mandatory.
+In this example, `timer_B` is equivalent to `timer_A`; `timer_C` records the time spent between `toto_start_timer` and `toto_stop_timer`, and
+between `titi_start_timer` and `titi_stop_timer`; and `timer_E` records the time spent between `PDI_init` and `PDI_finalize`, including the time
+spent in the simulation itself.
 
-`timer_B` uses a scalar-styled definition where only the prefix of the timer events is provided. The prefix can be either a user-defined name, or the name of the PDI plugins, such as `decl_hdf5`, `decl_netcdf`, `pycall`, etc. If the prefix is the PDI plugin, internal events named with `prefix_start_timer` and `prefix_stop_timer` will be emitted inside the plugin (except `set_value`). In the above example, `timer_B` is equivalent to `timer_A`.
+## `@timer` {#timer_config}
 
-`timer_C` uses a list-styled definition where a list of prefix is provided. If the name is not one of the PDI plugins' name, then it is the user's responsibility to emit the `prefix_start_timer` and `prefix_stop_timer` events. In this example, `timer_C` will record the time spent between `toto_start_timer`, `toto_stop_timer`, and between `titi_start_timer`, `titi_stop_timer`.
+A mapping.
+Use it, as the value of `plugins.timer` (see \ref spectree_pdi_plugins_plugin_name), to define timers, and where to output their results.
+It can also be a sequence of single-key mappings, which has the same meaning.
 
-It is also possible to have different names for start and stop events such as `timer_D`.
+**Example:**
 
-To measure the wall time used spent between `PDI_init` and `PDI_finalize`, one can define a timer as shown by `timer_E` with timer prefix "pdi". Please notie that, this timer include time spent on the simulation as well.
+\snippet{trimleft} timer/docs/reference.yml timer_config
 
-`output_to` (`cout` by default) key allows directing the timer results to either standard output or a file (e.g. `output_to: timer.csv`). The name `cout` is reserved for standard output so can not be used to name the output file. Please also note that, PDI timer plugin uses the `flock` to perform sequential writing of multiple processes to a single file. This can fail if the underlying filesystem does not support `flock`. We suggest user to use the standard output.
+
+**Example:**
+
+\snippet{trimleft} timer/docs/reference.yml timer_config_sequence
+
+
+### `@timer.<timer_name>` {#timer_timer_name}
+
+Use `<timer_name>` to define a timer named `<timer_name>`, and the events that start and stop it, either:
+* a mapping with both \ref timer_timer_name_start and \ref timer_timer_name_stop keys,
+* a prefix, given as a scalar, or a sequence of prefixes: for each prefix, the timer is started by the `<prefix>_start_timer` event and stopped by the
+  `<prefix>_stop_timer` event.
+
+The prefix can be either a user-defined name, whose events the application has to emit, or one of the following:
+* `pdi`, whose events %PDI emits in `PDI_init` and `PDI_finalize`,
+* the name of a plugin that emits such events around its own work: `decl_hdf5`, `decl_netcdf`, `json`, `pycall`, `serialize` or `user_code`.
+
+A timer started while already running, or stopped while not running, logs an error and is left unchanged.
+
+**Example:**
+
+\snippet{trimleft} timer/docs/reference.yml timer_timer_name
+
+
+### `@timer.<timer_name>.start` {#timer_timer_name_start}
+
+*Required in the mapping form.*
+A scalar.
+Use `start` to name the event that starts the timer.
+
+**Example:**
+
+\snippet{trimleft} timer/docs/reference.yml timer_timer_name_start
+
+
+### `@timer.<timer_name>.stop` {#timer_timer_name_stop}
+
+*Required in the mapping form.*
+A scalar.
+Use `stop` to name the event that stops the timer.
+
+**Example:**
+
+\snippet{trimleft} timer/docs/reference.yml timer_timer_name_stop
+
+
+### `@timer.output_to` {#timer_output_to}
+
+*Optional.*
+A scalar: either `cout` (the default), for the standard output through the logger of the plugin, or the path of a file.
+Use `output_to` to choose where to output the results of the timers.
+As `cout` is reserved for the standard output, it cannot be used as the name of the output file.
+
+The results are appended to the file, one line `<timer name>,<seconds>` per timer.
+The plugin locks the file with `flock`, so that several processes can write to it one after the other.
+If the underlying filesystem does not support `flock`, the results are not written, so the standard output is the safer choice.
+
+**Example:**
+
+\snippet{trimleft} timer/docs/reference.yml timer_output_to
+
+
+### `@timer.logging` {#timer_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugins_plugin_name_logging.
+This plugin only supports its scalar form: a level.
+Like any other key, it then also defines a timer, named `logging`, that uses the level as its prefix.
+
+**Example:**
+
+\snippet{trimleft} timer/docs/reference.yml timer_logging
+
+
