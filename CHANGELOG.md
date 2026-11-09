@@ -58,6 +58,8 @@ and this project adheres to
   the type spellings, literals and redefinition rules PDI applies.
 * The Trace plugin reference shows where the plugin writes its trace, and in
   which format, and documents its `logging` key.
+* The Pycall plugin reference gives examples with working Python code, and
+  documents how the plugin exposes values and handles errors.
 * Change JSON package name to `nlohmann_json` so that `USE_nlohmann_json=SYSTEM/AUTO`
   will find the system version if available.
   [#769](https://github.com/pdidev/pdi/issues/769) 
