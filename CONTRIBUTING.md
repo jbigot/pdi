@@ -195,6 +195,8 @@ There are several test suites, each with a different purpose:
 * `tests/api_tests/` exercise the public API against either PDI or mock PDI;
 * `tests/combination_tests/` cover interactions between plugins;
 * `tests/cmake_tests/` verify that a real installation can be consumed through `find_package`;
+* `tests/installation_tests/` download, build and install the latest release the way the source installation page tells a user to, so those commands
+  cannot go stale;
 * `example/` doubles as an integration test suite.
 
 ## Making a change
