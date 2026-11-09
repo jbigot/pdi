@@ -1,0 +1,34 @@
+# The plain YAML of the \ref YAML page, illustrating the format itself rather than a PDI tree, one per key: yaml_examples.c parses it.
+
+yaml_tree:
+  #! [yaml_tree]
+  tree_1:
+    array_1:
+      - scalar_1
+      - scalar_2
+    array_2: [1, 2, 3]
+  tree_2: {subtree_1: scalar_1, subtree_2: scalar_2}
+  #! [yaml_tree]
+
+sequence:
+  #! [sequence]
+  - 1
+  - 2
+  - 3
+  - hello
+  - world
+  #! [sequence]
+
+mapping:
+  #! [mapping]
+  1: one
+  2: two
+  "three": 3
+  #! [mapping]
+
+ordered_mapping:
+  #! [ordered_mapping]
+  - 1: one
+  - 2: two
+  - "three": 3
+  #! [ordered_mapping]
