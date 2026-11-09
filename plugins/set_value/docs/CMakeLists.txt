@@ -56,3 +56,7 @@ target_link_libraries(set_value_examples PDI::PDI_C GTest::gtest GTest::gtest_ma
 target_compile_definitions(set_value_examples PRIVATE "EXAMPLES_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 target_compile_features(set_value_examples PRIVATE cxx_std_17)
 gtest_discover_tests(set_value_examples)
+
+# The specification trees of the configuration reference (reference.yml), run by PDI with the events they react to, the plugin sharing the data.
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../../pdi/docs/RunTrees.cmake")
+pdi_doc_run_trees(set_value_reference "${CMAKE_CURRENT_SOURCE_DIR}/reference.yml" NO_SHARE EVENTS increment step)
