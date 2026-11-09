@@ -20,6 +20,8 @@ and this project adheres to
   with one more.
 
 #### Changed
+* The API reference no longer lists the deprecated macros, nor those that
+  serve the implementation of `PDI_PLUGIN` and the plugin API version.
 * The specification tree reference, and that of each plugin, documents the tree
   as a set of *blocks*, written `@name`: `@pdi` for the root of the tree, one
   per plugin for its configuration, such as `@decl_hdf5`, and one for each part
@@ -57,6 +59,8 @@ and this project adheres to
   per [#789](https://github.com/pdidev/pdi/issues/789).
 
 #### Fixed
+* The API reference names the deprecated statuses `PDI_UNAVAILABLE`,
+  `PDI_ERR_CONFIG` and `PDI_ERR_RIGHT`, instead of their deprecation macro.
 * The specification tree reference now describes logging as PDI implements it,
   with a working example, fixing [#808](https://github.com/pdidev/pdi/issues/808).
 * The specification tree reference now lists the datatypes PDI has, and only
