@@ -25,17 +25,7 @@ is released.
 
 ## Example of an MPI configuration {#mpi_configuration}
 
-```yaml
-data:
-  mpi_comm: MPI_Comm
-  mpi_comm_f: MPI_Comm_f
-plugins:
-  mpi:
-    Comm_c2f:
-      mpi_comm: m_mpi_comm_f
-    Comm_f2c:
-      mpi_comm_f: m_mpi_comm
-```
+\snippet{trimleft} mpi/docs/reference.yml mpi_configuration
 
 ## `@mpi` {#mpi_config}
 
@@ -44,20 +34,12 @@ Use it, as the value of `plugins.mpi` (see \ref spectree_pdi_plugins_plugin_name
 
 **Example:**
 
-```yaml
-plugins:
-  mpi: ~                  # <- no configuration: only the MPI metadata and types
-```
+\snippet{trimleft} mpi/docs/reference.yml mpi_config
 
 
 **Example:**
 
-```yaml
-plugins:
-  mpi:                    # <- with communicators to transtype
-    Comm_c2f:
-      my_comm: my_comm_f
-```
+\snippet{trimleft} mpi/docs/reference.yml mpi_config_mapping
 
 
 ### `@mpi.Comm_c2f.<data_name>` {#mpi_Comm_c2f_data_name}
@@ -67,10 +49,7 @@ Use `Comm_c2f.<data_name>` to share, under this name, the Fortran communicator t
 
 **Example:**
 
-```yaml
-Comm_c2f:
-  my_comm: my_comm_f      # <- each time my_comm (an MPI_Comm) is shared, its Fortran handle is shared as my_comm_f
-```
+\snippet{trimleft} mpi/docs/reference.yml mpi_Comm_c2f_data_name
 
 
 ### `@mpi.Comm_f2c.<data_name>` {#mpi_Comm_f2c_data_name}
@@ -80,10 +59,7 @@ Use `Comm_f2c.<data_name>` to share, under this name, the C communicator transty
 
 **Example:**
 
-```yaml
-Comm_f2c:
-  my_comm_f: my_comm      # <- each time my_comm_f (an MPI_Comm_f) is shared, its C handle is shared as my_comm
-```
+\snippet{trimleft} mpi/docs/reference.yml mpi_Comm_f2c_data_name
 
 
 ### `@mpi.transtype.<data_name>` {#mpi_transtype_data_name}
@@ -95,10 +71,7 @@ The direction of the transtyping depends on the type of `<data_name>`: C to Fort
 
 **Example:**
 
-```yaml
-transtype:
-  my_comm: my_comm_f      # <- deprecated: Comm_c2f: {my_comm: my_comm_f}
-```
+\snippet{trimleft} mpi/docs/reference.yml mpi_transtype_data_name
 
 
 ### `@mpi.logging` {#mpi_logging}
@@ -109,8 +82,6 @@ Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugi
 
 **Example:**
 
-```yaml
-logging: debug            # <- the logger of the MPI plugin
-```
+\snippet{trimleft} mpi/docs/reference.yml mpi_logging
 
 

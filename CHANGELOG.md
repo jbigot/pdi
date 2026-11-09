@@ -61,6 +61,7 @@ and this project adheres to
 * The MPI plugin reference uses the name under which the plugin shares the rank
   metadata, and documents `Comm_c2f` and `Comm_f2c` in place of the deprecated
   `transtype`.
+* The examples of the MPI plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
