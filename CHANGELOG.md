@@ -52,6 +52,9 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The examples of the datatypes and $-expressions references are checked
+  against what PDI makes of them, where the float and string formats applied to
+  an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
