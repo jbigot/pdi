@@ -1,11 +1,11 @@
 # The MPI plugin {#mpi_plugin}
 
 **WARNING** This documentation is a work in progress and does not reflect the
-full MPI plugin potential.
+full potential of the MPI plugin.
 
-MPI plugin defines 2 types in PDI:
-* `MPI_Comm` - C MPI_Comm type
-* `MPI_Comm_f` - Fortran MPI_Comm type
+The MPI plugin defines two types in PDI:
+* `MPI_Comm` - the C `MPI_Comm` type,
+* `MPI_Comm_f` - the Fortran communicator type, an integer.
 
 The MPI plugin exposes several metadata that correspond to values of the MPI library:
 * `MPI_COMM_WORLD_rank` - an integer, the rank of the process in `MPI_COMM_WORLD`,
@@ -16,7 +16,7 @@ The MPI plugin exposes several metadata that correspond to values of the MPI lib
 * `MPI_COMM_SELF_F` - an `MPI_Comm_f` (an integer), `MPI_COMM_SELF` for Fortran,
 * `MPI_COMM_NULL_F` - an `MPI_Comm_f` (an integer), `MPI_COMM_NULL` for Fortran.
 
-All above metadata are available from PDI_init call to PDI_finalize call.
+All the metadata above are available from the call to `PDI_init` to the call to `PDI_finalize`.
 
 The plugin can also transtype communicators between C and Fortran: each time a source communicator is shared, the transtyped communicator is
 shared under a destination name.
