@@ -62,6 +62,8 @@ and this project adheres to
 * The specification tree reference now gives tuple examples that PDI accepts,
   marks the required keys of arrays, tuples and includes as such, and documents
   the type spellings, literals and redefinition rules PDI applies.
+* The Trace plugin reference shows where the plugin writes its trace, and in
+  which format, and documents its `logging` key.
 * The JSON plugin reference gives a valid configuration example, shows the file
   the plugin writes, with a mustache template that matches its output, and
   documents its configuration forms and where its `logging` key can go.
@@ -116,6 +118,10 @@ and this project adheres to
   whatever it is, and an expression that ends with a lone `\` is now reported
   as an error instead of crashing, fixing
   [#846](https://github.com/pdidev/pdi/issues/846)
+* The examples of the first steps build and run, and show the output PDI
+  really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Trace plugin page are run by PDI, and its trace compared
+  to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

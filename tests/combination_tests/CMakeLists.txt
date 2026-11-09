@@ -37,6 +37,7 @@ set(RUNTEST_DIR "${CMAKE_CURRENT_LIST_DIR}/../cmake/runtest-dir")
 
 option(BUILD_DECL_HDF5_PLUGIN "Build Decl'HDF5 plug-in" ON)
 option(BUILD_SERIALIZE_PLUGIN "Build Serialize plug-in" ON)
+option(BUILD_TRACE_PLUGIN     "Build Trace plugin"      ON)
 
 include(CTest)
 
@@ -90,3 +91,33 @@ if("${BUILD_SET_VALUE_PLUGIN}" AND ("${BUILD_DECL_HDF5_PLUGIN}" OR "${BUILD_TRAC
 	target_compile_features(set_value_examples PRIVATE cxx_std_17)
 	gtest_discover_tests(set_value_examples)
 endif()
+
+# The First steps examples of the documentation.
+# They are built and run here rather than beside the documentation because they
+# load the Trace plugin, which is only available once the plugins have been
+# built.
+# Each of them reads its specification tree from its own directory.
+
+if("${BUILD_TRACE_PLUGIN}")
+
+set(FIRST_STEPS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../pdi/docs/First_steps")
+
+foreach(FIRST_STEPS_EXAMPLE IN ITEMS hello_data hello_event hello_expose hello_multi_expose)
+	add_executable(First_steps_${FIRST_STEPS_EXAMPLE}_C "${FIRST_STEPS_DIR}/${FIRST_STEPS_EXAMPLE}.c")
+	target_link_libraries(First_steps_${FIRST_STEPS_EXAMPLE}_C paraconf::paraconf PDI::PDI_C)
+	if(EXISTS "${FIRST_STEPS_DIR}/${FIRST_STEPS_EXAMPLE}.output")
+		# the documentation shows the output of this one, check it did not go stale
+		add_test(NAME First_steps_${FIRST_STEPS_EXAMPLE}_C
+				COMMAND "${CMAKE_COMMAND}"
+					"-DEXAMPLE=$<TARGET_FILE:First_steps_${FIRST_STEPS_EXAMPLE}_C>"
+					"-DEXPECTED=${FIRST_STEPS_DIR}/${FIRST_STEPS_EXAMPLE}.output"
+					"-DWORKDIR=${FIRST_STEPS_DIR}"
+					-P "${FIRST_STEPS_DIR}/../run_and_compare.cmake")
+	else()
+		add_test(NAME First_steps_${FIRST_STEPS_EXAMPLE}_C
+				COMMAND "$<TARGET_FILE:First_steps_${FIRST_STEPS_EXAMPLE}_C>"
+				WORKING_DIRECTORY "${FIRST_STEPS_DIR}")
+	endif()
+endforeach()
+
+endif("${BUILD_TRACE_PLUGIN}")
