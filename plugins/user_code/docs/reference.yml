@@ -1,0 +1,131 @@
+# The examples of the User-code configuration reference (reference.md), one whole specification tree per key, that the page shows the marked
+# part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx, built with reference_functions.c, which defines the functions they
+# call.
+
+user_code_config:
+  data:
+    field: {type: array, subtype: double, size: 4}
+  #! [user_code_config]
+  plugins:
+    user_code:
+      on_event:
+        checkpoint:         # <- functions called on an event...
+          write_checkpoint: {}
+      on_data:
+        field:              # <- ... and when data is shared
+          process_field: {input: $field}
+  #! [user_code_config]
+
+user_code_on_event:
+  plugins:
+    user_code:
+      #! [user_code_on_event]
+      on_event:                 # <- functions called on events
+        checkpoint:
+          write_checkpoint: {}
+      #! [user_code_on_event]
+
+user_code_on_event_event_name:
+  metadata:
+    cond: int
+  data:
+    desc2: int
+    desc3: int
+  plugins:
+    user_code:
+      #! [user_code_on_event_event_name]
+      on_event:
+        - my_event:             # <- two function lists for the same event, in the sequence form
+            when: $cond > 1
+            fun1: {in: $desc2, out: $desc3}
+        - my_event:
+            fun2: {}
+      #! [user_code_on_event_event_name]
+
+user_code_on_data:
+  data:
+    field: {type: array, subtype: double, size: 4}
+  plugins:
+    user_code:
+      #! [user_code_on_data]
+      on_data:                  # <- functions called when data is shared
+        field:
+          process_field: {input: $field}
+      #! [user_code_on_data]
+
+user_code_on_data_data_name:
+  data:
+    field: {type: array, subtype: double, size: 4}
+  plugins:
+    user_code:
+      #! [user_code_on_data_data_name]
+      on_data:
+        field:                  # <- called each time field is shared
+          process_field: {input: $field}
+          report: {}
+      #! [user_code_on_data_data_name]
+
+user_code_logging:
+  plugins:
+    user_code:
+      #! [user_code_logging]
+      logging: debug            # <- the logger of the User-code plugin
+      on_event:
+        checkpoint:
+          write_checkpoint: {}
+      #! [user_code_logging]
+
+user_code_function_list:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: 4}
+    result: double
+  plugins:
+    user_code:
+      #! [user_code_function_list]
+      on_event:
+        step:                   # <- this mapping is a function list
+          when: $iter > 0
+          compute: {in: $field, out: $result}
+          report: {}
+      #! [user_code_function_list]
+
+user_code_function_list_when:
+  metadata:
+    iter: int
+  plugins:
+    user_code:
+      on_event:
+        step:
+          #! [user_code_function_list_when]
+          when: $iter % 10 = 0      # <- the functions are only called every 10 iterations
+          report: {}
+          #! [user_code_function_list_when]
+
+user_code_function_list_function_name:
+  data:
+    field: {type: array, subtype: double, size: 4}
+  plugins:
+    user_code:
+      on_event:
+        step:
+          #! [user_code_function_list_function_name]
+          compute: {in: $field}     # <- calls compute(), with field shared as in while it runs
+          report: {}                # <- calls report(), with nothing shared
+          #! [user_code_function_list_function_name]
+
+user_code_function_list_function_name_alias_name:
+  data:
+    field: {type: array, subtype: double, size: 4}
+    result: double
+  plugins:
+    user_code:
+      on_event:
+        step:
+          #! [user_code_function_list_function_name_alias_name]
+          compute:
+            in: $field              # <- compute() accesses field as in
+            out: $result            #    and result as out
+          #! [user_code_function_list_function_name_alias_name]
