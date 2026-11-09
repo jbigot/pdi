@@ -25,9 +25,11 @@
 #include <mpi.h>
 #include <assert.h>
 #include <math.h>
+//! [ifdef_include]
 #ifndef WITHOUT_PARACONF
 #include <paraconf.h>
 #endif
+//! [ifdef_include]
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -160,9 +162,11 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
+	//! [ifdef_parse]
 #ifndef WITHOUT_PARACONF
 	PC_tree_t conf = PC_parse_path(argv[1]);
 #endif
+	//! [ifdef_parse]
 
 	MPI_Comm main_comm = MPI_COMM_WORLD;
 #ifndef WITHOUT_PARACONF
@@ -210,12 +214,15 @@ int main(int argc, char* argv[])
 #endif
 	psize[1] = longval;
 
+	//! [ifdef_paraconf_use]
 	double duration;
 #ifndef WITHOUT_PARACONF
 	PC_double(PC_get(conf, ".duration"), &duration);
 #else
+	// if we don't have paraconf available, we use a default, because... why not.
 	duration = 0.1;
 #endif
+	//! [ifdef_paraconf_use]
 
 	// get local & add ghosts to sizes
 	assert(dsize[0] % psize[0] == 0);

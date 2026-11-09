@@ -36,6 +36,10 @@ and this project adheres to
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
 * The User-code plugin reference gives examples with the access rights they need.
+* The page on using PDI shows the code of PDI's example it quotes from the
+  example itself, where it gave `PDI_init` a stray bracket, and no longer names
+  a C source for Fortran, as part of [#331](https://github.com/pdidev/pdi/issues/331) and
+  [#802](https://github.com/pdidev/pdi/issues/802).
 
 #### Security
 

@@ -51,8 +51,8 @@ Because in order to initialize %PDI, you also have to use Paraconf, you should d
 find_package(paraconf REQUIRED COMPONENTS f90)
 find_package(PDI REQUIRED COMPONENTS f90)
 
-add_executable(exec_file source_files.c)
-target_link_libraries(exec_file PRIVATE PDI::PDI_f90 paraconf::paraconf_f90)
+add_executable(exec_file_f90 source_files.f90)
+target_link_libraries(exec_file_f90 PRIVATE PDI::PDI_f90 paraconf::paraconf_f90)
 ```
 
 ## Running the application {#running_app}
@@ -147,17 +147,9 @@ The two uses you most definitely make in your code are
 2. the one to provide the `PC_tree_t` to %PDI.
 These should be `#ifdef`ed out.
 
-```C
-#ifndef WITHOUT_PARACONF
-#include <paraconf.h>
-#endif
-```
+\snippet example/example.c ifdef_include
 
-```C
-#ifndef WITHOUT_PARACONF
-	PDI_init(PC_parse_path(config_file]));
-#endif
-```
+\snippet example/example.c ifdef_parse
 
 And if your only use of Paraconf is for %PDI, that's all you have to do.
 
@@ -165,15 +157,7 @@ If you use Paraconf beyond %PDI, you will have to `#ifdef` out those usages too.
 Here you are on your own to provide sensible values instead of the one read from YAML by Paraconf.
 
 For example:
-```C++
-	double duration;
-#ifndef WITHOUT_PARACONF
-	PC_double(PC_get(conf, ".duration"), &duration);
-#else
-	// if we don't have paraconf available, we use 10 as duration, because... why not.
-	duration = 10;
-#endif
-```
+\snippet example/example.c ifdef_paraconf_use
 
 You can find a full example of this approach in the `example` directory.
 
