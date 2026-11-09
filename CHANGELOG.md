@@ -66,6 +66,8 @@ and this project adheres to
   whatever it is, and an expression that ends with a lone `\` is now reported
   as an error instead of crashing, fixing
   [#846](https://github.com/pdidev/pdi/issues/846)
+* The page of PDI's example shows the code and configuration of the example
+  itself, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
