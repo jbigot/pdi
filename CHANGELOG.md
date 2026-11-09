@@ -88,6 +88,11 @@ and this project adheres to
 * The examples of the Decl'HDF5 plugin reference are run by PDI, where one was
   not valid YAML and others lacked the description of the dataset that a smaller
   memory selection needs, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The Pycall plugin reference gives examples with working Python code, and
+  documents how the plugin exposes values and handles errors.
+* The examples of the Pycall plugin page are run by PDI, and the output of its
+  full example compared to that of a real run, where it showed log lines that
+  depend on the installation, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
