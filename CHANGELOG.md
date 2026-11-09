@@ -30,6 +30,9 @@ and this project adheres to
   warning of the `Fortran` component, which it now only prints without `QUIET`,
   fixing [#947](https://github.com/pdidev/pdi/issues/947).
 * The User-code plugin reference gives examples with the access rights they need.
+* The page on using PDI shows CMake and code that the tests build and run,
+  where it named a C source for Fortran and gave `PDI_init` a stray bracket, as
+  part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
