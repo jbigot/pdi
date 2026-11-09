@@ -1,0 +1,151 @@
+# The examples of the Decl'HDF5 configuration reference (reference.md), that only a parallel HDF5 runs, one whole specification tree per key, that the page shows the marked
+# part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+decl_hdf5_h5file_communicator:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      #! [decl_hdf5_h5file_communicator]
+      file: output.h5
+      communicator: $MPI_COMM_WORLD   # <- all processes access the same file, the MPI plugin defines $MPI_COMM_WORLD
+      datasets:
+        field: {type: array, subtype: double, size: [$nprocs, 64, 64]}
+      write:
+        field:
+          dataset_selection: {size: [1, 64, 64], start: [$rank, 0, 0]}
+      #! [decl_hdf5_h5file_communicator]
+
+decl_hdf5_h5file_subfiling:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      #! [decl_hdf5_h5file_subfiling]
+      file: output.h5
+      communicator: $MPI_COMM_WORLD
+      subfiling:                # <- the full form
+        count: 4
+        policy: CONTINUE
+      write: [field]
+      #! [decl_hdf5_h5file_subfiling]
+
+decl_hdf5_h5file_subfiling_short:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      #! [decl_hdf5_h5file_subfiling_short]
+      file: output.h5
+      communicator: $MPI_COMM_WORLD
+      subfiling: 4              # <- the short form, the count only
+      write: [field]
+      #! [decl_hdf5_h5file_subfiling_short]
+
+decl_hdf5_h5file_subfiling_count:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      #! [decl_hdf5_h5file_subfiling_count]
+      file: output.h5
+      communicator: $MPI_COMM_WORLD
+      subfiling:
+        count: -1               # <- one subfile per node
+      write: [field]
+      #! [decl_hdf5_h5file_subfiling_count]
+
+decl_hdf5_h5file_subfiling_policy:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      #! [decl_hdf5_h5file_subfiling_policy]
+      file: output.h5
+      communicator: $MPI_COMM_WORLD
+      subfiling:
+        count: 4
+        policy: CONTINUE        # <- without MPI_THREAD_MULTIPLE, write a regular file instead of failing
+      write: [field]
+      #! [decl_hdf5_h5file_subfiling_policy]
+
+decl_hdf5_h5file_subfiling_stripe_size:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      #! [decl_hdf5_h5file_subfiling_stripe_size]
+      file: output.h5
+      communicator: $MPI_COMM_WORLD
+      subfiling:
+        count: 4
+        stripe_size: 8388608    # <- 8 MiB to a subfile before moving to the next one
+      write: [field]
+      #! [decl_hdf5_h5file_subfiling_stripe_size]
+
+decl_hdf5_h5io_communicator:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      file: output.h5
+      write:
+        field:
+          #! [decl_hdf5_h5io_communicator]
+          communicator: $MPI_COMM_WORLD   # <- this access is parallel, only in a file without on_event
+          #! [decl_hdf5_h5io_communicator]
+
+decl_hdf5_h5io_mpio:
+  metadata:
+    iter: int
+    rank: int
+    nprocs: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_hdf5:
+      file: output.h5
+      write:
+        field:
+          #! [decl_hdf5_h5io_mpio]
+          communicator: $MPI_COMM_WORLD
+          mpio: INDEPENDENT         # <- each process accesses the file on its own, without synchronizing
+          #! [decl_hdf5_h5io_mpio]
+

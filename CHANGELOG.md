@@ -122,6 +122,9 @@ and this project adheres to
   really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Trace plugin page are run by PDI, and its trace compared
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Decl'HDF5 plugin reference are run by PDI, where one was
+  not valid YAML and others lacked the description of the dataset that a smaller
+  memory selection needs, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
