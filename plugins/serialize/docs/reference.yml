@@ -1,0 +1,70 @@
+# The examples of the Serialize plugin documentation (README.md), one whole specification tree per key, that the page shows the marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+serialize_sparse_array:
+  #! [serialize_sparse_array]
+  data:
+    sparse_array:
+      type: array
+      subtype: int
+      size: 8
+      start: 2
+      subsize: 4
+  plugins:
+    serialize:
+      logging: debug
+      sparse_array: dense_array
+  #! [serialize_sparse_array]
+
+serialize_dense_array:
+  data:
+    dense_array:
+      #! [serialize_dense_array]
+      type: array
+      subtype: int
+      size: 4
+      #! [serialize_dense_array]
+
+serialize_pointer_to_sparse_array:
+  #! [serialize_pointer_to_sparse_array]
+  data:
+    pointer_to_sparse_array:
+      type: pointer
+      subtype:
+        type: array
+        subtype: int
+        size: 8
+        start: 2
+        subsize: 4
+  plugins:
+    serialize:
+      pointer_to_sparse_array: dense_array
+  #! [serialize_pointer_to_sparse_array]
+
+serialize_config:
+  data:
+    sparse_array: {type: array, subtype: int, size: 8, start: 2, subsize: 4}
+  #! [serialize_config]
+  plugins:
+    serialize:              # <- the serialized version of each data, and its name
+      sparse_array: dense_array
+  #! [serialize_config]
+
+serialize_data_name:
+  data:
+    sparse_array: {type: array, subtype: int, size: 8, start: 2, subsize: 4}
+  plugins:
+    serialize:
+      #! [serialize_data_name]
+      sparse_array: dense_array # <- sparse_array is also shared as dense_array, serialized
+      #! [serialize_data_name]
+
+serialize_logging:
+  data:
+    sparse_array: {type: array, subtype: int, size: 8, start: 2, subsize: 4}
+  plugins:
+    serialize:
+      #! [serialize_logging]
+      logging: debug            # <- a level only
+      sparse_array: dense_array
+      #! [serialize_logging]
