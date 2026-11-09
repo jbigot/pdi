@@ -162,6 +162,8 @@ and this project adheres to
   events they react to, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the User-code plugin reference are run by PDI, with the
   functions they call, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The JSON plugin page tells how to run PDI's example with the plugin in a way
+  that works, by its test.
 
 #### Security
 
