@@ -1,0 +1,5 @@
+# Included by the examples of spectree.yml, from its pdi subtree; the rest of the file is the configuration of the simulation itself
+duration: 10
+pdi:
+  data:
+    pressure: double
