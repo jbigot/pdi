@@ -98,6 +98,9 @@ and this project adheres to
   an integer, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the YAML page are parsed by the tests, and those of a
   specification tree loaded by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Decl'NetCDF plugin reference are run by PDI, where its
+  I/O example lacked the description of the variable it writes to, as part of
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
