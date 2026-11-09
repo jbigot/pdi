@@ -43,6 +43,8 @@
 #
 # WORKDIR, when set, is the directory the example is run from, for the examples
 # that read their specification tree from a file next to them.
+#
+# ARGS, when set, is the list of the arguments of the example.
 
 if (NOT DEFINED EXAMPLE OR NOT DEFINED EXPECTED)
 	message(FATAL_ERROR "EXAMPLE and EXPECTED must be set, this script is meant to be run by ctest")
@@ -56,7 +58,7 @@ if (NOT DEFINED WORKDIR)
 	set(WORKDIR "${CMAKE_CURRENT_BINARY_DIR}")
 endif ()
 
-execute_process(COMMAND "${EXAMPLE}"
+execute_process(COMMAND "${EXAMPLE}" ${ARGS}
 		WORKING_DIRECTORY "${WORKDIR}"
 		OUTPUT_VARIABLE ACTUAL
 		ERROR_VARIABLE ACTUAL_ERR
