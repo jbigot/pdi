@@ -586,6 +586,23 @@ sbuild_add_module(PDI_API_TESTS
 	SUBSTEPS test
 )
 
+# the plugins of the plugin creation tutorial, tested but never installed
+sbuild_add_module(EXAMPLE_PLUGIN
+	ENABLE_BUILD_FLAG BUILD_TESTING
+	SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/plugins/example"
+	DEPENDS PDI
+	INSTALL_COMMAND ""
+	SUBSTEPS test
+)
+
+sbuild_add_module(POSIX_PLUGIN
+	ENABLE_BUILD_FLAG BUILD_TESTING
+	SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/plugins/posix"
+	DEPENDS PDI
+	INSTALL_COMMAND ""
+	SUBSTEPS test
+)
+
 sbuild_add_module(TIMER_PLUGIN
 	ENABLE_BUILD_FLAG BUILD_TIMER_PLUGIN
 	SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/plugins/timer"
