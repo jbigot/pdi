@@ -243,7 +243,7 @@ protected:
 	MOCK_METHOD(void, PdiError, (PDI_status_t, char const *), (const));
 };
 
-PdiTest::PdiTest()
+inline PdiTest::PdiTest()
 	: m_workdir(std::filesystem::canonical(std::filesystem::current_path()))
 {
 	static thread_local auto random_generator([]() {
