@@ -37,6 +37,8 @@ and this project adheres to
   values of a key that takes one of a fixed set of them are listed in a table.
 * Renamed the "How to create a plugin" documentation page from
   `How_to_create_plugin` to `How_to_create_a_plugin`.
+* The API reference no longer lists the deprecated macros, nor those that
+  serve the implementation of `PDI_PLUGIN` and the plugin API version.
 
 #### Deprecated
 
@@ -127,6 +129,8 @@ and this project adheres to
   plugin that does not exist, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The JSON plugin page tells how to run PDI's example with the plugin in a way
   that works, by its test.
+* The API reference names the deprecated statuses `PDI_UNAVAILABLE`,
+  `PDI_ERR_CONFIG` and `PDI_ERR_RIGHT`, instead of their deprecation macro.
 
 #### Security
 
