@@ -7,38 +7,81 @@ MPI plugin defines 2 types in PDI:
 * `MPI_Comm` - C MPI_Comm type
 * `MPI_Comm_f` - Fortran MPI_Comm type
 
-MPI plugin exposes several metadata that correspond with mpi library.
-* `MPI_COMM_WORLD.rank` - an integer value, represents the rank of the proccess
-  in the MPI_COMM_WORLD
-* `MPI_COMM_WORLD` - a MPI_Comm, MPI_COMM_WORLD for C language
-* `MPI_COMM_SELF` - a MPI_Comm, MPI_COMM_SELF for C language
-* `MPI_COMM_NULL` - a MPI_Comm, MPI_COMM_NULL for C language
-* `MPI_COMM_WORLD_F` - an integer, MPI_COMM_WORLD for Fortran language
-* `MPI_COMM_SELF_F` - an integer, MPI_COMM_SELF for Fortran language
-* `MPI_COMM_NULL_F` - an integer, MPI_COMM_NULL for Fortran language
+The MPI plugin exposes several metadata that correspond to values of the MPI library:
+* `MPI_COMM_WORLD_rank` - an integer, the rank of the process in `MPI_COMM_WORLD`,
+* `MPI_COMM_WORLD` - an `MPI_Comm`, `MPI_COMM_WORLD` for C,
+* `MPI_COMM_SELF` - an `MPI_Comm`, `MPI_COMM_SELF` for C,
+* `MPI_COMM_NULL` - an `MPI_Comm`, `MPI_COMM_NULL` for C,
+* `MPI_COMM_WORLD_F` - an `MPI_Comm_f` (an integer), `MPI_COMM_WORLD` for Fortran,
+* `MPI_COMM_SELF_F` - an `MPI_Comm_f` (an integer), `MPI_COMM_SELF` for Fortran,
+* `MPI_COMM_NULL_F` - an `MPI_Comm_f` (an integer), `MPI_COMM_NULL` for Fortran.
 
 All above metadata are available from PDI_init call to PDI_finalize call.
 
-At the yaml tree root plugin is a map that contains the following keys:
-|key|value|
-|:--|:----|
-|`"logging"` (*optional*)|a \ref spectree_logging|
-|`"transtype"` (*optional*)|a \ref transtype_map_node|
+The plugin can also transtype communicators between C and Fortran: each time a source communicator is shared, the transtyped communicator is
+shared under a destination name.
+When the source is released, the value of the destination is transtyped back into it if it was shared with write access, then the destination
+is released.
 
-## transtype map {#transtype_map_node}
-A *transtype map* can be used to transtype between C and Fortran MPI communicators.
-It is a mapping that in key has the name of data with communicator to transtype
-and in value the name of data where to write transtyped communicator.
+## Example of an MPI configuration {#mpi_configuration}
 
-Example:
+\snippet{trimleft} mpi/docs/reference.yml mpi_configuration
 
-```yaml
-data:
-  mpi_comm: MPI_Comm
-  mpi_comm_f: MPI_Comm_f
-plugins:
-  mpi:
-    transtype:
-      mpi_comm: m_mpi_comm_f
-      mpi_comm_f: m_mpi_comm
-```
+## `@mpi` {#mpi_config}
+
+Empty (`~`) or a mapping with the keys below.
+Use it, as the value of `plugins.mpi` (see \ref spectree_pdi_plugins_plugin_name), to load and configure the MPI plugin.
+
+**Example:**
+
+\snippet{trimleft} mpi/docs/reference.yml mpi_config
+
+
+**Example:**
+
+\snippet{trimleft} mpi/docs/reference.yml mpi_config_mapping
+
+
+### `@mpi.Comm_c2f.<data_name>` {#mpi_Comm_c2f_data_name}
+
+A scalar.
+Use `Comm_c2f.<data_name>` to share, under this name, the Fortran communicator transtyped from the C communicator named `<data_name>`.
+
+**Example:**
+
+\snippet{trimleft} mpi/docs/reference.yml mpi_Comm_c2f_data_name
+
+
+### `@mpi.Comm_f2c.<data_name>` {#mpi_Comm_f2c_data_name}
+
+A scalar.
+Use `Comm_f2c.<data_name>` to share, under this name, the C communicator transtyped from the Fortran communicator named `<data_name>`.
+
+**Example:**
+
+\snippet{trimleft} mpi/docs/reference.yml mpi_Comm_f2c_data_name
+
+
+### `@mpi.transtype.<data_name>` {#mpi_transtype_data_name}
+
+*Deprecated*, use \ref mpi_Comm_c2f_data_name and \ref mpi_Comm_f2c_data_name instead.
+A scalar.
+Use `transtype.<data_name>` to share, under this name, the communicator transtyped from the communicator named `<data_name>`.
+The direction of the transtyping depends on the type of `<data_name>`: C to Fortran for an `MPI_Comm`, Fortran to C otherwise.
+
+**Example:**
+
+\snippet{trimleft} mpi/docs/reference.yml mpi_transtype_data_name
+
+
+### `@mpi.logging` {#mpi_logging}
+
+*Optional.*
+A \ref spectree_logging.
+Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugins_plugin_name_logging.
+
+**Example:**
+
+\snippet{trimleft} mpi/docs/reference.yml mpi_logging
+
+

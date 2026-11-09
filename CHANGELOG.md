@@ -67,6 +67,9 @@ and this project adheres to
 * The Timer plugin reference documents the sequence form of its configuration,
   the plugins that emit timer events, the format of its output file, and that
   nothing is written to it when it cannot be locked.
+* The MPI plugin reference uses the name under which the plugin shares the rank
+  metadata, and documents `Comm_c2f` and `Comm_f2c` in place of the deprecated
+  `transtype`.
 * The Pycall plugin reference gives examples with working Python code, and
   documents how the plugin exposes values and handles errors.
 * The JSON plugin reference gives a valid configuration example, shows the file
@@ -138,6 +141,7 @@ and this project adheres to
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Timer plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Serialize plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the MPI plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Pycall plugin page are run by PDI, and the output of its
   full example compared to that of a real run, where it showed log lines that
   depend on the installation, as part of [#331](https://github.com/pdidev/pdi/issues/331).
