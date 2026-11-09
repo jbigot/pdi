@@ -6,29 +6,13 @@ The trace plugin is intended to generate a trace of what happens in
 The plugin is very simple; just list its name in the 
 \ref Specification_tree "specification tree" and you're done.
 
-```yaml
-data: #...
-metadata: #...
-plugins:
-  trace:
-  #...
-```
+\snippet{trimleft} trace/docs/reference.yml trace_plugin
 
 The plugin then generates a (somewhat verbose) trace through its logger, on the
 standard output by default.
 
 For example:
-```
-[10:52:58][Trace] *** info: Welcome!
-[10:52:58][PDI] *** info: Initialization successful
-[10:52:58][Trace] *** info: !!!                            named event: pdi_start_timer
-[10:52:58][Trace] *** info: =>>   data becoming available in the store: my_data
-[10:52:58][Trace] *** info: <<= data stop being available in the store: my_data
-[10:52:58][Trace] *** info: !!!                            named event: my_event
-[10:52:58][Trace] *** info: !!!                            named event: pdi_stop_timer
-[10:52:58][PDI] *** info: Finalization
-[10:52:58][Trace] *** info: Goodbye!
-```
+\snippet trace/docs/trace_output.output output
 
 Each line starting by `=>>   data becoming available in the store` means a new
 piece of data has been shared.
@@ -46,10 +30,7 @@ Use it, as the value of `plugins.trace` (see \ref spectree_pdi_plugins_plugin_na
 
 **Example:**
 
-```yaml
-plugins:
-  trace: ~                # <- no configuration: the trace goes to the standard output
-```
+\snippet{trimleft} trace/docs/reference.yml trace_config
 
 
 ### `@trace.logging` {#trace_logging}
@@ -60,9 +41,4 @@ Use `logging` to configure the logger of the plugin, through which it writes the
 
 **Example:**
 
-```yaml
-logging:
-  level: info
-  output:
-    file: trace.log   # <- the trace goes to trace.log instead of the standard output
-```
+\snippet{trimleft} trace/docs/reference.yml trace_logging
