@@ -134,6 +134,8 @@ and this project adheres to
 * The page on using PDI shows CMake and code that the tests build and run,
   where it named a C source for Fortran and gave `PDI_init` a stray bracket, as
   part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The page of PDI's example shows the code and configuration of the example
+  itself, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
