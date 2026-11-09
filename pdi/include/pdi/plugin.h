@@ -48,6 +48,10 @@ class PDI_EXPORT Plugin
 	Logger& m_logger;
 
 public:
+	/// \name Plugin
+	/// Constructs the plugin; a plugin can be neither copied nor moved
+	///@{
+
 	Plugin(const Plugin&) = delete;
 
 	Plugin(Plugin&&) = delete;
@@ -57,6 +61,8 @@ public:
 	 * \param ctx the PDI context for this plugin instance
 	 */
 	Plugin(Logger& logger, Context& ctx);
+
+	///@}
 
 	virtual ~Plugin() noexcept(false);
 

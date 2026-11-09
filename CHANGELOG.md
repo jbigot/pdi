@@ -136,6 +136,8 @@ and this project adheres to
 #### Added
 
 #### Changed
+* The plugin API reference documents the overloads of a function together,
+  under the function's name, with a description of what they share.
 
 #### Deprecated
 
