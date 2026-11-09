@@ -140,6 +140,9 @@ and this project adheres to
   really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the YAML page are parsed by the tests, and those of a
   specification tree loaded by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The page on using PDI shows CMake and code that the tests build and run,
+  where it named a C source for Fortran and gave `PDI_init` a stray bracket, as
+  part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the specification tree reference are run by PDI, and its
   default log patterns checked against what PDI logs, where one of them loaded a
   plugin that does not exist, as part of [#331](https://github.com/pdidev/pdi/issues/331).
