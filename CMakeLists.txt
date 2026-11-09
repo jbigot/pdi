@@ -542,6 +542,7 @@ sbuild_add_module(TRACE_PLUGIN
 	ENABLE_BUILD_FLAG BUILD_TRACE_PLUGIN
 	SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/plugins/trace"
 	DEPENDS PDI
+	SUBSTEPS test
 )
 
 
@@ -560,10 +561,15 @@ sbuild_add_module(PDI_EXAMPLE
 	SUBSTEPS test
 )
 
+# the examples of the documentation among the combination tests load the Trace plugin
+set(PDI_COMBINATION_TESTS_DEPENDS PDI)
+if("${BUILD_TRACE_PLUGIN}")
+	list(APPEND PDI_COMBINATION_TESTS_DEPENDS TRACE_PLUGIN)
+endif()
 sbuild_add_module(PDI_COMBINATION_TESTS
 	ENABLE_BUILD_FLAG BUILD_TESTING
 	SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/combination_tests"
-	DEPENDS PDI
+	DEPENDS ${PDI_COMBINATION_TESTS_DEPENDS}
 	INSTALL_COMMAND ""
 	SUBSTEPS test
 )
