@@ -36,6 +36,8 @@ and this project adheres to
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
 * The User-code plugin reference gives examples with the access rights they need.
+* The examples of the YAML page are parsed by the tests, and those of a
+  specification tree loaded by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
