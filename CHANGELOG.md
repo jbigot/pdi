@@ -36,6 +36,8 @@ and this project adheres to
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
 * The User-code plugin reference gives examples with the access rights they need.
+* The examples of the first steps build and run, and show the output PDI
+  really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
