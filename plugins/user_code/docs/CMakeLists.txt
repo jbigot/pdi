@@ -57,3 +57,11 @@ target_compile_definitions(user_code_examples PRIVATE "EXAMPLES_DIR=\"${CMAKE_CU
 target_compile_features(user_code_examples PRIVATE cxx_std_17)
 set_target_properties(user_code_examples PROPERTIES ENABLE_EXPORTS TRUE)
 gtest_discover_tests(user_code_examples)
+
+# The specification trees of the configuration reference (reference.yml), run by PDI with the functions they call, and the events they react to.
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../../pdi/docs/RunTrees.cmake")
+pdi_doc_run_trees(user_code_reference "${CMAKE_CURRENT_SOURCE_DIR}/reference.yml"
+	INOUT
+	VALUES cond=2 iter=10
+	EVENTS checkpoint my_event step
+	SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/reference_functions.c")

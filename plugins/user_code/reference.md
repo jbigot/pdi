@@ -12,16 +12,7 @@ Keys not listed here are ignored.
 
 **Example:**
 
-```yaml
-plugins:
-  user_code:
-    on_event:
-      checkpoint:         # <- functions called on an event...
-        write_checkpoint: {}
-    on_data:
-      field:              # <- ... and when data is shared
-        process_field: {input: $field}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_config
 
 
 ### `@user_code.on_event` {#user_code_on_event}
@@ -33,11 +24,7 @@ It can also be a sequence of single-key mappings, which has the same meaning and
 
 **Example:**
 
-```yaml
-on_event:                 # <- functions called on events
-  checkpoint:
-    write_checkpoint: {}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_on_event
 
 
 ### `@user_code.on_event.<event_name>` {#user_code_on_event_event_name}
@@ -47,14 +34,7 @@ Use `on_event.<event_name>` to call the functions each time the event named `<ev
 
 **Example:**
 
-```yaml
-on_event:
-  - my_event:             # <- two function lists for the same event, in the sequence form
-      when: $cond > 1
-      fun1: {in: $desc2, out: $desc3}
-  - my_event:
-      fun2: {}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_on_event_event_name
 
 `fun2` is called each time `my_event` is emitted, `fun1` only if, in addition, `$cond > 1`.
 
@@ -68,11 +48,7 @@ It can also be a sequence of single-key mappings, which has the same meaning and
 
 **Example:**
 
-```yaml
-on_data:                  # <- functions called when data is shared
-  field:
-    process_field: {input: $field}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_on_data
 
 
 ### `@user_code.on_data.<data_name>` {#user_code_on_data_data_name}
@@ -82,12 +58,7 @@ Use `on_data.<data_name>` to call the functions each time the data named `<data_
 
 **Example:**
 
-```yaml
-on_data:
-  field:                  # <- called each time field is shared
-    process_field: {input: $field}
-    report: {}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_on_data_data_name
 
 
 ### `@user_code.logging` {#user_code_logging}
@@ -98,12 +69,7 @@ Use `logging` to configure the logger of the plugin, see \ref spectree_pdi_plugi
 
 **Example:**
 
-```yaml
-logging: debug            # <- the logger of the User-code plugin
-on_event:
-  checkpoint:
-    write_checkpoint: {}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_logging
 
 
 ## `@function_list` {#user_code_function_list}
@@ -113,13 +79,7 @@ You can use it in \ref user_code_on_event_event_name and \ref user_code_on_data_
 
 **Example:**
 
-```yaml
-on_event:
-  step:                   # <- this mapping is a function list
-    when: $iter > 0
-    compute: {in: $field, out: $result}
-    report: {}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_function_list
 
 
 ### `@function_list.when` {#user_code_function_list_when}
@@ -132,10 +92,7 @@ An error while evaluating it is logged and does not interrupt the program.
 
 **Example:**
 
-```yaml
-when: $iter % 10 = 0      # <- the functions are only called every 10 iterations
-report: {}
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_function_list_when
 
 
 ### `@function_list.<function_name>` {#user_code_function_list_function_name}
@@ -147,10 +104,7 @@ A function cannot be named `when`: this key is reserved for the condition of the
 
 **Example:**
 
-```yaml
-compute: {in: $field}     # <- calls compute(), with field shared as in while it runs
-report: {}                # <- calls report(), with nothing shared
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_function_list_function_name
 
 
 ### `@function_list.<function_name>.<alias_name>` {#user_code_function_list_function_name_alias_name}
@@ -160,8 +114,4 @@ Use `<alias_name>` to share its value under the name `<alias_name>` while the fu
 
 **Example:**
 
-```yaml
-compute:
-  in: $field              # <- compute() accesses field as in
-  out: $result            #    and result as out
-```
+\snippet{trimleft} user_code/docs/reference.yml user_code_function_list_function_name_alias_name
