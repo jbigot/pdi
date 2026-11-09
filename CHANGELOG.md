@@ -58,6 +58,8 @@ and this project adheres to
   really prints; the tests run them, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the Trace plugin page are run by PDI, and its trace compared
   to that of a real run, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The Pycall plugin reference gives examples with working Python code, and
+  documents how the plugin exposes values and handles errors.
 
 #### Security
 
