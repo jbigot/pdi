@@ -65,3 +65,14 @@ if("${BUILD_NETCDF_PARALLEL}")
 	set_property(TEST decl_netcdf_examples_mpi PROPERTY TIMEOUT 30)
 	set_property(TEST decl_netcdf_examples_mpi PROPERTY PROCESSORS 2)
 endif()
+
+# The specification trees of the configuration reference (reference.yml, and reference_parallel.yml for a parallel NetCDF), run by PDI.
+# Those that read restart.nc or matrix.nc, which no example writes, are only initialized.
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../../pdi/docs/RunTrees.cmake")
+pdi_doc_run_trees(decl_netcdf_reference "${CMAKE_CURRENT_SOURCE_DIR}/reference.yml"
+	VALUES iter=1
+	EVENTS checkpoint finalization
+	INIT_ONLY decl_netcdf_config_sequence decl_netcdf_ncfile_read_data_name decl_netcdf_ncfile_read_item decl_netcdf_ncio_size_of)
+if("${BUILD_NETCDF_PARALLEL}")
+	pdi_doc_run_trees(decl_netcdf_reference_parallel "${CMAKE_CURRENT_SOURCE_DIR}/reference_parallel.yml" MPI)
+endif()

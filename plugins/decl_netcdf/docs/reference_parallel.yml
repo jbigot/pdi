@@ -1,0 +1,17 @@
+# The examples of the Decl'NetCDF configuration reference (reference.md) that only a parallel NetCDF runs, one whole specification tree per key, that the page shows the
+# marked part of.
+# The test of this directory runs each of them with pdi/docs/run_trees.cxx.
+
+decl_netcdf_ncfile_communicator:
+  metadata:
+    iter: int
+  data:
+    field: {type: array, subtype: double, size: [64, 64]}
+  plugins:
+    mpi: ~
+    decl_netcdf:
+      #! [decl_netcdf_ncfile_communicator]
+      file: output.nc
+      communicator: $MPI_COMM_WORLD   # <- all processes access output.nc, the MPI plugin defines $MPI_COMM_WORLD
+      write: [field]
+      #! [decl_netcdf_ncfile_communicator]
