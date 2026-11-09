@@ -108,6 +108,7 @@ and this project adheres to
   events they react to, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 * The examples of the User-code plugin reference are run by PDI, with the
   functions they call, as part of [#331](https://github.com/pdidev/pdi/issues/331).
+* The examples of the Serialize plugin page are run by PDI, as part of [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 
