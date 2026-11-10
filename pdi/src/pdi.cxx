@@ -239,7 +239,9 @@ try {
 			PDI_VERSION_PATCH
 		};
 	}
-	Data_store::store().logger().trace("PDI API version: {}.{}.{}", PDI_VERSION_MAJOR, PDI_VERSION_MINOR, PDI_VERSION_PATCH);
+	if (Data_store::initialized()) {
+		Data_store::store().logger().trace("PDI API version: {}.{}.{}", PDI_VERSION_MAJOR, PDI_VERSION_MINOR, PDI_VERSION_PATCH);
+	}
 	return PDI_OK;
 } catch (const Error& e) {
 	return g_error_context.return_err(e);

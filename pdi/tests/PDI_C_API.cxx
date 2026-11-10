@@ -161,6 +161,26 @@ TEST_F(PdiCApiTest, PdiVersion)
 	EXPECT_EQ(PDI_VERSION, provided);
 }
 
+/* Name:                PdiCApiTest.PdiVersionBeforeInit
+ *
+ * Description:         Checks PDI_version before PDI_init: a compatible version succeeds and an incompatible one fails, the provided
+ *                      version filled in both cases
+ */
+TEST_F(PdiCApiTest, PdiVersionBeforeInit)
+{
+	PDI_errhandler_t previous_handler = PDI_errhandler(PDI_NULL_HANDLER);
+
+	unsigned long provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, PDI_VERSION)) << "exact match is compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR + 1, 0, 0))) << "major is not FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	PDI_errhandler(previous_handler);
+}
+
 /* Name:                PdiCApiTest.InvalidMetadataRef
  *
  * Tested functions:    PDI_expose()
