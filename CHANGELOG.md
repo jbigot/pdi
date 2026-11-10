@@ -42,6 +42,9 @@ and this project adheres to
   with the new `PDI_ERR_INVALID_VERSION` status, instead of `PDI_ERR_PLUGIN`
   and a message about an invalid plugin, fixing
   [#949](https://github.com/pdidev/pdi/issues/949)
+* `PDI_version` called before `PDI_init` with a compatible version now succeeds,
+  instead of failing because PDI is not initialized, fixing
+  [#950](https://github.com/pdidev/pdi/issues/950)
 
 #### Security
 
