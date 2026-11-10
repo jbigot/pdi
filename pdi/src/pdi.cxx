@@ -229,8 +229,8 @@ try {
 	unsigned long expected_patch = (expected >> 8) & MASK;
 
 	if (expected && (expected_major != PDI_VERSION_MAJOR || expected_minor > PDI_VERSION_MINOR)) {
-		throw Plugin_error{
-			"Invalid PDI API version: {}.{}.{}, PDI provided version is {}.{}.{}",
+		throw Version_error{
+			"expected PDI API version is {}.{}.{}, but provided version is {}.{}.{}",
 			expected_major,
 			expected_minor,
 			expected_patch,

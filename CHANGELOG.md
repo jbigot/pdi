@@ -77,6 +77,10 @@ and this project adheres to
 * The mock PDI defines the version macros of `pdi.h`, `PDI_VERSION` and its
   components, with the version of the last release, and its `PDI_version`
   provides that version, fixing [#951](https://github.com/pdidev/pdi/issues/951)
+* `PDI_version` and Python's `pdi.version()` report an incompatible version
+  with the new `PDI_ERR_INVALID_VERSION` status, instead of `PDI_ERR_PLUGIN`
+  and a message about an invalid plugin, fixing
+  [#949](https://github.com/pdidev/pdi/issues/949)
 
 #### Security
 * PDI builds again against paraconf 1.2.0 with `-Werror=format-security`, and

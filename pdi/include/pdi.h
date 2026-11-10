@@ -107,9 +107,11 @@ typedef enum PDI_status_e {
 	PDI_ERR_INVALIDACTION,
 	/// Multiple errors of different types append
 	PDI_ERR_MULTIPLE,
+	/// There is a version incompatibility between APIs/ABIs
+	PDI_ERR_INVALID_VERSION,
 	/// The amount of distinct error codes defined. This should not be used as an error code
 	// it should also always remain last
-	PDI_NB_STATUSES_DEFINED
+	PDI_NB_STATUSES_DEFINED,
 } PDI_status_t;
 
 static
@@ -117,18 +119,21 @@ static
 	constexpr
 #endif
 	char const * const PDI_STATUS_MSG[]
-	= {"Not an error",
-       "Data unavailable",
-       "Invalid entry in specification tree",
-       "Invalid value expression",
-       "Invalid plugin",
-       "Missing feature",
-       "System error",
-       "Precondition not respected",
-       "Permission issue",
-       "Incorrect type",
-       "Invalid action requested",
-       "Multiple errors"};
+	= {
+		"Not an error",
+		"Data unavailable",
+		"Invalid entry in specification tree",
+		"Invalid value expression",
+		"Invalid plugin",
+		"Missing feature",
+		"System error",
+		"Precondition not respected",
+		"Permission issue",
+		"Incorrect type",
+		"Invalid action requested",
+		"Multiple errors",
+		"Incompatible versions",
+};
 
 /** Type of a callback function used when an error occurs
  * \param status the error code

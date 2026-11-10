@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015-2025 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+ * Copyright (C) 2015-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,12 +28,138 @@
 
 #include <paraconf.h>
 #include <pdi.h>
+#include <pdi/testing.h>
 
-class PdiCApiTest: public ::testing::Test
+using ::testing::Eq;
+using ::testing::HasSubstr;
+
+class PdiCApiTest: public ::PDI::PdiTest
+{};
+
+TEST_F(PdiCApiTest, PdiVersion)
 {
-protected:
-	void TearDown() override { PDI_finalize(); }
-};
+	InitPdi(PC_parse_string("{}"));
+
+	EXPECT_EQ(PDI_OK, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, PDI_VERSION_MINOR, PDI_VERSION_PATCH)))
+		<< "exact match is compatible";
+
+	EXPECT_EQ(PDI_OK, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, PDI_VERSION_MINOR, 0))) << "patch is BW compatible";
+
+	EXPECT_EQ(PDI_OK, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, PDI_VERSION_MINOR, 255))) << "patch is FW compatible";
+
+	EXPECT_EQ(PDI_OK, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 0, PDI_VERSION_PATCH))) << "minor is BW compatible";
+
+	EXPECT_EQ(PDI_OK, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 0, 0))) << "minor is BW compatible";
+
+	EXPECT_EQ(PDI_OK, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 0, 255))) << "minor is BW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 255, PDI_VERSION_PATCH)))
+		<< "minor is not FW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 255, 0))) << "minor is not FW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 255, 255))) << "minor is not FW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(0, PDI_VERSION_MINOR, PDI_VERSION_PATCH)))
+		<< "major is not BW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(0, 0, 1))) << "major is not BW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(0, 255, 255))) << "major is not BW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(255, PDI_VERSION_MINOR, PDI_VERSION_PATCH)))
+		<< "major is not FW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(255, 0, 0))) << "major is not FW compatible";
+
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(nullptr, PDI_COMPUTE_VERSION(255, 255, 255))) << "major is not FW compatible";
+
+	unsigned long provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, 0));
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, PDI_VERSION_MINOR, PDI_VERSION_PATCH)))
+		<< "exact match is compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, PDI_VERSION_MINOR, 0))) << "patch is BW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, PDI_VERSION_MINOR, 255))) << "patch is FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 0, PDI_VERSION_PATCH))) << "minor is BW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 0, 0))) << "minor is BW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_EQ(PDI_OK, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 0, 255))) << "minor is BW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 255, PDI_VERSION_PATCH)))
+		<< "minor is not FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 255, 0))) << "minor is not FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(PDI_VERSION_MAJOR, 255, 255))) << "minor is not FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(0, PDI_VERSION_MINOR, PDI_VERSION_PATCH)))
+		<< "major is not BW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(0, 0, 1))) << "major is not BW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(0, 255, 255))) << "major is not BW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(255, PDI_VERSION_MINOR, PDI_VERSION_PATCH)))
+		<< "major is not FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(255, 0, 0))) << "major is not FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+
+	provided = 0;
+	EXPECT_CALL(*this, PdiError(Eq(PDI_ERR_INVALID_VERSION), HasSubstr("PDI API version")));
+	EXPECT_EQ(PDI_ERR_INVALID_VERSION, PDI_version(&provided, PDI_COMPUTE_VERSION(255, 255, 255))) << "major is not FW compatible";
+	EXPECT_EQ(PDI_VERSION, provided);
+}
 
 /* Name:                PdiCApiTest.InvalidMetadataRef
  *
@@ -44,7 +170,7 @@ protected:
  */
 TEST_F(PdiCApiTest, InvalidMetadataRef)
 {
-	static const char* CONFIG_YAML
+	static constexpr const char* CONFIG_YAML
 		= "logging: trace          \n"
 		  "data:                   \n"
 		  "  invalid:              \n"
@@ -53,7 +179,7 @@ TEST_F(PdiCApiTest, InvalidMetadataRef)
 		  "    size: $meta2        \n"
 		  "plugins:                \n";
 
-	PDI_init(PC_parse_string(CONFIG_YAML));
+	InitPdi(PC_parse_string(CONFIG_YAML));
 
 	PDI_errhandler(PDI_NULL_HANDLER);
 	double invalid;
@@ -75,7 +201,7 @@ TEST_F(PdiCApiTest, InvalidMetadataRef)
  */
 TEST_F(PdiCApiTest, MetadataDensification)
 {
-	static const char* CONFIG_YAML
+	static constexpr const char* CONFIG_YAML
 		= "logging: trace         \n"
 		  "metadata:              \n"
 		  "  my_array:            \n"
@@ -85,7 +211,7 @@ TEST_F(PdiCApiTest, MetadataDensification)
 		  "    type: array        \n"
 		  "    subtype: int  \n";
 
-	PDI_init(PC_parse_string(CONFIG_YAML));
+	InitPdi(PC_parse_string(CONFIG_YAML));
 
 	int sparse_array[1000]; //buffer: 10 x 10 x 10; data: 3 x 4 x 5; start: (1, 2, 3)
 	int* dense_array; //buffer: 3 x 4 x 5
@@ -130,8 +256,8 @@ void test_share(PDI_inout_t access)
  */
 TEST_F(PdiCApiTest, PDI_share)
 {
-	static const char* CONFIG_YAML = "logging: trace\n";
-	PDI_init(PC_parse_string(CONFIG_YAML));
+	static constexpr const char* CONFIG_YAML = "logging: trace\n";
+	InitPdi(PC_parse_string(CONFIG_YAML));
 
 	test_share(PDI_OUT);
 	test_share(PDI_INOUT);
@@ -145,8 +271,8 @@ TEST_F(PdiCApiTest, PDI_share)
  */
 TEST_F(PdiCApiTest, PDI_expose)
 {
-	static const char* CONFIG_YAML = "logging: trace\n";
-	PDI_init(PC_parse_string(CONFIG_YAML));
+	static constexpr const char* CONFIG_YAML = "logging: trace\n";
+	InitPdi(PC_parse_string(CONFIG_YAML));
 
 	int i = 42;
 	const int j = 51;
@@ -167,8 +293,8 @@ TEST_F(PdiCApiTest, PDI_expose)
  */
 TEST_F(PdiCApiTest, PDI_multi_expose)
 {
-	static const char* CONFIG_YAML = "logging: trace\n";
-	PDI_init(PC_parse_string(CONFIG_YAML));
+	static constexpr const char* CONFIG_YAML = "logging: trace\n";
+	InitPdi(PC_parse_string(CONFIG_YAML));
 
 	int i = 42;
 	const int j = 51;
