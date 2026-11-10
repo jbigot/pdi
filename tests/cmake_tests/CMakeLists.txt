@@ -126,3 +126,19 @@ if ("${BUILD_PYTHON}")
     assert("${PDI_FOUND}")
     assert(TARGET PDI::PDI_C)
 endif()
+
+
+
+# Find PDI in a project of its own, so that the output of find_package can be checked
+
+if("${BUILD_FORTRAN}")
+	# The deprecated Fortran component warns, unless QUIET
+	add_test(NAME find_deprecated_component_warns
+		COMMAND "${CMAKE_COMMAND}" -S "${CMAKE_CURRENT_SOURCE_DIR}/quiet" -B "${CMAKE_CURRENT_BINARY_DIR}/find_deprecated_component_warns"
+			"-DPDI_DIR=${PDI_DIR}" -DPDI_COMPONENTS=Fortran -DQUIET=OFF)
+	set_tests_properties(find_deprecated_component_warns PROPERTIES PASS_REGULAR_EXPRESSION "\"Fortran\" component is deprecated")
+	add_test(NAME find_deprecated_component_quiet
+		COMMAND "${CMAKE_COMMAND}" -S "${CMAKE_CURRENT_SOURCE_DIR}/quiet" -B "${CMAKE_CURRENT_BINARY_DIR}/find_deprecated_component_quiet"
+			"-DPDI_DIR=${PDI_DIR}" -DPDI_COMPONENTS=Fortran -DQUIET=ON)
+	set_tests_properties(find_deprecated_component_quiet PROPERTIES FAIL_REGULAR_EXPRESSION "PDI:")
+endif()
