@@ -190,6 +190,11 @@ extern template class PDI_EXPORT impl::Error_impl<PDI_ERR_TYPE>;
 using Invalid_action_error = impl::Error_impl<PDI_ERR_INVALIDACTION>;
 extern template class PDI_EXPORT impl::Error_impl<PDI_ERR_INVALIDACTION>;
 
+/** An error class to use when there is a version incompatibility between APIs/ABIs
+ */
+using Version_error = impl::Error_impl<PDI_ERR_INVALID_VERSION>;
+extern template class PDI_EXPORT impl::Error_impl<PDI_ERR_INVALID_VERSION>;
+
 /** An error class to use when there is an invalid entry in the specification tree
  */
 class PDI_EXPORT Spectree_error

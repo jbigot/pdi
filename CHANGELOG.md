@@ -38,6 +38,10 @@ and this project adheres to
 * `find_package(PDI)` now sets `PDI_<component>_FOUND` for each component
   requested, so that a project can tell which optional components it got,
   fixing [#948](https://github.com/pdidev/pdi/issues/948).
+* `PDI_version` and Python's `pdi.version()` report an incompatible version
+  with the new `PDI_ERR_INVALID_VERSION` status, instead of `PDI_ERR_PLUGIN`
+  and a message about an invalid plugin, fixing
+  [#949](https://github.com/pdidev/pdi/issues/949)
 
 #### Security
 

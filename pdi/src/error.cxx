@@ -95,6 +95,7 @@ template class impl::Error_impl<PDI_ERR_STATE>;
 template class impl::Error_impl<PDI_ERR_PERMISSION>;
 template class impl::Error_impl<PDI_ERR_TYPE>;
 template class impl::Error_impl<PDI_ERR_INVALIDACTION>;
+template class impl::Error_impl<PDI_ERR_INVALID_VERSION>;
 
 } // namespace impl
 
