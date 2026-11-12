@@ -41,9 +41,8 @@ using PDI::combination_tests::Vector;
 
 struct SerializeDeclNetcdf: public ::PDI::PdiTest {};
 
-// a vector record and an array section, written then read back
-// TODO: NetCDF cannot create the large serialized record with a fill value, https://github.com/pdidev/pdi/issues/433
-TEST_F(SerializeDeclNetcdf, DISABLED_VectorAndArray)
+// a vector record and an array section, written then read back (the large serialized record needs the _NoFill attribute)
+TEST_F(SerializeDeclNetcdf, VectorAndArray)
 {
 	InitPdi(PC_parse_string(R"==(
 types:
@@ -153,6 +152,10 @@ plugins:
   decl_netcdf:
     - file: VectorAndArray.nc
       on_event: write
+      variables:
+        vector_data_serialized:
+          attributes:
+            _NoFill: true
       write: [vector_data_serialized, int_array_serialized]
     - file: VectorAndArray.nc
       on_event: read
