@@ -31,7 +31,8 @@
 #[[ This is a test of PDI installed CMake config.
 
 It checks that all targets are made available, and that multiple calls to find_package() work, each adding the requested components, never removing
-previously requested ones, including when called from a subdirectory added by add_subdirectory()
+previously requested ones, including when called from a subdirectory added by add_subdirectory(), and that a QUIET find_package() prints
+nothing.
 
 #]]
 
@@ -93,3 +94,36 @@ add_subdirectory(subdir1)
 # testing that find_package(PDI) works in another subdirectory
 message("++ add_subdirectory(subdir2)")
 add_subdirectory(subdir2)
+
+message(STATUS "checking the output of find_package")
+
+# Configure a project of its own that looks for COMPONENT, and return its exit status and its whole output
+function(configure_find_project RESULT_VAR OUTPUT_VAR QUIET COMPONENT)
+	execute_process(COMMAND "${CMAKE_COMMAND}"
+			-S "${CMAKE_CURRENT_SOURCE_DIR}/quiet" -B "${CMAKE_CURRENT_BINARY_DIR}/quiet_${QUIET}"
+			"-DPDI_DIR=${PDI_DIR}" "-DPDI_COMPONENTS=${COMPONENT}" "-DQUIET=${QUIET}"
+		RESULT_VARIABLE _RESULT OUTPUT_VARIABLE _OUTPUT ERROR_VARIABLE _OUTPUT)
+	set("${RESULT_VAR}" "${_RESULT}" PARENT_SCOPE)
+	set("${OUTPUT_VAR}" "${_OUTPUT}" PARENT_SCOPE)
+endfunction()
+
+if("${BUILD_FORTRAN}")
+	message("++ find_package with the deprecated Fortran component warns")
+	configure_find_project(RESULT OUTPUT OFF Fortran)
+	string(COMPARE EQUAL "${RESULT}" "0" SUCCESS)
+	assert("${SUCCESS}")
+	string(FIND "${OUTPUT}" "\"Fortran\" component is deprecated" WARNING_POS)
+	string(COMPARE NOTEQUAL "${WARNING_POS}" "-1" WARNED)
+	assert("${WARNED}")
+
+	message("++ QUIET find_package with the deprecated Fortran component prints nothing")
+	configure_find_project(RESULT OUTPUT ON Fortran)
+	string(COMPARE EQUAL "${RESULT}" "0" SUCCESS)
+	assert("${SUCCESS}")
+	string(FIND "${OUTPUT}" "PDI:" PDI_MESSAGE_POS)
+	string(COMPARE EQUAL "${PDI_MESSAGE_POS}" "-1" SILENT)
+	if(NOT "${SILENT}")
+		message(STATUS "Output of the QUIET find_package:\n${OUTPUT}")
+	endif()
+	assert("${SILENT}")
+endif()
