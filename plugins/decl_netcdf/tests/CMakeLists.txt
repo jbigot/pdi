@@ -1,6 +1,7 @@
 #=============================================================================
 # Copyright (C) 2020-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
 # Copyright (C) 2020-2021 Institute of Bioorganic Chemistry Polish Academy of Science (PSNC)
+# Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -64,7 +65,7 @@ if("${BUILD_NETCDF_PARALLEL}")
 endif()
 
 add_executable(decl_netcdf_08_C decl_netcdf_test_08.cxx)
-target_link_libraries(decl_netcdf_08_C PDI::PDI_C GTest::gmock_main)
+target_link_libraries(decl_netcdf_08_C PDI::PDI_C NetCDF::NetCDF GTest::gmock_main)
 target_compile_features(decl_netcdf_08_C PUBLIC cxx_std_20)
 gtest_discover_tests(decl_netcdf_08_C PROPERTIES TIMEOUT 15)
 
