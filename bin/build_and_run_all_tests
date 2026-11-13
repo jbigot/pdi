@@ -83,8 +83,10 @@ fi
 
 if [[ "x${PDI_SYSTEM}" =~ ^x(ubuntu|debian) && "x${PDI_LIBS}" = "xprovided" ]]
 then
-	# Workaround: parallel NetCDF detection broken in debuntu (and absent in mpich case)
-	# TODO: However netcdf-parallel 1:4.10.1-1 might have fixed it. the flag should be removed in this case
+	# Workaround: debuntu provide no parallel NetCDF for MPICH, and the CMake configuration of the OpenMPI one is unusable
+	#             up to netcdf-parallel 1:4.10.1-2 at least: https://bugs.debian.org/DEBIAN_BUG
+	#             The test_env images install no parallel NetCDF for that reason.
+	#             The parallel plugin is still tested here against the vendored NetCDF, in the mini images.
 	CMAKE_FLAGS="-DBUILD_NETCDF_PARALLEL=OFF ${CMAKE_FLAGS}"
 fi
 
