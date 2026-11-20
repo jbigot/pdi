@@ -33,7 +33,7 @@ struct example_plugin : public PDI::Plugin
     example_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
         Plugin{logger, ctx}
     {}
-}
+};
 
 PDI_PLUGIN(example)
 ```
@@ -42,7 +42,7 @@ PDI_PLUGIN(example)
 To be notified when the user shares data (calls `PDI_share`, `PDI_expose` or `PDI_multiexpose`), a plugin registers a function (a callback) with `PDI::Context::on_data`.
 
 ```cpp
-std::function<void()> on_data(const std::function<void(const std::string&, Ref)>& callback, const std::string& name = {}))
+std::function<void()> on_data(const std::function<void(const std::string&, Ref)>& callback, const std::string& name = {})
 ```
 
 The first argument is the function to be called when user shares the data.
@@ -51,6 +51,8 @@ Returns a function that removes the callback from PDI::Context container.
 
 Example of adding new callback:
 ```cpp
+#include <iostream>
+
 #include <pdi/context.h>
 #include <pdi/logger.h>
 #include <pdi/paraconf_wrapper.h>
@@ -66,7 +68,7 @@ struct example_plugin : public PDI::Plugin
             std::cout << "User has shared a data named " << data_name << std::endl;
         });
     }
-}
+};
 
 PDI_PLUGIN(example)
 ```
@@ -99,9 +101,20 @@ User has shared a data named some_integer
 ```
 
 ### Reading and writing data {#rw_data}
-Example of reading and writing data:
+
+A `PDI::Ref` gives no access to the data by itself.
+The plugin converts it to a `PDI::Ref_r` to read the data, a `PDI::Ref_w` to write it, or a `PDI::Ref_rw` to do both, and the converted
+reference is null if the share does not grant that access.
+Which access to ask for follows from what the plugin was configured to do, never from what the share happens to grant: see
+\ref pdg_config_decides "the design guidelines".
+
+The type of the reference describes the data: check it before interpreting the buffer.
+Example of a plugin that reads an integer each time one is shared:
 ```cpp
+#include <iostream>
+
 #include <pdi/context.h>
+#include <pdi/error.h>
 #include <pdi/logger.h>
 #include <pdi/paraconf_wrapper.h>
 #include <pdi/plugin.h>
@@ -113,27 +126,34 @@ struct example_plugin : public PDI::Plugin
         Plugin{logger, ctx}
     {
         ctx.on_data([](const std::string& data_name, PDI::Ref ref){
-            if(PDI::Ref_rw ref_rw{ref}) {
-                //Plugin can read and write
-                int* some_integer = ref_rw.get();
-            } else if(PDI::Ref_r ref_r{ref}) {
-                //Plugin can read
-                const int* some_integer = ref_r.get();
-            } else if(PDI::Ref_w ref_w{ref}) {
-                //Plugin can write
-                int* some_integer = ref_w.get();
+            // this plugin reads the data: ask for read access
+            if (PDI::Ref_r ref_r{ref}) {
+                // converts the value to long, whatever the type of integer, and throws if it is not a scalar
+                long some_integer = ref_r.scalar_value<long>();
+                std::cout << data_name << " = " << some_integer << std::endl;
             } else {
-                //Plugin cannot read nor write
+                throw PDI::Permission_error{"Cannot read `{}'", data_name};
             }
         });
     }
-}
+};
 
 PDI_PLUGIN(example)
 ```
 
 ### Handling events {#example_events}
+
+To be notified of events, a plugin registers a callback with `PDI::Context::on_event`, either for all events, or for one event given by name.
+Like the names of data, the names of events are chosen by the user, in the specification tree:
+```yaml
+plugins:
+  example:
+    on_event: checkpoint
+```
 ```cpp
+#include <iostream>
+#include <string>
+
 #include <pdi/context.h>
 #include <pdi/logger.h>
 #include <pdi/paraconf_wrapper.h>
@@ -149,18 +169,18 @@ struct example_plugin : public PDI::Plugin
             this->handle_event(event_name);
         });
         ctx.on_event([this](const std::string& event_name){
-            this->handle_special_event(event_name);
-        }, "special_event");
+            this->handle_configured_event(event_name);
+        }, PDI::to_string(PC_get(spec_tree, ".on_event")));
     }
 private:
     void handle_event(const std::string& event_name) {
-        std::cout << "Event" << event_name << "called." << std::endl;
+        std::cout << "Event `" << event_name << "' called." << std::endl;
     }
 
-    void handle_special_event(const std::string& event_name) {
-        std::cout << "Special event `" << event_name << "' called." << std::endl;
-    } 
-}
+    void handle_configured_event(const std::string& event_name) {
+        std::cout << "Configured event `" << event_name << "' called." << std::endl;
+    }
+};
 
 PDI_PLUGIN(example)
 ```
@@ -175,6 +195,9 @@ plugins:
 ```
 Reading a scalar and an array:
 ```cpp
+#include <string>
+#include <vector>
+
 #include <pdi/context.h>
 #include <pdi/logger.h>
 #include <pdi/paraconf_wrapper.h>
@@ -199,7 +222,7 @@ struct example_plugin : public PDI::Plugin
             array.emplace_back(PDI::to_long(array_element));
         }
     }
-}
+};
 
 PDI_PLUGIN(example)
 ```
@@ -215,8 +238,9 @@ plugins:
         any: 3
         subtree: 4
 ```
-Reading a scalar and an array:
+Reading a map:
 ```cpp
+#include <string>
 #include <unordered_map>
 
 #include <pdi/context.h>
@@ -237,196 +261,258 @@ struct example_plugin : public PDI::Plugin
         for (int i = 0; i < subtree_size; i++) {
             PC_tree_t key = PC_get(subtree, "{%d}", i);
             PC_tree_t value = PC_get(subtree, "<%d>", i);
-            custom_map.emplace_back(PDI::to_string(key), PDI::to_long(value));
+            custom_map.emplace(PDI::to_string(key), PDI::to_long(value));
         }
     }
-}
+};
 
 PDI_PLUGIN(example)
 ```
 
 ## Creating a true plugin: POSIX plugin {#create_true_plugin}
 
-### Step 1: Think what your plugin will be for. {#step_1}
+The fastest way to learn is by example.
+This section builds a "POSIX plugin" that writes data to files and reads it back, a minimal checkpointing plugin.
+It does nothing a real I/O plugin would not do better, but it follows the \ref plugin_design_guidelines "plugin design guidelines", and
+shows how each of them translates into code.
 
-Simple checkpointing. Each data will be saved in separate file. User can check the status of all files at once and then recover the data.
+### Step 1: Think what your plugin will be for {#step_1}
 
-### Step 2: Prepare your specification tree schema. {#step_2}
+Simple checkpointing: each data is saved to a file of its own, and read back from it on restart.
+The application can also learn whether a checkpoint exists, to decide whether to restart.
+
+The library here is POSIX file I/O, whose only concept is the file: the configuration describes files, which data to write to them or read
+from them, and when.
+
+### Step 2: Prepare your specification tree schema {#step_2}
+
 ```yaml
+metadata:
+  rank: int
+  iter: int
+  restart: int
 data:
-  some_data: {type: array, subtype: int, size: 64}
-  can_recover_data: int
+  field: {type: array, subtype: double, size: [64, 64]}
+  checkpoint_found: int
 
 plugins:
   posix:
-    data:
-      some_data: /file_path/
-    can_recover_all: can_recover_data
+    write:                          # data to write, each with where and when
+      field:
+        file: field_${rank}.bin     # a $-expression, evaluated on each write
+        when: '$iter % 10 = 0'      # the configuration decides when to write
+    read:                           # data to read, same form
+      field:
+        file: field_${rank}.bin
+        when: $restart              # the configuration decides when to read
+    exists:                         # data to fill with whether a file exists
+      checkpoint_found: field_${rank}.bin
 ```
-/file_path/ is a path where to save and load from some_data. can_recover_data is a flag that indicates if the recover is possible.
 
-The fastest way to learn is by examples. To show how to create a plugin, we will create "posix plugin". It won't do anything special, but give you a basic knowledge how to create one.
+Each entry of `write` and `read` is a `FILE_OP`: either the name of the file alone, which always triggers, or a map with the `file` and a
+`when` condition, which defaults to always.
+`write: {field: field.bin}` is enough to write `field` to `field.bin` each time it is shared.
 
-### Step 3: Write your plugin. {#step_3}
-Members and constructor:
+The application only shares `rank`, `iter`, `restart`, `field` and `checkpoint_found`.
+It does not know which plugin uses them, and the access it grants on `field` (`PDI_OUT`, `PDI_IN` or `PDI_INOUT`) does not change what the
+plugin does: the `when` conditions do.
+The plugin only checks that the access is enough for what it was asked.
+
+### Step 3: Write your plugin {#step_3}
+
+Parse a `FILE_OP`, accepting the short form, and rejecting unknown keys with their location in the specification tree:
 ```cpp
-class posix_plugin : public PDI::Plugin
+#include <filesystem>
+#include <fstream>
+#include <memory>
+#include <string>
+#include <unordered_map>
+
+#include <pdi/context.h>
+#include <pdi/error.h>
+#include <pdi/expression.h>
+#include <pdi/logger.h>
+#include <pdi/paraconf_wrapper.h>
+#include <pdi/plugin.h>
+#include <pdi/ref_any.h>
+
+namespace {
+
+/// A file to access, and the condition to access it
+struct File_op {
+    PDI::Expression file;
+    PDI::Expression when = 1L;
+};
+
+/// Parses a FILE_OP: either the file name alone, or a map with `file' and optionally `when'
+File_op parse_file_op(PC_tree_t tree)
 {
-    std::string m_can_recover_data;
-    std::unordered_map<std::string, std::string> m_data_to_path_map;
+    if (PDI::is_scalar(tree)) {
+        return {PDI::to_string(tree)};
+    }
+    File_op result;
+    PDI::each(tree, [&](PC_tree_t key_tree, PC_tree_t value) {
+        std::string key = PDI::to_string(key_tree);
+        if (key == "file") {
+            result.file = PDI::to_string(value);
+        } else if (key == "when") {
+            result.when = PDI::to_string(value);
+        } else {
+            throw PDI::Spectree_error{key_tree, "Unknown key in POSIX file operation: `{}'", key};
+        }
+    });
+    if (PC_status(PC_get(tree, ".file"))) {
+        throw PDI::Spectree_error{tree, "Missing `file' in POSIX file operation"};
+    }
+    return result;
+}
+
+} // namespace
+```
+
+Store the operations to execute, indexed by the name of the data that triggers them, and register a single callback for all data.
+The whole configuration is parsed and checked in the constructor, so that a mistake is reported when the plugin loads.
+The $-expressions, on the other hand, are kept as `PDI::Expression`s, to be evaluated when they are used:
+```cpp
+class posix_plugin: public PDI::Plugin
+{
+    /// data name -> where and when to write it
+    std::unordered_map<std::string, File_op> m_writes;
+
+    /// data name -> where and when to read it
+    std::unordered_map<std::string, File_op> m_reads;
+
+    /// data name -> the file whose existence to store in it
+    std::unordered_map<std::string, PDI::Expression> m_exists;
 
 public:
-    posix_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {}
-}
+    posix_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree)
+        : Plugin{logger, ctx}
+    {
+        PDI::each(spec_tree, [&](PC_tree_t key_tree, PC_tree_t value) {
+            std::string key = PDI::to_string(key_tree);
+            if (key == "write") {
+                PDI::each(value, [&](PC_tree_t data, PC_tree_t op) { m_writes.emplace(PDI::to_string(data), parse_file_op(op)); });
+            } else if (key == "read") {
+                PDI::each(value, [&](PC_tree_t data, PC_tree_t op) { m_reads.emplace(PDI::to_string(data), parse_file_op(op)); });
+            } else if (key == "exists") {
+                PDI::each(value, [&](PC_tree_t data, PC_tree_t file) { m_exists.emplace(PDI::to_string(data), PDI::to_string(file)); });
+            } else if (key != "logging") { // `logging' is handled by PDI
+                throw PDI::Spectree_error{key_tree, "Unknown key in POSIX plugin configuration: `{}'", key};
+            }
+        });
+        ctx.on_data([this](const std::string& name, PDI::Ref ref) { this->data(name, ref); });
+    }
+
+private:
+```
+
+On each share, execute the operations whose `when` holds:
+```cpp
+    void data(const std::string& name, PDI::Ref ref)
+    {
+        // read before writing, so that a data both read and written on the same share is not
+        // overwritten before it is read
+        if (auto&& op = m_reads.find(name); op != m_reads.end() && op->second.when.to_long(context())) {
+            read(name, ref, op->second.file.to_string(context()));
+        }
+        if (auto&& op = m_writes.find(name); op != m_writes.end() && op->second.when.to_long(context())) {
+            write(name, ref, op->second.file.to_string(context()));
+        }
+        if (auto&& file = m_exists.find(name); file != m_exists.end()) {
+            exists(name, ref, file->second.to_string(context()));
+        }
+    }
+```
+
+Write the data, asking for read access to it, and reporting every failure.
+The data can be sparse in memory (a subset of a larger array, for example): its type describes its layout, and is used to make a dense copy:
+```cpp
+    void write(const std::string& name, PDI::Ref_r ref, const std::string& path)
+    {
+        if (!ref) {
+            throw PDI::Permission_error{"Cannot read `{}' to write it to `{}'", name, path};
+        }
+        auto&& type = ref.type();
+        const char* data = static_cast<const char*>(ref.get());
+        std::unique_ptr<char[]> dense_copy;
+        if (type->buffersize() != type->datasize()) {
+            // the data is sparse in memory, make a dense copy of it
+            dense_copy.reset(new char[type->datasize()]);
+            type->data_to_dense_copy(dense_copy.get(), data);
+            data = dense_copy.get();
+        }
+
+        // write to a temporary file, then replace the old one, so that a failed write keeps it
+        std::string tmp_path = path + ".tmp";
+        std::ofstream file{tmp_path, std::ios::binary};
+        file.write(data, type->datasize());
+        file.close();
+        if (!file) {
+            throw PDI::System_error{"Cannot write `{}' to `{}'", name, tmp_path};
+        }
+        std::error_code error;
+        std::filesystem::rename(tmp_path, path, error);
+        if (error) {
+            throw PDI::System_error{"Cannot rename `{}' to `{}': {}", tmp_path, path, error.message()};
+        }
+    }
+```
+
+Read the data, asking for write access to it, and checking that the file holds the expected amount of data before copying it:
+```cpp
+    void read(const std::string& name, PDI::Ref_w ref, const std::string& path)
+    {
+        if (!ref) {
+            throw PDI::Permission_error{"Cannot write `{}' to read it from `{}'", name, path};
+        }
+        auto&& type = ref.type();
+        std::error_code error;
+        auto file_size = std::filesystem::file_size(path, error);
+        if (error) {
+            throw PDI::System_error{"Cannot read `{}' from `{}': {}", name, path, error.message()};
+        }
+        if (file_size != type->datasize()) {
+            throw PDI::Value_error{"`{}' holds {} B, `{}' needs {} B", path, file_size, name, type->datasize()};
+        }
+
+        std::unique_ptr<char[]> dense_copy{new char[type->datasize()]};
+        std::ifstream file{path, std::ios::binary};
+        file.read(dense_copy.get(), type->datasize());
+        if (!file) {
+            throw PDI::System_error{"Cannot read `{}' from `{}'", name, path};
+        }
+        // the data may be sparse in memory, copy it to its layout
+        type->data_from_dense_copy(ref.get(), dense_copy.get());
+    }
+```
+
+Store whether the file exists in the data the user chose.
+`scalar_assign` writes the value according to the type of the data, whatever the size of the integer, and throws if it is not a scalar, so
+that the plugin never writes past the end of the user's buffer:
+```cpp
+    void exists(const std::string& name, PDI::Ref_w ref, const std::string& path)
+    {
+        if (!ref) {
+            throw PDI::Permission_error{"Cannot write to `{}' whether `{}' exists", name, path};
+        }
+        // assigns the value according to the type of the data, and throws if it is not a scalar
+        ref.scalar_assign(std::filesystem::exists(path) ? 1 : 0);
+    }
+};
 
 PDI_PLUGIN(posix)
 ```
 
-Read recover tree:
-```cpp
-void read_recover_tree(PC_tree_t spec_tree) {
-    PC_tree_t recover_tree = PC_get(spec_tree, ".can_recover_all");
-    if(!PC_status(recover_tree)) {
-        m_can_recover_data = PDI::to_string(recover_tree);
-    }
-}
-```
-
-Read data tree:
-```cpp
-void read_data_tree(PC_tree_t spec_tree) {
-    PC_tree_t data_tree = PC_get(spec_tree, ".data");
-    if (!PC_status(data_tree)) {
-        int data_tree_size = PDI::len(data_tree);
-        for (int i = 0; i < data_tree_size; i++) {
-            PC_tree_t key = PC_get(data_tree, "{%d}", i);
-            PC_tree_t value = PC_get(data_tree, "<%d>", i);
-            m_data_to_path_map.emplace_back(PDI::to_string(key), PDI::to_string(value));
-        }
-    }
-}
-```
-
-Create a function that writes data to temporary file and check if file was created, size is correct and then replace old file:
-```cpp
-void write_data(const std::string& data_name, PDI::Ref_r ref_r) {
-    if(!ref_r) {
-        return;
-    }
-    std::string tmp_path = m_data_to_path_map[data_name] + ".tmp";
-    std::ofstream file{tmp_path, std::ios::binary};
-    if (ref_r.type().buffersize() == ref_r.type().datasize()) {
-        //dense data
-        file.write((const char*)ref_r.get(), ref_r.type().buffersize());
-    } else {
-        //sparse data
-        std::unique_ptr<char> data_copy {new char[ref_r.type().dataSize()]};
-        ref_r.type().data_to_dense_copy(data_copy.get(), ref_r.get());
-        file.write(data_copy.get(), ref_r.type().datasize());
-    }
-    file.close();
-
-    //replace old file
-    struct stat status;
-    if (!stat(tmp_path.c_str(), &status) && status.st_size == ref_r.type().datasize()) {
-        if (!stat(m_data_to_path_map[data_name].c_str()) && std::remove(m_data_to_path_map[data_name].c_str())) {
-            throw PDI::Error {PDI_ERR_SYSTEM, "Cannot remove old file {}", m_data_to_path_map[data_name]};
-        }
-        if (std::rename(tmp_path.c_str(), m_data_to_path_map[data_name].c_str())) {
-            throw PDI::Error {PDI_ERR_SYSTEM, "Cannot rename temporary file {}", tmp_path};
-        }
-    } else {
-        throw PDI::Error {PDI_ERR_SYSTEM, "Data write not complete"};
-    }
-}
-
-```
-
-Create a function that reads data from file:
-```cpp
-void read_data(const std::string& data_name, PDI::Ref_w ref_w) {
-    if(!ref_w) {
-        return;
-    }
-    std::ifstream file{m_data_to_path_map[data_name], std::ios::binary};
-    if (ref_w.type().buffersize() == ref_w.type().datasize()) {
-        //dense data
-        file.read((char*)ref_w.get(), ref_w.type().buffersize());
-    } else {
-        //sparse data
-        std::unique_ptr<char> data_copy {new char[ref_w.type().dataSize()]};
-        file.read(data_copy.get(), ref_w.type().datasize());
-        ref_w.type().data_from_dense_copy(ref_w.get(), data_copy.get());
-    }
-}
-```
-
-Handle can_recover_all data:
-```cpp
-void can_recover(const std::string& data_name, PDI::Ref_w ref_w) {
-    if (!ref_w) {
-        throw PDI::Error {PDI_ERR_RIGHT, "Cannot write to `can_recover_all' data"};
-    }
-    for (const auto& data_path_pair : m_data_to_path_map) {
-        struct stat status;
-        if (stat(data_path_pair.second.c_str(), &status)) {
-            *static_cast<int*>(ref_w.get()) = 0;
-            return;
-        }
-    }
-    *static_cast<int*>(ref_w.get()) = 1;
-}
-```
-
-Add created functions to callbacks:
-```cpp
-class posix_plugin : public PDI::Plugin
-{
-    std::string m_can_recover_data;
-    std::unordered_map<std::string, std::string> m_data_to_path_map;
-
-public:
-    posix_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {
-        read_recover_tree(spec_tree);
-        read_data_tree(spec_tree);
-        for (const auto& data_path_pair : m_data_to_path_map) {
-            ctx.on_data([this](const std::string& data_name, PDI::Ref ref) {
-                this->write_data(data_name, ref);
-            }, data_path_pair.first);
-            ctx.on_data([this](const std::string& data_name, PDI::Ref ref) {
-                this->read_data(data_name, ref);
-            }, data_path_pair.first);
-        }
-        if (!m_can_recover_data.empty()) {
-            ctx.on_data([this](const std::string& data_name, PDI::Ref ref) {
-                this->can_recover(data_name, ref);
-            }, m_can_recover_all_data);
-        }
-    }
-}
-```
+The references stay alive for the whole duration of each callback, so that no other plugin accesses the data while it is being read or
+written.
 
 ### Next steps {#plugin_compile}
-1. Compile: 
-g++ posix.cxx -o libpdi_posix_plugin.so -lpdi -shared -fPIC -std=c++11
 
-2. Copy created file to path where dynamic linker can find it. For example:
-sudo cp libpdi_posix_plugin.so /usr/local/lib/
+1. Compile:
+   `g++ -std=c++20 -shared -fPIC posix.cxx -o libpdi_posix_plugin.so -lpdi -lparaconf`
+2. Copy the created file next to the other plugins, or to a directory listed in `PDI_PLUGIN_PATH`.
+3. Write a program that shares the data of the specification tree above, compile it and run it.
 
-3. Configure dynamic linker run-time bindings:
-sudo ldconfig
-
-4. Create program that uses posix plugin.
-
-5. Compile your test program:
-gcc example_use.cxx -o example_use -lpdi -lparaconf
-
-6. Run your test program:
-./example_use
-
-You can see example of the program that uses this plugin on these [slides](https://docs.google.com/presentation/d/1jT416oALDkquBBgq_XkVrU48o4qx72wGHUPb4emXJw4).
-
+The next step to make this plugin a real one would be to trigger operations on events as well as on shares, with an `on_event` key, as
+\ref Decl_HDF5_plugin "Decl'HDF5" does.

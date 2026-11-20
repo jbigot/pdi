@@ -63,6 +63,10 @@ and this project adheres to
 #### Removed
 
 #### Fixed
+* Every example of the plugin creation tutorial compiles, and its POSIX plugin
+  takes $-expressions for its file names, lets the configuration decide when to
+  read and write, and checks the data it writes to, fixing
+  [#839](https://github.com/pdidev/pdi/issues/839).
 * `bin/build_and_run_all_tests` skips the tests listed in `EXCLUDED_PDI_TESTS`
   as documented, instead of ignoring them, fixing
   [#894](https://github.com/pdidev/pdi/issues/894).
