@@ -1,5 +1,9 @@
 # How to create a plugin {#how_to_create_a_plugin}
 
+This tutorial shows how to write the code of a plugin.
+Before designing your own, read the \ref plugin_design_guidelines "plugin design guidelines", which describe how a plugin should fit the
+declarative approach of %PDI.
+
 ## Plugin class {#plugin_class}
 
 Plugin is a class, that handles shared data and triggered events to perform an I/O operations. It is dynamically linked to the user program by PDI. Behavior of each plugin is defined by specification tree in plugins subtree.

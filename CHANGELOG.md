@@ -15,7 +15,7 @@ and this project adheres to
 
 #### Changed
 * Renamed the "How to create a plugin" documentation page from
-  `How_to_create_plugin` to `How_to_create_a_plugin`.
+  `How_to_create_a_plugin` to `How_to_create_a_plugin`.
 
 #### Deprecated
 

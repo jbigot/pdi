@@ -26,8 +26,9 @@ ensemble run, etc.
 
 ## Developer documentation
 
-1. \subpage how_to_create_a_plugin "Plugin creation tutorial"
-2. \subpage PDI "API for plugin developers"
+1. \subpage plugin_design_guidelines "Plugin design guidelines"
+2. \subpage how_to_create_a_plugin "Plugin creation tutorial"
+3. \subpage PDI "API for plugin developers"
 
 
 ## Get support
