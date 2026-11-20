@@ -81,3 +81,4 @@ add_custom_target(doc ALL
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/" DESTINATION "${CMAKE_INSTALL_DOCDIR}/html")
 
 add_subdirectory(First_steps)
+add_subdirectory(How_to_create_a_plugin)

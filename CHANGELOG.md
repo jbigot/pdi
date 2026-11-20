@@ -67,6 +67,9 @@ and this project adheres to
   takes $-expressions for its file names, lets the configuration decide when to
   read and write, and checks the data it writes to, fixing
   [#839](https://github.com/pdidev/pdi/issues/839).
+* The code of the plugin creation tutorial is built and run by the tests when
+  the documentation is built, so that it keeps working with the plugin API,
+  part of [#331](https://github.com/pdidev/pdi/issues/331).
 * `bin/build_and_run_all_tests` skips the tests listed in `EXCLUDED_PDI_TESTS`
   as documented, instead of ignoring them, fixing
   [#894](https://github.com/pdidev/pdi/issues/894).
