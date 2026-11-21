@@ -126,6 +126,10 @@ and this project adheres to
   directory it builds in, and a `--ctest-outdir <dir>` option to choose where
   it writes the JUnit test reports, part of
   [#895](https://github.com/pdidev/pdi/issues/895).
+* The plugin creation tutorial shows how plugins report errors and time their
+  operations, the optional `pretty_name()` and `dependencies()` of a plugin, the
+  other callbacks of the context and when plugins are constructed, part of
+  [#492](https://github.com/pdidev/pdi/issues/492).
 
 #### Changed
 

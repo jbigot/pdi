@@ -50,6 +50,11 @@ It forwards the logger and the context to \ref PDI::Plugin, which makes them ava
 The class is then registered as a plugin with `PDI_PLUGIN(<name>)`.
 It sits in an anonymous namespace, as the plugins distributed with %PDI do, so that its name never clashes with that of a class of another plugin or of the application.
 
+`PDI_PLUGIN` also looks for two optional static member functions of the class:
+
+* `pretty_name()` returns the name of the plugin in the logs, such as Decl'HDF5 for `decl_hdf5`, and defaults to `<name>`;
+* `dependencies()` returns a pair of sets of plugin names: the plugins that must be in the specification tree too, and those that, when they are, must be loaded first.
+
 The rest of this section builds the `example` plugin up, one callback at a time.
 
 ### Adding callbacks {#adding_callback}
@@ -79,6 +84,11 @@ For example, the following callback logs the name of each buffer the application
 
 \snippet{trimleft} example/example_plugin.cxx on_data
 
+The context offers other callbacks, documented with \ref PDI::Context, such as `on_init` once every plugin is loaded and the data of the specification tree declared, `on_data_remove` when a buffer is reclaimed, and `on_missing_data` when the value of a data that is not shared is accessed, which gives plugins a chance to share it.
+
+%PDI removes every callback when it is finalized, before it destroys the plugins, so the callbacks may capture `this`.
+A plugin only needs to call the function `on_event` or `on_data` returns to stop being notified earlier.
+
 ### Using the specification subtree {#plugin_subtree}
 
 More realistic plugins let users guide their behavior from the specification tree.
@@ -97,6 +107,9 @@ It reads the name of the event from its subtree, and registers a callback for th
 with the handler itself as a member of the plugin:
 
 \snippet{trimleft} example/example_plugin.cxx event_handlers
+
+The plugins are constructed before the data and metadata of the specification tree are declared, and before the application shares anything.
+The constructor can thus read the subtree of the plugin, but not evaluate its $-expressions: that has to wait until the callbacks are triggered, or at least until `on_init`.
 
 ### Reading and writing data {#rw_data}
 
@@ -132,6 +145,28 @@ With the specification tree above, reading the scalar `scalar` and the array `ar
 With the same specification tree, reading the map `custom_subtree` looks as follows:
 
 \snippet{trimleft} example/example_plugin.cxx conf_map
+
+The example plugin reads these values to show how, but does nothing with them, and accepts any other key.
+A real plugin rejects the keys it does not know, as the POSIX plugin below does.
+
+### Reporting errors {#plugin_errors}
+
+Plugins report errors by throwing a `PDI::Error`, which %PDI turns into an error status for the application, according to its error handling settings.
+`pdi/error.h` defines one subclass per kind of error, each setting the status the application receives:
+
+* `PDI::Spectree_error` for a mistake in the specification tree, which takes the node at fault so that the message gives its location;
+* `PDI::Permission_error` when a share does not grant the access the plugin needs;
+* `PDI::Type_error` when the type of a data does not suit what the plugin does with it;
+* `PDI::Value_error` when a value is wrong, such as a file holding less data than expected;
+* `PDI::System_error` when a library or a system call fails;
+* `PDI::Plugin_error` for other failures of the plugin.
+
+Each of them takes a format string and its arguments, as the logger does.
+
+### Timing operations {#plugin_timers}
+
+A `PDI::Timer_event_handler` emits the `<plugin_name>_start_timer` event when it is constructed and the matching `<plugin_name>_stop_timer` event when it is destroyed.
+Declared at the start of an operation, it lets the \ref timer_plugin "Timer" plugin measure how long the operation takes, as \ref Decl_HDF5_plugin "Decl'HDF5" and \ref Decl_NetCDF_plugin "Decl'NetCDF" do.
 
 ## Creating a true plugin: the POSIX plugin {#create_true_plugin}
 
