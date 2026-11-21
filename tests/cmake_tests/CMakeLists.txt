@@ -1,5 +1,6 @@
 #=============================================================================
 # Copyright (C) 2025-2026 Commissariat a l'energie atomique et aux energies alternatives (CEA)
+# Copyright (C) 2026 Julien Bigot <julien@julien-bigot.fr>
 #
 # All rights reserved.
 #
@@ -88,6 +89,18 @@ add_subdirectory(../../tests/combination_tests/ combination_tests)
 
 message("++ add_subdirectory(subdir)")
 add_subdirectory(subdir)
+
+message(STATUS "Testing the search order of the superbuild")
+
+add_test(NAME superbuild_search_order
+	COMMAND "${CMAKE_COMMAND}"
+		"-DPDI_DIST_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../.."
+		"-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/superbuild_search_order"
+		"-DGENERATOR=${CMAKE_GENERATOR}"
+		"-DC_COMPILER=${CMAKE_C_COMPILER}"
+		"-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
+		-P "${CMAKE_CURRENT_SOURCE_DIR}/superbuild_search_order/test.cmake")
+set_tests_properties(superbuild_search_order PROPERTIES TIMEOUT 600)
 
 message(STATUS "Testing multiple find_package(PDI)")
 
