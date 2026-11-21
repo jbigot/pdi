@@ -35,6 +35,8 @@ and this project adheres to
 * The specification tree reference, and that of each plugin, gives an example
   for each key: a minimal configuration of its block, its line commented. The
   values of a key that takes one of a fixed set of them are listed in a table.
+* Renamed the "How to create a plugin" documentation page from
+  `how_to_create_plugin` to `how_to_create_a_plugin`.
 
 #### Deprecated
 
@@ -150,6 +152,19 @@ and this project adheres to
   tells PDI where to look for plugins at runtime; pass
   `-DINSTALL_PDIPLUGINDIR=<dir>` in `CMAKE_FLAGS` to choose where they install,
   fixing [#905](https://github.com/pdidev/pdi/issues/905).
+* Every example of the plugin creation tutorial compiles, and its plugins log
+  through the logger PDI gives them instead of printing to `std::cout`, fixing
+  [#839](https://github.com/pdidev/pdi/issues/839) and
+  [#840](https://github.com/pdidev/pdi/issues/840).
+* The POSIX plugin of the plugin creation tutorial takes $-expressions for its
+  file names, lets the configuration decide when to read and write, so that a
+  data shared `PDI_INOUT` keeps its checkpoint, and checks the data it writes
+  to, fixing [#984](https://github.com/pdidev/pdi/issues/984).
+* The code of the plugin creation tutorial is that of the `example`, `minimal`
+  and `posix` plugins of the distribution, which are built and tested with the
+  other plugins, their output compared to the one the tutorial shows, but never
+  installed, so that it keeps working with the plugin API, part of
+  [#331](https://github.com/pdidev/pdi/issues/331).
 
 #### Security
 

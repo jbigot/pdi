@@ -196,7 +196,7 @@ A plugin defines a `class <name>_plugin:
 public PDI::Plugin` with a constructor taking `(PDI::Logger&, PDI::Context&, PC_tree_t)` and invokes the `PDI_PLUGIN(<name>)` macro, which emits the
 loader together with the optional `dependencies()` and `pretty_name()` hooks.
 Plugins do their work by registering callbacks on the context from their constructor.
-`pdi/docs/How_to_create_plugin.md` is the reference for writing one.
+`pdi/docs/How_to_create_a_plugin.md` is the reference for writing one.
 
 ### Tests
 
@@ -274,6 +274,7 @@ grammar or the log format change around it.
 **Write examples in files that are built and run, and pull them into the documentation with the doxygen `\snippet` command.**
 The files of the examples of a page live in a directory named after it, in `pdi/docs/` or in `plugins/<plugin>/docs/`, and the test suite that CI
 executes builds and runs them, so that an example that stops working breaks the tests rather than misleading a reader.
+The plugin creation tutorial is the exception: its examples are whole plugin projects, in `plugins/example/` and `plugins/posix/`.
 Delimit the region to show with a `//! [label]` comment on either side in code, `#! [label]` in YAML, and refer to it as `\snippet <path> label`.
 The markers themselves never appear in the rendered page.
 A region that holds a marker must not sit inside another region the documentation shows: the inner markers would appear in that listing.

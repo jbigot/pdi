@@ -1,428 +1,226 @@
 # How to create a plugin {#how_to_create_a_plugin}
 
+This tutorial shows how to write the code of a plugin.
+
+The code of this tutorial is that of the `example`, `minimal` and `posix` plugins of the %PDI distribution, in `plugins/example` and `plugins/posix`.
+They are built and tested with %PDI, but never installed.
+
+## CMake plumbing {#plugin_cmake}
+
+The first step to create a plugin is to create its CMake project.
+Plugins are CMake `MODULE` libraries that link to the `PDI::PDI_plugins` target, as the POSIX plugin, built in the last section, does:
+
+```cmake
+project(pdi_posix_plugin LANGUAGES C CXX)
+
+find_package(PDI REQUIRED COMPONENTS plugins)
+
+add_library(pdi_posix_plugin MODULE posix.cxx)
+target_link_libraries(pdi_posix_plugin PDI::PDI_plugins)
+set_target_properties(pdi_posix_plugin PROPERTIES CXX_VISIBILITY_PRESET hidden)
+```
+
+%PDI loads the plugin named `<name>` in the specification tree from a file named `libpdi_<name>_plugin.so`, so the target is named `pdi_<name>_plugin`.
+`PDI::PDI_plugins` brings the include directories, the libraries and the C++20 support the plugin API requires.
+The symbols %PDI looks for are explicitly exported, so the others can be hidden.
+
+A plugin meant to be used is also installed, in the directory where %PDI installed its own plugins, as the plugins distributed with %PDI, such as \ref trace_plugin "Trace", do:
+
+```cmake
+install(TARGETS pdi_posix_plugin LIBRARY DESTINATION "${PDI_DEFAULT_PLUGINDIR}")
+```
+
+`PDI_DEFAULT_PLUGINDIR` is usually relative to the installation prefix: installing the plugin with the same prefix as %PDI puts it next to the plugins of %PDI.
+
 ## Plugin class {#plugin_class}
 
-Plugin is a class, that handles shared data and triggered events to perform an I/O operations. It is dynamically linked to the user program by PDI. Behavior of each plugin is defined by specification tree in plugins subtree.
+Plugins are classes that handle shared buffers and triggered events.
+They are dynamically loaded into the application by %PDI.
+Their behavior is guided by their dedicated subtree in the specification tree.
 
-```yaml
-plugins:
-  example:
-    ...
-```
-The given example will load example plugin and pass its subtree to the plugin's constructor.
+### Minimal plugin {#example_plugin}
 
-The plugin has to inherit from PDI::Plugin and have a constructor with arguments
-PDI::Logger&, PDI::Context& and PC_tree_t.
-It forwards the logger and the context to PDI::Plugin.
+The simplest possible plugin, one that does nothing, looks as follows:
 
-### Example plugin {#example_plugin}
-Example of the simplest plugin, that does nothing:
+\snippet example/minimal_plugin.cxx example
 
-```cpp
-#include <pdi/context.h>
-#include <pdi/logger.h>
-#include <pdi/paraconf_wrapper.h>
-#include <pdi/plugin.h>
+It is a class named `<name>_plugin` that inherits from \ref PDI::Plugin.
+Its constructor takes three arguments: a `PDI::Logger&`, a `PDI::Context&` and a `PC_tree_t`, its subtree of the specification tree.
+It forwards the logger and the context to \ref PDI::Plugin, which makes them available through its `logger()` and `context()` member functions.
+The class is then registered as a plugin with `PDI_PLUGIN(<name>)`.
+It sits in an anonymous namespace, as the plugins distributed with %PDI do, so that its name never clashes with that of a class of another plugin or of the application.
 
-struct example_plugin : public PDI::Plugin
-{
-    example_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {}
-}
+The rest of this section builds the `example` plugin up, one callback at a time.
 
-PDI_PLUGIN(example)
-```
+### Adding callbacks {#adding_callback}
 
-### Adding a callback {#adding_callback}
-To be notified when the user shares data (calls `PDI_share`, `PDI_expose` or `PDI_multiexpose`), a plugin registers a function (a callback) with `PDI::Context::on_data`.
+Plugins react at various stages of the life cycle of the application: when it emits an event or shares a buffer.
+To do so, plugins register callbacks to be notified.
 
-```cpp
-std::function<void()> on_data(const std::function<void(const std::string&, Ref)>& callback, const std::string& name = {}))
-```
+To be notified when the application emits an event (with \ref PDI_event), plugins register a callback with \ref PDI::Context::on_event.
+The first argument is the function to call when the event is emitted (the callback), which takes the name of the event as parameter.
+If the second, optional, argument is provided, the callback is only triggered for the event with that name.
+The returned value is a function that unregisters the callback.
 
-The first argument is the function to be called when user shares the data.
-If the second parameter (name) is given, the function will be called only on a specified data name.
-Returns a function that removes the callback from PDI::Context container.
+This can be used, for example, to log every event the application emits.
+To do so, first include the logging header:
 
-Example of adding new callback:
-```cpp
-#include <pdi/context.h>
-#include <pdi/logger.h>
-#include <pdi/paraconf_wrapper.h>
-#include <pdi/plugin.h>
-#include <pdi/ref_any.h>
+\snippet example/example_plugin.cxx include_logger
 
-struct example_plugin : public PDI::Plugin
-{
-    example_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {
-        ctx.on_data([](const std::string& data_name, PDI::Ref ref){
-            std::cout << "User has shared a data named " << data_name << std::endl;
-        });
-    }
-}
+Then, register the callback itself:
 
-PDI_PLUGIN(example)
-```
-If user create specification tree:
-```yaml
-data:
-    some_integer: int
+\snippet{trimleft} example/example_plugin.cxx on_event
 
-plugins:
-    example: ~
-```
-And a program:
-```cpp
-#include <pdi.h>
+Similarly, to be notified when the application shares a buffer (with \ref PDI_share, \ref PDI_expose, or \ref PDI_multi_expose), plugins register a callback with \ref PDI::Context::on_data.
+The first argument is the callback, which takes the name of the buffer and a \ref PDI::Ref to its content.
+The second, optional, argument restricts the callback to the buffer with that name, and the returned value is a function that unregisters the callback.
 
-int main()
-{
-    PDI_init(PC_parse_path("spec_tree.yaml"));
-    int some_integer = 0;
-    PDI_expose("some_integer", &some_integer, PDI_OUT);
-    PDI_finalize();
-    return 0;
-}
-```
-The console will display:
-```
-[PDI][13:42:41] *** info: Initialization successful
-User has shared a data named some_integer
-[PDI][13:42:42] *** info: Finalization
-```
+For example, the following callback logs the name of each buffer the application shares:
+
+\snippet{trimleft} example/example_plugin.cxx on_data
+
+### Using the specification subtree {#plugin_subtree}
+
+More realistic plugins let users guide their behavior from the specification tree.
+For example, a plugin may only react to an event whose name the user specifies:
+
+\snippet example/tests/example_use.yml yaml
+
+The plugin reads its subtree with the paraconf wrappers of %PDI:
+
+\snippet example/example_plugin.cxx include_paraconf
+
+It reads the name of the event from its subtree, and registers a callback for that event only:
+
+\snippet{trimleft} example/example_plugin.cxx user_event
+
+with the handler itself as a member of the plugin:
+
+\snippet{trimleft} example/example_plugin.cxx event_handlers
 
 ### Reading and writing data {#rw_data}
-Example of reading and writing data:
-```cpp
-#include <pdi/context.h>
-#include <pdi/logger.h>
-#include <pdi/paraconf_wrapper.h>
-#include <pdi/plugin.h>
-#include <pdi/ref_any.h>
 
-struct example_plugin : public PDI::Plugin
-{
-    example_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {
-        ctx.on_data([](const std::string& data_name, PDI::Ref ref){
-            if(PDI::Ref_rw ref_rw{ref}) {
-                //Plugin can read and write
-                int* some_integer = ref_rw.get();
-            } else if(PDI::Ref_r ref_r{ref}) {
-                //Plugin can read
-                const int* some_integer = ref_r.get();
-            } else if(PDI::Ref_w ref_w{ref}) {
-                //Plugin can write
-                int* some_integer = ref_w.get();
-            } else {
-                //Plugin cannot read nor write
-            }
-        });
-    }
-}
+A `PDI::Ref` gives no access to the data by itself.
+Plugins convert it to a `PDI::Ref_r` to read the data, a `PDI::Ref_w` to write it, or a `PDI::Ref_rw` to do both, and the converted reference is null if the share does not grant that access.
+Which access to ask for follows from what plugins were configured to do, never from what the share happens to grant.
 
-PDI_PLUGIN(example)
+The type of the reference describes the data: check it before interpreting the buffer.
+Here is a callback that reads an integer each time one is shared:
+
+\snippet{trimleft} example/example_plugin.cxx rw_data
+
+### Running the example {#example_run}
+
+The following program loads the plugin with the specification tree above, given as its argument, shares `some_integer` and emits the `checkpoint` event:
+
+\snippet example/tests/example_use.c example
+
+With all the callbacks above registered, it displays:
+
+\snippet example/tests/example_use.output output
+
+The `pdi_start_timer` and `pdi_stop_timer` events are emitted by %PDI itself, at initialization and finalization, for the \ref timer_plugin "Timer" plugin.
+
+### Reading scalars and arrays from the specification tree {#reading_pc_tree}
+
+With the specification tree above, reading the scalar `scalar` and the array `array` looks as follows:
+
+\snippet{trimleft} example/example_plugin.cxx conf_scalar_array
+
+### Reading maps from the specification tree {#reading_pc_tree_2}
+
+With the same specification tree, reading the map `custom_subtree` looks as follows:
+
+\snippet{trimleft} example/example_plugin.cxx conf_map
+
+## Creating a true plugin: the POSIX plugin {#create_true_plugin}
+
+The fastest way to learn is by example.
+This section builds a "POSIX plugin" that writes data to files and reads it back: a minimal checkpointing plugin.
+It does nothing a real I/O plugin would not do better, but it shows how a plugin turns its specification subtree into operations on the data.
+
+### Step 1: Decide what your plugin is for {#step_1}
+
+Simple checkpointing: each data is saved to a file of its own, and read back from it on restart.
+The application can also learn whether a checkpoint exists, to decide whether to restart.
+
+The library here is POSIX file I/O, whose only concept is the file: the specification tree describes files, which data to write to them or read from them, and when.
+
+### Step 2: Design your specification tree {#step_2}
+
+\snippet posix/tests/posix.yml yaml
+
+Each entry of `write` and `read` maps the name of a data to a file operation: either the name of the file alone, or a map with the `file`, an optional `when` condition, which defaults to always, and an optional `on_event`.
+Without `on_event`, the operation is executed each time the data is shared.
+With it, the operation is executed on each of the events it names, a single one or a list, and the data must be shared at that time.
+`write: {field: field.bin}` is thus enough to write `field` to `field.bin` each time it is shared.
+Each entry of `exists` maps the name of a data to the name of a file, and stores in that data whether the file exists.
+
+The application only shares `rank`, `iter`, `restart`, `field` and `checkpoint_found`, and emits `newiter`.
+It does not know which plugin uses them, and the access it grants on `field` (`PDI_OUT`, `PDI_IN` or `PDI_INOUT`) does not change what the plugin does: the `when` conditions do.
+The plugin only checks that the access is enough for what it was asked to do.
+
+### Step 3: Write your plugin {#step_3}
+
+Parse a file operation, accepting the short form, and rejecting unknown keys with their location in the specification tree:
+
+\snippet{trimleft} posix/posix.cxx parse
+
+Store the operations to execute on share, indexed by the name of the data that triggers them, and register a single callback for all data.
+The whole subtree is parsed and checked in the constructor, so that a mistake is reported when the plugin loads.
+The `logging` key is the only one not to reject: %PDI handles it for every plugin.
+The $-expressions, on the other hand, are kept as `PDI::Expression` objects, to be evaluated when they are used.
+`pretty_name()` names the plugin `POSIX` in the logs:
+
+\snippet{trimleft} posix/posix.cxx constructor
+
+The operations triggered by events get a callback each, which accesses the data through the context, since no reference comes with an event:
+
+\snippet{trimleft} posix/posix.cxx add_operation
+
+On each share, execute the operations whose `when` holds:
+
+\snippet{trimleft} posix/posix.cxx data
+
+Write the data, asking for read access to it, and reporting every failure.
+The data can be sparse in memory (a subset of a larger array, for example): its type describes its layout, and is used to make a dense copy:
+
+\snippet{trimleft} posix/posix.cxx write
+
+Read the data, asking for write access to it, and checking that the file holds the expected amount of data before copying it:
+
+\snippet{trimleft} posix/posix.cxx read
+
+Store whether the file exists in the data the user chose.
+`scalar_assign` writes the value according to the type of the data, whatever the size of the integer, and throws if it is not a scalar, so that the plugin never writes past the end of the user's buffer:
+
+\snippet{trimleft} posix/posix.cxx exists
+
+The references stay alive for the whole duration of each operation, so that no other plugin modifies the data while it is being read or written.
+Reading a checkpoint back is logged at the `info` level, since it changes the course of the run, and the other operations at the `debug` level, to diagnose a specification tree that does not behave as expected.
+
+### Step 4: Build and use your plugin {#plugin_compile}
+
+Build the plugin with the CMake project of the \ref plugin_cmake "first section", and install it with the same prefix as %PDI:
+
+```sh
+cmake -B build -DCMAKE_INSTALL_PREFIX=<PDI prefix>
+cmake --build build
+cmake --install build
 ```
 
-### Handling events {#example_events}
-```cpp
-#include <pdi/context.h>
-#include <pdi/logger.h>
-#include <pdi/paraconf_wrapper.h>
-#include <pdi/plugin.h>
-#include <pdi/ref_any.h>
+Alternatively, leave it where it was built, and give %PDI its directory, either in the `PDI_PLUGIN_PATH` environment variable or in the `plugin_path` key of the specification tree.
 
-struct example_plugin : public PDI::Plugin
-{
-    example_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {
-        ctx.on_event([this](const std::string& event_name){
-            this->handle_event(event_name);
-        });
-        ctx.on_event([this](const std::string& event_name){
-            this->handle_special_event(event_name);
-        }, "special_event");
-    }
-private:
-    void handle_event(const std::string& event_name) {
-        std::cout << "Event" << event_name << "called." << std::endl;
-    }
+Then, write a program that shares the data of the specification tree above, compile it and run it.
+This one computes for a few iterations, then restarts from the last checkpoint:
 
-    void handle_special_event(const std::string& event_name) {
-        std::cout << "Special event `" << event_name << "' called." << std::endl;
-    } 
-}
+\snippet posix/tests/posix_use.c example
 
-PDI_PLUGIN(example)
-```
+It displays the line the plugin logs at the `info` level when it reads the checkpoint back:
 
-### Reading scalar and array from specification tree {#reading_pc_tree}
-Specification tree:
-```yaml
-plugins:
-  example:
-    scalar: some_string
-    array: [0, 1, 2]
-```
-Reading a scalar and an array:
-```cpp
-#include <pdi/context.h>
-#include <pdi/logger.h>
-#include <pdi/paraconf_wrapper.h>
-#include <pdi/plugin.h>
-#include <pdi/ref_any.h>
+\snippet posix/tests/posix_use.output output
 
-struct example_plugin : public PDI::Plugin
-{
-    example_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {
-        //scalar
-        PC_tree_t scalar_tree = PC_get(spec_tree, ".scalar");
-        std::string string_scalar = PDI::to_string(scalar_tree);
+`PDI_multi_expose` shares `iter` and `field`, emits `newiter` while they are shared, then reclaims them.
 
-        //array
-        PC_tree_t array_tree = PC_get(spec_tree, ".array");
-        int array_size = PDI::len(array_tree);
-        std::vector<long> array;
-        for (int i = 0; i < array_size; i++) {
-            PC_tree_t array_element = PC_get(array_tree, "[%d]", i);
-            array.emplace_back(PDI::to_long(array_element));
-        }
-    }
-}
-
-PDI_PLUGIN(example)
-```
-### Reading maps from specification tree {#reading_pc_tree_2}
-Specification tree:
-```yaml
-plugins:
-  example:
-    custom_subtree:
-        here: 0
-        can: 1
-        be: 2
-        any: 3
-        subtree: 4
-```
-Reading a scalar and an array:
-```cpp
-#include <unordered_map>
-
-#include <pdi/context.h>
-#include <pdi/logger.h>
-#include <pdi/paraconf_wrapper.h>
-#include <pdi/plugin.h>
-#include <pdi/ref_any.h>
-
-struct example_plugin : public PDI::Plugin
-{
-    example_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {
-        PC_tree_t subtree = PC_get(spec_tree, ".custom_subtree");
-        int subtree_size = PDI::len(subtree);
-        std::unordered_map<std::string, long> custom_map;
-
-        for (int i = 0; i < subtree_size; i++) {
-            PC_tree_t key = PC_get(subtree, "{%d}", i);
-            PC_tree_t value = PC_get(subtree, "<%d>", i);
-            custom_map.emplace_back(PDI::to_string(key), PDI::to_long(value));
-        }
-    }
-}
-
-PDI_PLUGIN(example)
-```
-
-## Creating a true plugin: POSIX plugin {#create_true_plugin}
-
-### Step 1: Think what your plugin will be for. {#step_1}
-
-Simple checkpointing. Each data will be saved in separate file. User can check the status of all files at once and then recover the data.
-
-### Step 2: Prepare your specification tree schema. {#step_2}
-```yaml
-data:
-  some_data: {type: array, subtype: int, size: 64}
-  can_recover_data: int
-
-plugins:
-  posix:
-    data:
-      some_data: /file_path/
-    can_recover_all: can_recover_data
-```
-/file_path/ is a path where to save and load from some_data. can_recover_data is a flag that indicates if the recover is possible.
-
-The fastest way to learn is by examples. To show how to create a plugin, we will create "posix plugin". It won't do anything special, but give you a basic knowledge how to create one.
-
-### Step 3: Write your plugin. {#step_3}
-Members and constructor:
-```cpp
-class posix_plugin : public PDI::Plugin
-{
-    std::string m_can_recover_data;
-    std::unordered_map<std::string, std::string> m_data_to_path_map;
-
-public:
-    posix_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {}
-}
-
-PDI_PLUGIN(posix)
-```
-
-Read recover tree:
-```cpp
-void read_recover_tree(PC_tree_t spec_tree) {
-    PC_tree_t recover_tree = PC_get(spec_tree, ".can_recover_all");
-    if(!PC_status(recover_tree)) {
-        m_can_recover_data = PDI::to_string(recover_tree);
-    }
-}
-```
-
-Read data tree:
-```cpp
-void read_data_tree(PC_tree_t spec_tree) {
-    PC_tree_t data_tree = PC_get(spec_tree, ".data");
-    if (!PC_status(data_tree)) {
-        int data_tree_size = PDI::len(data_tree);
-        for (int i = 0; i < data_tree_size; i++) {
-            PC_tree_t key = PC_get(data_tree, "{%d}", i);
-            PC_tree_t value = PC_get(data_tree, "<%d>", i);
-            m_data_to_path_map.emplace_back(PDI::to_string(key), PDI::to_string(value));
-        }
-    }
-}
-```
-
-Create a function that writes data to temporary file and check if file was created, size is correct and then replace old file:
-```cpp
-void write_data(const std::string& data_name, PDI::Ref_r ref_r) {
-    if(!ref_r) {
-        return;
-    }
-    std::string tmp_path = m_data_to_path_map[data_name] + ".tmp";
-    std::ofstream file{tmp_path, std::ios::binary};
-    if (ref_r.type().buffersize() == ref_r.type().datasize()) {
-        //dense data
-        file.write((const char*)ref_r.get(), ref_r.type().buffersize());
-    } else {
-        //sparse data
-        std::unique_ptr<char> data_copy {new char[ref_r.type().dataSize()]};
-        ref_r.type().data_to_dense_copy(data_copy.get(), ref_r.get());
-        file.write(data_copy.get(), ref_r.type().datasize());
-    }
-    file.close();
-
-    //replace old file
-    struct stat status;
-    if (!stat(tmp_path.c_str(), &status) && status.st_size == ref_r.type().datasize()) {
-        if (!stat(m_data_to_path_map[data_name].c_str()) && std::remove(m_data_to_path_map[data_name].c_str())) {
-            throw PDI::Error {PDI_ERR_SYSTEM, "Cannot remove old file {}", m_data_to_path_map[data_name]};
-        }
-        if (std::rename(tmp_path.c_str(), m_data_to_path_map[data_name].c_str())) {
-            throw PDI::Error {PDI_ERR_SYSTEM, "Cannot rename temporary file {}", tmp_path};
-        }
-    } else {
-        throw PDI::Error {PDI_ERR_SYSTEM, "Data write not complete"};
-    }
-}
-
-```
-
-Create a function that reads data from file:
-```cpp
-void read_data(const std::string& data_name, PDI::Ref_w ref_w) {
-    if(!ref_w) {
-        return;
-    }
-    std::ifstream file{m_data_to_path_map[data_name], std::ios::binary};
-    if (ref_w.type().buffersize() == ref_w.type().datasize()) {
-        //dense data
-        file.read((char*)ref_w.get(), ref_w.type().buffersize());
-    } else {
-        //sparse data
-        std::unique_ptr<char> data_copy {new char[ref_w.type().dataSize()]};
-        file.read(data_copy.get(), ref_w.type().datasize());
-        ref_w.type().data_from_dense_copy(ref_w.get(), data_copy.get());
-    }
-}
-```
-
-Handle can_recover_all data:
-```cpp
-void can_recover(const std::string& data_name, PDI::Ref_w ref_w) {
-    if (!ref_w) {
-        throw PDI::Error {PDI_ERR_RIGHT, "Cannot write to `can_recover_all' data"};
-    }
-    for (const auto& data_path_pair : m_data_to_path_map) {
-        struct stat status;
-        if (stat(data_path_pair.second.c_str(), &status)) {
-            *static_cast<int*>(ref_w.get()) = 0;
-            return;
-        }
-    }
-    *static_cast<int*>(ref_w.get()) = 1;
-}
-```
-
-Add created functions to callbacks:
-```cpp
-class posix_plugin : public PDI::Plugin
-{
-    std::string m_can_recover_data;
-    std::unordered_map<std::string, std::string> m_data_to_path_map;
-
-public:
-    posix_plugin(PDI::Logger& logger, PDI::Context& ctx, PC_tree_t spec_tree):
-        Plugin{logger, ctx}
-    {
-        read_recover_tree(spec_tree);
-        read_data_tree(spec_tree);
-        for (const auto& data_path_pair : m_data_to_path_map) {
-            ctx.on_data([this](const std::string& data_name, PDI::Ref ref) {
-                this->write_data(data_name, ref);
-            }, data_path_pair.first);
-            ctx.on_data([this](const std::string& data_name, PDI::Ref ref) {
-                this->read_data(data_name, ref);
-            }, data_path_pair.first);
-        }
-        if (!m_can_recover_data.empty()) {
-            ctx.on_data([this](const std::string& data_name, PDI::Ref ref) {
-                this->can_recover(data_name, ref);
-            }, m_can_recover_all_data);
-        }
-    }
-}
-```
-
-### Next steps {#plugin_compile}
-1. Compile: 
-g++ posix.cxx -o libpdi_posix_plugin.so -lpdi -shared -fPIC -std=c++11
-
-2. Copy created file to path where dynamic linker can find it. For example:
-sudo cp libpdi_posix_plugin.so /usr/local/lib/
-
-3. Configure dynamic linker run-time bindings:
-sudo ldconfig
-
-4. Create program that uses posix plugin.
-
-5. Compile your test program:
-gcc example_use.cxx -o example_use -lpdi -lparaconf
-
-6. Run your test program:
-./example_use
-
-You can see example of the program that uses this plugin on these [slides](https://docs.google.com/presentation/d/1jT416oALDkquBBgq_XkVrU48o4qx72wGHUPb4emXJw4).
-
+Test the plugin from at least C and Fortran.
+The Fortran version of this program, `plugins/posix/tests/posix_use.f90`, uses the same specification tree, with a transaction in place of `PDI_multi_expose`.
