@@ -1,6 +1,7 @@
 # How to create a plugin {#how_to_create_a_plugin}
 
 This tutorial shows how to write the code of a plugin.
+The \ref plugin_design_guidelines "plugin design guidelines" complement it with how to design the interface of a plugin, its subtree of the specification tree.
 
 The code of this tutorial is that of the `example`, `minimal` and `posix` plugins of the %PDI distribution, in `plugins/example` and `plugins/posix`.
 They are built and tested with %PDI, but never installed.
@@ -102,7 +103,7 @@ with the handler itself as a member of the plugin:
 
 A `PDI::Ref` gives no access to the data by itself.
 Plugins convert it to a `PDI::Ref_r` to read the data, a `PDI::Ref_w` to write it, or a `PDI::Ref_rw` to do both, and the converted reference is null if the share does not grant that access.
-Which access to ask for follows from what plugins were configured to do, never from what the share happens to grant.
+Which access to ask for follows from what plugins were configured to do, never from what the share happens to grant: see \ref pdg_config_decides "the design guidelines".
 
 The type of the reference describes the data: check it before interpreting the buffer.
 Here is a callback that reads an integer each time one is shared:
@@ -137,7 +138,7 @@ With the same specification tree, reading the map `custom_subtree` looks as foll
 
 The fastest way to learn is by example.
 This section builds a "POSIX plugin" that writes data to files and reads it back: a minimal checkpointing plugin.
-It does nothing a real I/O plugin would not do better, but it shows how a plugin turns its specification subtree into operations on the data.
+It does nothing a real I/O plugin would not do better, but it follows the \ref plugin_design_guidelines "plugin design guidelines", and shows how each of them translates into code.
 
 ### Step 1: Decide what your plugin is for {#step_1}
 
