@@ -167,6 +167,9 @@ and this project adheres to
   directory it builds in, and a `--ctest-outdir <dir>` option to choose where
   it writes the JUnit test reports, part of
   [#895](https://github.com/pdidev/pdi/issues/895).
+* The plugin design guidelines page of the documentation tells how to design the
+  specification subtree of a plugin and how its code accesses the data, as per
+  [#993](https://github.com/pdidev/pdi/issues/993).
 
 #### Changed
 * The plugin API reference documents the overloads of a function together,

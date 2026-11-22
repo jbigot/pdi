@@ -18,7 +18,7 @@ This turns the usual library design upside down: libraries do not get to require
 
 ## The application
 
-### The application proposes, the specification tree disposes
+### The application proposes, the specification tree disposes {#pdg_config_decides}
 
 **Leave every decision about what plugins do to the specification tree.**
 Whether to write or read, which data to process, at which step to act: none of this should be decided by the application, nor inferred by plugins from what the application did.
