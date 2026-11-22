@@ -170,6 +170,10 @@ and this project adheres to
 * The plugin design guidelines page of the documentation tells how to design the
   specification subtree of a plugin and how its code accesses the data, as per
   [#993](https://github.com/pdidev/pdi/issues/993).
+* The plugin creation tutorial shows how plugins report errors and time their
+  operations, the optional `pretty_name()` and `dependencies()` of a plugin, the
+  other callbacks of the context and when plugins are constructed, part of
+  [#492](https://github.com/pdidev/pdi/issues/492).
 
 #### Changed
 * The plugin API reference documents the overloads of a function together,
