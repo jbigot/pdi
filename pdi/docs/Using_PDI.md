@@ -1,7 +1,6 @@
 # %PDI usage {#PDI_usage}
 
-After \ref Installation step, %PDI must be used in the application, that
-is written either in C/C++, Fortran or Pyhton.
+After \ref Installation, %PDI must be used in the application, that is written either in C/C++, Fortran or Python.
 
 ## Preparing the environment {#preparing_the_environment}
 

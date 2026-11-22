@@ -41,6 +41,9 @@ and this project adheres to
 #### Deprecated
 
 #### Removed
+* The FAQ page of the documentation, whose only entry, on building PDI with the
+  Intel compiler, was left unfinished, partially answering
+  [#842](https://github.com/pdidev/pdi/issues/842).
 
 #### Fixed
 * The source installation guide lists Doxygen, says that the distribution provides
