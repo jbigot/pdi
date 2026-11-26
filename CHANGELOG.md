@@ -147,9 +147,9 @@ and this project adheres to
   that works, by its test, fixing [#945](https://github.com/pdidev/pdi/issues/945).
 * The API reference names the deprecated statuses `PDI_UNAVAILABLE`,
   `PDI_ERR_CONFIG` and `PDI_ERR_RIGHT`, instead of their deprecation macro.
-* The page on using PDI shows the code of PDI's example it quotes from the
-  example itself, where it gave `PDI_init` a stray bracket, and no longer names
-  a C source for Fortran, as part of [#331](https://github.com/pdidev/pdi/issues/331) and
+* The page on using PDI shows CMake and code that the tests build and run,
+  where it named a C source for Fortran and gave `PDI_init` a stray bracket, as
+  part of [#331](https://github.com/pdidev/pdi/issues/331) and
   [#802](https://github.com/pdidev/pdi/issues/802).
 * The page of PDI's example shows the code and configuration of the example
   itself, as part of [#331](https://github.com/pdidev/pdi/issues/331).
