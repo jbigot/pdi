@@ -11,15 +11,7 @@ They are built and tested with %PDI, but never installed.
 The first step to create a plugin is to create its CMake project.
 Plugins are CMake `MODULE` libraries that link to the `PDI::PDI_plugins` target, as the POSIX plugin, built in the last section, does:
 
-```cmake
-project(pdi_posix_plugin LANGUAGES C CXX)
-
-find_package(PDI REQUIRED COMPONENTS plugins)
-
-add_library(pdi_posix_plugin MODULE posix.cxx)
-target_link_libraries(pdi_posix_plugin PDI::PDI_plugins)
-set_target_properties(pdi_posix_plugin PROPERTIES CXX_VISIBILITY_PRESET hidden)
-```
+\snippet posix/CMakeLists.txt cmake
 
 %PDI loads the plugin named `<name>` in the specification tree from a file named `libpdi_<name>_plugin.so`, so the target is named `pdi_<name>_plugin`.
 `PDI::PDI_plugins` brings the include directories, the libraries and the C++20 support the plugin API requires.
