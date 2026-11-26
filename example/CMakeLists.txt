@@ -43,7 +43,9 @@ option(BUILD_JSON_PLUGIN        "Build JSON plug-in"         OFF)
 option(BUILD_PYCALL_PLUGIN      "Build Pycall plug-in"       OFF)
 option(BUILD_PYTHON             "Build with Python support"  OFF)
 option(BUILD_TIMER_PLUGIN       "Build Timer plugin"         OFF)
+#! [use_mock_pdi_option]
 option(PDI_EXAMPLE_USE_MOCK_PDI "Disable the use of both PDI and Paraconf in the project" OFF)
+#! [use_mock_pdi_option]
 
 if("${BUILD_FORTRAN}")
 	enable_language(Fortran)

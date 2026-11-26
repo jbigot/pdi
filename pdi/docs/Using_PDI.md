@@ -34,25 +34,13 @@ If you have instrumented your code using %PDI but no %PDI installation is availa
 
 To compile C/C++ applications, cmake must find the `C` component from %PDI package and the `PDI::PDI_C` target must be linked to the application target:
 Because in order to initialize %PDI, you also have to use Paraconf, you should do the same for Paraconf component `C` and target `paraconf::paraconf`.
-```CMake
-find_package(paraconf REQUIRED COMPONENTS C)
-find_package(PDI REQUIRED COMPONENTS C)
-
-add_executable(exec_file source_files.c)
-target_link_libraries(exec_file PRIVATE PDI::PDI_C paraconf::paraconf)
-```
+\snippet cmake_tests/documented_usage/CMakeLists.txt c_usage
 
 ### Fortran compilation {#fortan_compiling_by_cmake_application}
 
 To compile Fortran applications, cmake must find the `C` component from %PDI and the `PDI::PDI_f90` target must be linked to the application target.
 Because in order to initialize %PDI, you also have to use Paraconf, you should do the same for Paraconf component `f90` and target `paraconf::paraconf_f90`.
-```CMake
-find_package(paraconf REQUIRED COMPONENTS f90)
-find_package(PDI REQUIRED COMPONENTS f90)
-
-add_executable(exec_file_f90 source_files.f90)
-target_link_libraries(exec_file_f90 PRIVATE PDI::PDI_f90 paraconf::paraconf_f90)
-```
+\snippet cmake_tests/documented_usage/CMakeLists.txt f90_usage
 
 ## Running the application {#running_app}
 
@@ -92,20 +80,12 @@ I you do not or can not do it, have a look at the \ref MockFind "\"MockFind\" ap
 
 To use "SubdirMock", your need to introduce a new cmake option in your project.
 For example, in the %PDI `example`, the option is called `PDI_EXAMPLE_USE_MOCK_PDI`.
-```CMake
-option(PDI_EXAMPLE_USE_MOCK_PDI "Disable the use of both PDI and Paraconf in the project" OFF)
-```
+\snippet example/CMakeLists.txt use_mock_pdi_option
 
 Then, where you used to look for %PDI, you will have to replace the call to `find_package` by a call to `add_subdirectory`.
 As parameter, pass the location where you copied the `mock_pdi` directory in your project.
 
-```CMake
-if("${PDI_EXAMPLE_USE_MOCK_PDI}")
-	add_subdirectory(<path/to>/mock_pdi mock_pdi)
-else()
-	find_package(PDI REQUIRED)
-endif()
-```
+\snippet cmake_tests/documented_usage/subdirmock.cmake.in subdirmock
 
 With this approach, your code should be able to compile without %PDI.
 Please note, that it will still require Paraconf however.
@@ -124,15 +104,7 @@ If you want to go further and make Paraconf optional too:
 1. set `PDI_MOCK_PARACONF_TARGET` to true before the `add_subdirectory` call, and
 2. put Paraconf `find_package` in the same place as the one for %PDI that is not called in case your disabling option is set.
 
-```CMake
-if("${PDI_EXAMPLE_USE_MOCK_PDI}")
-	set(PDI_MOCK_PARACONF_TARGET TRUE)
-	add_subdirectory(<path/to>/mock_pdi mock_pdi)
-else()
-	find_package(paraconf REQUIRED)
-	find_package(PDI REQUIRED)
-endif()
-```
+\snippet cmake_tests/documented_usage/subdirmock.cmake.in subdirmock_without_paraconf
 \remark
 Again, in your code, you can check the `WITHOUT_PDI` macro.
 This time, you can also check and handle the case where Paraconf is disabled by checking the `WITHOUT_PARACONF` macro.
