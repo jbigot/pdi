@@ -28,6 +28,7 @@
 #=============================================================================
 
 cmake_minimum_required(VERSION 3.22...4.2)
+#! [cmake]
 project(pdi_posix_plugin LANGUAGES C CXX)
 
 find_package(PDI REQUIRED COMPONENTS plugins)
@@ -35,6 +36,7 @@ find_package(PDI REQUIRED COMPONENTS plugins)
 add_library(pdi_posix_plugin MODULE posix.cxx)
 target_link_libraries(pdi_posix_plugin PDI::PDI_plugins)
 set_target_properties(pdi_posix_plugin PROPERTIES CXX_VISIBILITY_PRESET hidden)
+#! [cmake]
 
 # The POSIX plugin of the plugin creation tutorial (pdi/docs/How_to_create_a_plugin.md).
 # It is built and tested to check that the tutorial matches the plugin API, but a real I/O plugin does better, so it is never installed.
